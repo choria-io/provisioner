@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10
+
+    working_directory: /go/src/github.com/choria-io/provisioning-agent
+
+    steps:
+      - checkout
+
+      - run: go get github.com/Masterminds/glide
+      - run: go get github.com/onsi/ginkgo/ginkgo
+      - run: glide install
+      - run: ginkgo -r -skipMeasurements .
