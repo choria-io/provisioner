@@ -225,6 +225,9 @@ def genconfig(node, ssldir)
     srvdomain = "dev.example.net" if facts["environment"] == "development"
 
     {
+      # you must disable provisioning in the config as its on by default at compile time
+      "plugin.choria.server.provision" => "false",
+
       # custom SSL config, not using Puppet CA here
       "plugin.security.provider" => "file",
       "plugin.security.file.certificate" => File.join(ssldir, "certificate.pem"),
@@ -245,7 +248,6 @@ def genconfig(node, ssldir)
       "plugin.choria.agent_provider.mcorpc.libdir" => "/opt/puppetlabs/mcollective/plugins",
       "plugin.rpcaudit.logfile" => "/var/log/choria-audit.log",
       "plugin.yaml" => "/etc/puppetlabs/mcollective/generated-facts.yaml",
-      "plugin.choria.server.provision" => "false",
       "rpcaudit" => "1"
     }
 end
@@ -282,7 +284,7 @@ def restart(node, client)
 end
 ```
 
-### Pulling it all together
+### Pulling it all together
 
 ```ruby
 #!/opt/puppetlabs/puppet/bin/ruby
