@@ -28,6 +28,7 @@ import (
 )
 
 type ConfigureRequest struct {
+	Token         string `json:"token"`
 	Configuration string `json:"config"`
 	Certificate   string `json:"certificate"`
 	CA            string `json:"ca"`
@@ -35,16 +36,18 @@ type ConfigureRequest struct {
 }
 
 type RestartRequest struct {
-	Splay int `json:"splay"`
+	Token string `json:"token"`
+	Splay int    `json:"splay"`
 }
 
 type CSRRequest struct {
-	CN string `json:"cn"`
-	C  string `json:"C"`
-	L  string `json:"L"`
-	O  string `json:"O"`
-	OU string `json:"OU"`
-	ST string `json:"ST"`
+	Token string `json:"token"`
+	CN    string `json:"cn"`
+	C     string `json:"C"`
+	L     string `json:"L"`
+	O     string `json:"O"`
+	OU    string `json:"OU"`
+	ST    string `json:"ST"`
 }
 
 type CSRReply struct {
@@ -56,8 +59,13 @@ type Reply struct {
 	Message string `json:"message"`
 }
 
+type ReprovisionRequest struct {
+	Token string `json:"token"`
+}
+
 var mu = &sync.Mutex{}
 var allowRestart = true
+var log *logrus.Entry
 
 func New(mgr server.AgentManager) (*mcorpc.Agent, error) {
 	metadata := &agents.Metadata{
@@ -70,7 +78,9 @@ func New(mgr server.AgentManager) (*mcorpc.Agent, error) {
 		URL:         "http://choria.io",
 	}
 
-	agent := mcorpc.New("choria_provision", metadata, mgr.Choria(), mgr.Logger())
+	log = mgr.Logger()
+
+	agent := mcorpc.New("choria_provision", metadata, mgr.Choria(), log)
 
 	agent.MustRegisterAction("gencsr", csrAction)
 	agent.MustRegisterAction("configure", configureAction)
@@ -94,6 +104,15 @@ func csrAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply, ag
 		return
 	}
 
+	args := CSRRequest{}
+	if !mcorpc.ParseRequestData(&args, req, reply) {
+		return
+	}
+
+	if !checkToken(args.Token, reply) {
+		return
+	}
+
 	ssldir := filepath.Join(filepath.Dir(agent.Config.ConfigFile), "ssl")
 	if agent.Config.Choria.SSLDir != "" {
 		ssldir = agent.Config.Choria.SSLDir
@@ -107,11 +126,6 @@ func csrAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply, ag
 	err := os.MkdirAll(ssldir, 0700)
 	if err != nil {
 		abort(fmt.Sprintf("Could not create SSL Directory %s: %s", ssldir, err), reply)
-		return
-	}
-
-	args := CSRRequest{}
-	if !mcorpc.ParseRequestData(&args, req, reply) {
 		return
 	}
 
@@ -205,6 +219,15 @@ func reprovisionAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.R
 		return
 	}
 
+	args := ReprovisionRequest{}
+	if !mcorpc.ParseRequestData(&args, req, reply) {
+		return
+	}
+
+	if !checkToken(args.Token, reply) {
+		return
+	}
+
 	cfg := make(map[string]string)
 
 	cfg["plugin.choria.server.provision"] = "1"
@@ -214,7 +237,7 @@ func reprovisionAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.R
 		cfg["logfile"] = agent.Config.LogFile
 	}
 
-	if agent.Config.Choria.FileContentRegistrationData != "" {
+	if build.ProvisionRegistrationData == "" && agent.Config.Choria.FileContentRegistrationData != "" {
 		cfg["registration"] = "file_content"
 		cfg["plugin.choria.registration.file_content.data"] = agent.Config.Choria.FileContentRegistrationData
 	}
@@ -250,6 +273,10 @@ func configureAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Rep
 
 	args := &ConfigureRequest{}
 	if !mcorpc.ParseRequestData(args, req, reply) {
+		return
+	}
+
+	if !checkToken(args.Token, reply) {
 		return
 	}
 
@@ -300,10 +327,12 @@ func restartAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply
 		return
 	}
 
-	args := RestartRequest{}
-	err := json.Unmarshal(req.Data, &args)
-	if err != nil {
-		abort(fmt.Sprintf("Could not parse request arguments: %s", err), reply)
+	args := &RestartRequest{}
+	if !mcorpc.ParseRequestData(args, req, reply) {
+		return
+	}
+
+	if !checkToken(args.Token, reply) {
 		return
 	}
 
@@ -407,4 +436,18 @@ func restart(splay time.Duration, log *logrus.Entry) {
 	if err != nil {
 		log.Errorf("Could not restart server: %s", err)
 	}
+}
+
+func checkToken(token string, reply *mcorpc.Reply) bool {
+	if build.ProvisionToken == "" {
+		return true
+	}
+
+	if token != build.ProvisionToken {
+		log.Errorf("Incorrect Provisioning Token %s given", token)
+		abort("Incorrect provision token supplied", reply)
+		return false
+	}
+
+	return true
 }

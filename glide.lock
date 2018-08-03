@@ -6,7 +6,7 @@ imports:
   subpackages:
   - quantile
 - name: github.com/choria-io/go-choria
-  version: 6889b7b9c6c4ecdd44268dabeaa457109e14e59b
+  version: abe93087707fe6e1bf94f81456ff10753e52d062
   subpackages:
   - backoff
   - build

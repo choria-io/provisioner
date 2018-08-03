@@ -25,10 +25,10 @@ import (
 func Test(t *testing.T) {
 	os.Setenv("MCOLLECTIVE_CERTNAME", "rip.mcollective")
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "McoRPC/Golang/Provision")
+	RunSpecs(t, "Provision/Agent")
 }
 
-var _ = Describe("McoRPC/Golang/Provision", func() {
+var _ = Describe("Provision/Agent", func() {
 	var (
 		mockctl   *gomock.Controller
 		requests  chan *choria.ConnectorMessage
@@ -65,6 +65,8 @@ var _ = Describe("McoRPC/Golang/Provision", func() {
 		allowRestart = false
 		build.ProvisionModeDefault = "false"
 		build.ProvisionBrokerURLs = "nats://n1:4222"
+		build.ProvisionToken = ""
+
 		ctx = context.Background()
 
 		targetdir, err = ioutil.TempDir("", "provision_test")
@@ -100,6 +102,27 @@ var _ = Describe("McoRPC/Golang/Provision", func() {
 			csrAction(ctx, &mcorpc.Request{}, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
 			Expect(reply.Statusmsg).To(Equal("Cannot determine where to store SSL data, no configure file given and no SSL directory configured"))
+		})
+
+		It("Should support a token", func() {
+			prov.Config.Choria.SSLDir = filepath.Join(targetdir, "ssl")
+			build.ProvisionToken = "fail"
+			build.ProvisionModeDefault = "true"
+
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{"cn":"ginkgo.example.net", "token":"toomanysecrets"}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+			csrAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+
+			build.ProvisionToken = "toomanysecrets"
+			reply = &mcorpc.Reply{}
+
+			csrAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 		})
 
 		It("Should create the Key, CSR and return the CSR", func() {
@@ -148,6 +171,28 @@ var _ = Describe("McoRPC/Golang/Provision", func() {
 			Expect(reply.Statusmsg).To(Equal("Configuration testdata/provisioning.cfg enables provisioning, restart cannot continue"))
 		})
 
+		It("Should support a token", func() {
+			build.ProvisionModeDefault = "true"
+			cfg.ConfigFile = "testdata/default.cfg"
+			build.ProvisionToken = "fail"
+
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{"splay":10, "token":"toomanysecrets"}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+
+			restartAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+
+			build.ProvisionToken = "toomanysecrets"
+			reply = &mcorpc.Reply{}
+
+			restartAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
+		})
+
 		It("Should restart with splay", func() {
 			build.ProvisionModeDefault = "true"
 			cfg.ConfigFile = "testdata/default.cfg"
@@ -166,25 +211,55 @@ var _ = Describe("McoRPC/Golang/Provision", func() {
 	})
 
 	Describe("reprovisionAction", func() {
+		var req *mcorpc.Request
+
+		BeforeEach(func() {
+			req = &mcorpc.Request{
+				Data: json.RawMessage(`{}`),
+			}
+		})
+
 		It("Should only reprovision nodes not in provisioning mode", func() {
 			build.ProvisionModeDefault = "true"
 
-			reprovisionAction(ctx, &mcorpc.Request{}, reply, prov, nil)
+			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
 			Expect(reply.Statusmsg).To(Equal("Server is already in provisioning mode, cannot enable provisioning mode again"))
 		})
 
 		It("Should fail when the config file cannot be determined", func() {
 			cfg.ConfigFile = ""
-			reprovisionAction(ctx, &mcorpc.Request{}, reply, prov, nil)
+			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
 			Expect(reply.Statusmsg).To(Equal("Cannot determine the configuration file to manage"))
 		})
 
+		It("Should fail for wrong tokens with not an empty token", func() {
+			cfg.ConfigFile = targetcfg
+			build.ProvisionToken = "toomanysecrets"
+
+			req.Data = json.RawMessage(`{"token":"fail"}`)
+
+			reprovisionAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+			Expect(reply.Statusmsg).To(Equal("Incorrect provision token supplied"))
+		})
+
+		It("Should match tokens", func() {
+			cfg.ConfigFile = targetcfg
+			build.ProvisionToken = "toomanysecrets"
+
+			req.Data = json.RawMessage(`{"token":"toomanysecrets"}`)
+
+			reprovisionAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
+		})
+
 		It("Should write a sane config file without registration by default", func() {
 			cfg.ConfigFile = targetcfg
+			build.ProvisionToken = ""
 
-			reprovisionAction(ctx, &mcorpc.Request{}, reply, prov, nil)
+			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 
 			cfg, err := config.NewConfig(targetcfg)
@@ -202,8 +277,9 @@ var _ = Describe("McoRPC/Golang/Provision", func() {
 			cfg.Registration = []string{"file_content"}
 			cfg.Choria.FileContentRegistrationData = "/tmp/choria_test.json"
 			cfg.Choria.FileContentRegistrationTarget = "default.registration"
+			build.ProvisionRegistrationData = ""
 
-			reprovisionAction(ctx, &mcorpc.Request{}, reply, prov, nil)
+			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 
 			cfg, err := config.NewConfig(targetcfg)
@@ -244,6 +320,28 @@ var _ = Describe("McoRPC/Golang/Provision", func() {
 
 			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
 			Expect(reply.Statusmsg).To(Equal("Did not receive any configuration to write, cannot write a empty configuration file"))
+		})
+
+		It("Should support a token", func() {
+			build.ProvisionToken = "fail"
+			build.ProvisionModeDefault = "true"
+			cfg.ConfigFile = targetcfg
+
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(fmt.Sprintf(`{"token":"toomanysecrets", "certificate": "stub_cert", "ca":"stub_ca", "ssldir":"%s", "config":"{\"plugin.choria.server.provision\":\"0\", \"plugin.choria.srv_domain\":\"another.com\"}"}`, targetdir)),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+
+			configureAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+
+			build.ProvisionToken = "toomanysecrets"
+			reply = &mcorpc.Reply{}
+
+			configureAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 		})
 
 		It("Should write the configuration", func() {

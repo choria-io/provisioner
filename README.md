@@ -4,6 +4,8 @@ Choria Server supports a Provisioning mode that assists bootstrapping the system
 
 When an unconfigured Choria Server is in provisioning mode it will connect to a compiled-in Middleware network and join the `provisioning` sub collective.  It will optionally publish it's metadata and expose it's facts.
 
+You can think of this as a similar setup as the old Provisioning VLANs where new servers would join to PXE boot etc. but here we expose an API that let the provisioning environment control the node.
+
 The idea is that an automated system will discover nodes in the `provisioning` sub collective and guide them through the on-boarding process.  The on-boarding process can be entirely custom, one possible flow might be:
 
   * Discover all nodes in the `provisioning` subcollective with the `choria_provision` agent
@@ -16,9 +18,11 @@ The idea is that an automated system will discover nodes in the `provisioning` s
         * Send the configuration, certificate and CA chain to the node where it will configure itself
         * Request the node restarts itself within a provided splay time
 
-After this flow the node will join it's configured Member Collective with it's signed Certificate and CA known and become a normal node like any other.
+After this flow the node will join it's configured Member Collective with it's signed Certificate and CA known it becomes a normal node like any other.
 
 You can invoke the `choria_provision#reprovision` action to ask it to leave its Member Collective and re-enter the provisioning flow.
+
+**WARNING** At present Choria Server does not yet support something like the Action Policy ACL system and inherently during provision there is no CA to provide Authentication against. While a token is supported the token is easily found in the `choria` binary.  Keep this in mind before adopting this approach.
 
 ## Configuring Choria Server
 
@@ -44,6 +48,7 @@ flags_map:
   ProvisionSecure: github.com/choria-io/go-choria/build.ProvisionSecure
   ProvisionRegistrationData: github.com/choria-io/go-choria/build.ProvisionRegistrationData
   ProvisionFacts: github.com/choria-io/go-choria/build.ProvisionFacts
+  ProvisionToken: github.com/choria-io/go-choria/build.ProvisionToken
 
 foss:
   compile_targets:
@@ -58,6 +63,7 @@ foss:
         ProvisionSecure: "false"
         ProvisionRegistrationData: "/opt/acme/etc/node-metadata.json"
         ProvisionFacts: "/opt/acme/etc/node-metadata.json"
+        ProvisionToken: "toomanysecrets"
 
     64bit_linux:
       os: linux
@@ -122,6 +128,15 @@ Server Settings:
 # ...
 ```
 
+If you just want the binary and no packages use `rake build_binaries`.
+
 ## Provisioning nodes
+
+The agent has the following actions:
+
+  * **gencsr** - generates a private key and CSR on the node, returns the CSR and directory they were stored in
+  * **configure** - configures a node with the given configuration, signed certificate and ca and path to the ssl store
+  * **restart** - restarts the server after a random splay
+  * **reprovision** - re-enter provisioning mode
 
 To be completed
