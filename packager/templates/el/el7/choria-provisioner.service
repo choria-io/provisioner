@@ -1,0 +1,13 @@
+[Unit]
+Description=Choria Server Provisioner
+After=network.target
+
+[Service]
+StandardOutput=syslog
+StandardError=syslog
+User=root
+Group=root
+ExecStart={{cpkg_bindir}}/{{cpkg_name}} run --config={{cpkg_etcdir}}/{{cpkg_name}}.yaml
+
+[Install]
+WantedBy=multi-user.target

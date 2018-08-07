@@ -1,0 +1,15 @@
+---
+# refer to https://github.com/choria-io/provisioning-agent for
+# full details about the structure and contents of the config file
+workers: 4
+interval: 5m
+logfile: "/var/log/{{cpkg_name}}.log"
+loglevel: info
+helper: /etc/choria-provisioner/helper
+token: toomanysecrets
+tls: false
+site: TEST
+monitor_port: 8080
+
+features:
+  pki: true

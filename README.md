@@ -24,6 +24,8 @@ You can invoke the `choria_provision#reprovision` action to ask it to leave its 
 
 **WARNING** At present Choria Server does not yet support something like the Action Policy ACL system and inherently during provision there is no CA to provide Authentication against. While a token is supported the token is easily found in the `choria` binary.  Keep this in mind before adopting this approach.
 
+This project includes a provisioner that you can use, it will call a `helper` that you provide and can write in any language to integrate with your CA and generate configuration.
+
 ## Configuring Choria Server
 
 Provisioning is off and cannot be enabled in the version of Choria shipped to the Open Source community, to use it you need to perform a custom build and make your own packages.  Choria provides the tools to do this.

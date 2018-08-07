@@ -30,7 +30,9 @@ type Config struct {
 
 // Load reads configuration from a YAML file
 func Load(file string) (*Config, error) {
-	config := &Config{}
+	config := &Config{
+		File: file,
+	}
 
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		return nil, fmt.Errorf("file %s not found", file)

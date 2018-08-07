@@ -11,8 +11,8 @@ import (
 
 	"github.com/choria-io/go-choria/choria"
 	cconf "github.com/choria-io/go-choria/config"
-	"github.com/choria-io/provisioning-agent/provisioner/config"
-	"github.com/choria-io/provisioning-agent/provisioner/hosts"
+	"github.com/choria-io/provisioning-agent/config"
+	"github.com/choria-io/provisioning-agent/hosts"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
@@ -27,10 +27,15 @@ var (
 	ctx     context.Context
 	cancel  func()
 	log     *logrus.Entry
+	version string
+	sha     string
 )
 
 func Run() {
 	app := kingpin.New("choria-provisioner", "The Choria Provisioning Framework")
+	app.Version(version)
+	app.Author("R.I.Pienaar <rip@devco.net>")
+
 	app.Flag("debug", "Enables debug logging").BoolVar(&debug)
 
 	cmd := app.Command("run", "Runs the provisioner").Default()

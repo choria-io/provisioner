@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/choria-io/provisioning-agent/provisioner/host"
+	"github.com/choria-io/provisioning-agent/host"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/srvcache"
