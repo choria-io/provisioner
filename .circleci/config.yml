@@ -92,7 +92,7 @@ jobs:
 
   gather_artifacts:
     docker:
-      - image: circleci/golang:10.1
+      - image: circleci/golang:1.10
 
     steps:
       - attach_workspace:
