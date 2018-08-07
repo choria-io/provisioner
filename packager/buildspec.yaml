@@ -1,0 +1,46 @@
+flags_map:
+  Version: github.com/choria-io/provisioning-agent/cmd.version
+  SHA: github.com/choria-io/provisioning-agent/cmd.sha
+
+foss:
+  compile_targets:
+    defaults:
+      output: choria-provisioner-{{version}}-{{os}}-{{arch}}
+
+    64bit_linux:
+      os: linux
+      arch: amd64
+
+    32bit_linux:
+      os: linux
+      arch: 386
+
+    darwin:
+      os: darwin
+      arch: amd64
+
+  packages:
+    defaults:
+      name: choria-provisioner
+      bindir: /usr/sbin
+      etcdir: /etc/choria-provisioner
+      release: 1
+      manage_conf: 1
+
+    el6_32:
+      dist: el6
+      template: el/el6
+      target_arch: i686
+      binary: 32bit_linux
+
+    el6_64:
+      dist: el6
+      template: el/el6
+      target_arch: x86_64
+      binary: 64bit_linux
+
+    el7_64:
+      dist: el7
+      template: el/el7
+      target_arch: x86_64
+      binary: 64bit_linux

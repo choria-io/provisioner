@@ -1,2 +1,4 @@
 vendor
-provisioner/provisioner
+choria-provisioner-*-*-*
+provisioning-agent
+*.rpm

@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     docker:
       - image: circleci/golang:1.10
 
@@ -8,8 +8,197 @@ jobs:
 
     steps:
       - checkout
-
+      - setup_remote_docker
       - run: go get github.com/Masterminds/glide
       - run: go get github.com/onsi/ginkgo/ginkgo
       - run: glide install
-      - run: ginkgo -r -skipMeasurements .
+      - run: ginkgo -r -skipMeasurements
+      - run: mkdir -p /tmp/workspace
+      - run: cd .. ; tar -czf /tmp/workspace/provisioning-agent.tgz provisioning-agent
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - provisioning-agent.tgz
+
+  build_el6_64bit_rpms: &pkg_build
+    docker:
+      - image: circleci/golang:1.10
+
+    working_directory: /go/src/github.com/choria-io/provisioning-agent
+
+    environment:
+      PACKAGE: el6_64
+      BUILD: foss
+      BUILDER: choria/packager:el5-go1.10
+
+    steps: &std_build_steps
+      - setup_remote_docker
+
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run: docker create -v /go -v /build/artifacts --name store alpine:3.4 /bin/true
+      - run: cd .. ; tar -xzf /tmp/workspace/provisioning-agent.tgz
+
+      - run: docker cp /go store:/
+
+      - run: |
+          VERSION="${CIRCLE_TAG}"
+
+          if [ -z "${CIRCLE_TAG}" ]
+          then
+            VERSION=${CIRCLE_SHA1}
+
+            if [ ! -z "${NIGHTLY}" ]
+            then
+              VERSION="0.99.0.$(date +'%Y%m%d')"
+            fi
+          fi
+
+          docker run --volumes-from store --rm -e SOURCE_DIR=/go/src/github.com/choria-io/provisioning-agent -e SHA1=${CIRCLE_SHA1} -e BUILD=${BUILD} -e VERSION=${VERSION} -e ARTIFACTS=/build/artifacts -e PACKAGE=${PACKAGE} ${BUILDER}
+
+      - run: |
+          mkdir -p /tmp/workspace/artifacts/${BUILD}/${PACKAGE}
+          for i in $(docker run --volumes-from store --rm ${BUILDER} ls /build/artifacts);do
+            docker cp store:/build/artifacts/${i} /tmp/workspace/artifacts/${BUILD}/${PACKAGE}
+          done
+          ls -l /tmp/workspace/artifacts/${BUILD}/${PACKAGE}
+
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - artifacts
+
+  build_el6_32bit_rpms:
+    <<: *pkg_build
+    environment:
+      PACKAGE: el6_32
+      BUILD: foss
+      BUILDER: choria/packager:el7-go10.1
+
+  build_el7_64bit_rpms:
+    <<: *pkg_build
+    environment:
+      PACKAGE: el7_64
+      BUILD: foss
+      BUILDER: choria/packager:el7-go10.1
+
+  build_puppet_module:
+    <<: *pkg_build
+    environment:
+      PACKAGE: puppet
+      BUILD: foss
+      BUILDER: choria/packager:el7-go10.1-puppet
+
+  gather_artifacts:
+    docker:
+      - image: circleci/golang:10.1
+
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - store_artifacts:
+          path: /tmp/workspace
+
+  nightly_packagecloud: &packagecloud_push
+    environment:
+      REPO: nightly
+
+    docker:
+      - image: circleci/ruby
+
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - run: gem install package_cloud
+
+      - run: |
+          for d in 6 7
+          do
+            for i in $(find /tmp/workspace -name \*.el${d}.\*.rpm | grep -v src.rpm)
+            do
+              package_cloud push choria/${REPO}/el/${d} ${i}
+            done
+          done
+
+
+  release_packagecloud:
+    <<: *packagecloud_push
+    environment:
+      REPO: release
+
+workflows:
+  version: 2
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - test
+      - build_el7_64bit_rpms:
+          context: org-global
+          requires:
+            - test
+
+      - gather_artifacts:
+          requires:
+            - build_el7_64bit_rpms
+
+      - nightly_packagecloud:
+          requires:
+            - gather_artifacts
+
+  test_and_ship:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /.+/
+
+      - build_el6_32bit_rpms:
+          requires:
+            - test
+          filters: &semver_only
+            tags:
+              only: /^\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
+
+      - build_el6_64bit_rpms:
+          requires:
+            - test
+          filters:
+            *semver_only
+
+      - build_el7_64bit_rpms:
+          requires:
+            - test
+          filters:
+            *semver_only
+
+      - gather_artifacts:
+          requires:
+             - build_el6_32bit_rpms
+             - build_el6_64bit_rpms
+             - build_el7_64bit_rpms
+          filters:
+            *semver_only
+
+      - release_hold:
+          type: approval
+          requires:
+            - gather_artifacts
+          filters:
+            *semver_only
+
+      - release_packagecloud:
+          requires:
+            - release_hold
+          filters:
+            *semver_only

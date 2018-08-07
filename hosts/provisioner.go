@@ -3,11 +3,11 @@ package hosts
 import (
 	"context"
 
-	"github.com/choria-io/provisioning-agent/provisioner/host"
+	"github.com/choria-io/provisioning-agent/host"
 )
 
 func provisioner(ctx context.Context, i int) {
-	log.Infof("Provisioner worker %d starting", i)
+	log.Debugf("Provisioner worker %d starting", i)
 
 	for {
 		select {

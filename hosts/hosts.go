@@ -9,8 +9,8 @@ import (
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-client/client"
 	rpc "github.com/choria-io/mcorpc-agent-provider/mcorpc/client"
-	"github.com/choria-io/provisioning-agent/provisioner/config"
-	"github.com/choria-io/provisioning-agent/provisioner/host"
+	"github.com/choria-io/provisioning-agent/config"
+	"github.com/choria-io/provisioning-agent/host"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,7 +30,7 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	conf = cfg
 	log = fw.Logger("hosts")
 
-	log.Infof("Choria Provisioner starting using %s with interval %s", conf.File, conf.Interval)
+	log.Infof("Choria Provisioner starting using configuration file %s. Discovery interval %s using %d workers", conf.File, conf.Interval, conf.Workers)
 	agent, err := rpc.New(fw, "choria_provision")
 	if err != nil {
 		return fmt.Errorf("could not create RPC client: %s", err)

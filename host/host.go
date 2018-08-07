@@ -8,7 +8,7 @@ import (
 
 	"github.com/choria-io/go-choria/choria"
 	provision "github.com/choria-io/provisioning-agent/agent"
-	"github.com/choria-io/provisioning-agent/provisioner/config"
+	"github.com/choria-io/provisioning-agent/config"
 	"github.com/sirupsen/logrus"
 )
 

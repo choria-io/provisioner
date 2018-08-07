@@ -1,0 +1,119 @@
+#!/bin/bash
+#
+# Init script for {{cpkg_name}}
+#
+### BEGIN INIT INFO
+# Provides:          {{cpkg_name}}
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Choria Server Provisioner
+# Description:       Automatically provisions Choria Servers
+### END INIT INFO
+
+# source function library
+. /etc/rc.d/init.d/functions
+
+prog="{{cpkg_name}}"
+user="nobody"
+group="nobody"
+exec="{{bindir}}/{{cpkg_name}}"
+pidfile="/var/run/${prog}/${prog}.pid"
+lockfile="/var/lock/subsys/${prog}"
+logfile="/var/log/${prog}.log"
+conffile="{{cpkg_etcdir}}/{{cpkg_name}}.yaml"
+
+# pull in sysconfig settings
+[ -e /etc/sysconfig/${prog} ] && . /etc/sysconfig/${prog}
+
+start() {
+    [ -x $exec ] || exit 5
+    [ -f $conffile ] || exit 6
+
+    umask 077
+
+    touch $logfile $pidfile
+
+    echo -n $"Starting ${prog}: "
+
+    daemon \
+      --pidfile=${pidfile} \
+      " { nohup ${exec} ${args} > ${logfile} 2>&1 & }"
+
+    RETVAL=$?
+    echo
+
+    [ $RETVAL -eq 0 ] && touch $lockfile
+
+    return $RETVAL
+}
+
+stop() {
+  echo -n $"Shutting down $prog: "
+
+  if rh_status_q ; then
+    pid=$(cat "$pidfile")
+    kill -TERM $pid
+
+    for i in 1 2 3 4 5 ; do
+      rh_status_q || break
+      sleep 1
+    done
+
+    if rh_status_q ; then
+        echo "Timeout reached. Killing $prog (pid $pid) with SIGKILL."
+        kill -KILL $pid
+        echo "$prog killed with SIGKILL."
+    else
+      echo "$prog stopped."
+    fi
+  fi
+}
+
+restart() {
+    stop
+    sleep 1
+    start
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    status -p "$pidfile" -l $prog $exec
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+    start)
+        rh_status_q && exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|force-reload}"
+        exit 2
+esac
+
+exit $?
