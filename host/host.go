@@ -69,6 +69,7 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 
 	config, err := h.getConfig(ctx)
 	if err != nil {
+		helperErrCtr.WithLabelValues(h.cfg.Site).Inc()
 		return err
 	}
 

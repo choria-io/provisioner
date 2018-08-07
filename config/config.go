@@ -17,7 +17,7 @@ type Config struct {
 	Loglevel    string `json:"loglevel"`
 	Helper      string `json:"helper"`
 	Token       string `json:"token"`
-	TLS         bool   `json:"tls"`
+	Insecure    bool   `json:"choria_insecure"`
 	Site        string `json:"site"`
 	MonitorPort int    `json:"monitor_port"`
 	Features    struct {

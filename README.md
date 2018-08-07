@@ -211,6 +211,60 @@ If you do not care for PKI then do not set `certificate` and `ca`.
 
 The `configuration` contains the config in key value pairs where everything should be strings, this gets written directly into the Choria Server configuration.
 
+#### Configuring the provisioner
+
+The provisioner takes a YAML or JSON configuration file, something like:
+
+```yaml
+---
+# how many concurrent provisions can be run
+workers: 4
+
+# how frequently to start the cycle in go duration format
+interval: 5m
+
+# where to log
+logfile: "/var/log/provisioner.log"
+
+# loglevel - debug, info, warn, error
+loglevel: info
+
+# path to your helper script
+helper: /usr/local/bin/provision
+
+# the token you compiled into choria
+token: toomanysecrets
+
+# if your provision network has no TLS set this
+choria_insecure: true
+
+# a site name, unused now but will be needed in future
+site: testing
+
+# if not 0 then /metrics will be prometheus metrics
+monitor_port: 9999
+
+features:
+  # enables fetching of the CSR
+  pki: true
+```
+
+#### Statistics
+
+The daemon keeps a number of Prometheus format stats and will expose it in `/metrics` if the `monitor_port` settings is over 0.
+
+|Statistic|Descriptions|
+|---------|------------|
+|choria_provisioner_rpc_time|How long each RPC request takes|
+|choria_provisioner_helper_time|How long the helper takes to run|
+|choria_provisioner_discovered|How many nodes are discovered using the broadcast discovery|
+|choria_provisioner_event_discovered|How many nodes were discovered due to events being fired about them|
+|choria_provisioner_discover_cycles|How many discovery cycles were ran|
+|choria_provisioner_rpc_errors|How many times a RPC request failed|
+|choria_provisioner_helper_errors|How many times the helper failed to run|
+|choria_provisioner_discovery_errors|How many times the discovery failed to run|
+|choria_provisioner_provision_errors|How many times provisioning failed|
+
 ### Write your own provisioner
 
 The intention is that you'll write a bit of code - a daemon in effect - that repeatedly scans the provisioning network for new nodes and provision them.  For a evented approach you can listen on the `choria.provisioning_data` topic for node registration data and discover them this way.

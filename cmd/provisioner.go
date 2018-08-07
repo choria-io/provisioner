@@ -69,7 +69,7 @@ func run() {
 		ccfg.LogLevel = "debug"
 	}
 
-	if !cfg.TLS {
+	if cfg.Insecure {
 		ccfg.DisableTLS = true
 	}
 
