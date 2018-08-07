@@ -265,6 +265,23 @@ The daemon keeps a number of Prometheus format stats and will expose it in `/met
 |choria_provisioner_discovery_errors|How many times the discovery failed to run|
 |choria_provisioner_provision_errors|How many times provisioning failed|
 
+#### Packages
+
+RPMs are hosted in the Choria yum repository for el6 and 7 64bit systems, packages are called `choria-provisioner`:
+
+```ini
+[choria_release]
+name=choria_release
+baseurl=https://packagecloud.io/choria/release/el/$releasever/$basearch
+repo_gpgcheck=1
+gpgcheck=0
+enabled=1
+gpgkey=https://packagecloud.io/choria/release/gpgkey
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+```
+
 ### Write your own provisioner
 
 The intention is that you'll write a bit of code - a daemon in effect - that repeatedly scans the provisioning network for new nodes and provision them.  For a evented approach you can listen on the `choria.provisioning_data` topic for node registration data and discover them this way.
@@ -446,3 +463,7 @@ end
 ```
 
 When you run this it will forever find all nodes and provision them.  In the real world you'll have something more complex but I wanted to show how this flow can work to take nodes from unconfigured to fully functional.
+
+## Thanks
+
+<img src="https://packagecloud.io/images/packagecloud-badge.png" width="158">
