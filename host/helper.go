@@ -55,7 +55,7 @@ func runHelper(ctx context.Context, args []string, input string, cfg *config.Con
 	obs := prometheus.NewTimer(helperDuration.WithLabelValues(cfg.Site))
 	defer obs.ObserveDuration()
 
-	tctx, cancel := context.WithTimeout(ctx, time.Duration(5*time.Second))
+	tctx, cancel := context.WithTimeout(ctx, time.Duration(10*time.Second))
 	defer cancel()
 
 	execution := exec.CommandContext(tctx, cfg.Helper, args...)

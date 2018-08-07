@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -56,6 +57,10 @@ func Load(file string) (*Config, error) {
 	config.IntervalDuration, err = time.ParseDuration(config.Interval)
 	if err != nil {
 		return nil, fmt.Errorf("invalid duration: %s", err)
+	}
+
+	if config.IntervalDuration < time.Minute {
+		return nil, errors.New("interval is too small, minmum is 1 minute.  Valid example values are 10m or 10h")
 	}
 
 	return config, nil
