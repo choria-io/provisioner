@@ -1,4 +1,4 @@
-# Auto Provisioning Agent For Choria Server
+# Auto Provisioning System For Choria Server
 
 Choria Server supports a Provisioning mode that assists bootstrapping the system in large environments or dynamic cloud based environments that might not be under strict CM control.
 
@@ -22,9 +22,9 @@ After this flow the node will join it's configured Member Collective with it's s
 
 You can invoke the `choria_provision#reprovision` action to ask it to leave its Member Collective and re-enter the provisioning flow.
 
-**WARNING** At present Choria Server does not yet support something like the Action Policy ACL system and inherently during provision there is no CA to provide Authentication against. While a token is supported the token is easily found in the `choria` binary.  Keep this in mind before adopting this approach.
-
 This project includes a provisioner that you can use, it will call a `helper` that you provide and can write in any language to integrate with your CA and generate configuration.
+
+**WARNING** At present Choria Server does not yet support something like the Action Policy ACL system and inherently during provision there is no CA to provide Authentication against. While a token is supported the token is easily found in the `choria` binary.  Keep this in mind before adopting this approach.
 
 ## Configuring Choria Server
 
@@ -134,8 +134,6 @@ If you just want the binary and no packages use `rake build_binaries`.
 
 ## Provisioning nodes
 
-### Overview
-
 The agent has the following actions:
 
   * **gencsr** - generates a private key and CSR on the node, returns the CSR and directory they were stored in
@@ -149,7 +147,7 @@ You can either write your own provisioner end to end or use one we provide and p
 
 ### Use our provisioner
 
-A provisioner project is included that can be used to provision your nodes.  It has this generic flow:
+A provisioner project is included that can be used to provision your nodes, it allows you to hook in a program to compute the config and integrate with your SSL.  It has this generic flow:
 
 Nodes will be discovered at startup and then every `interval` period:
 
@@ -173,7 +171,7 @@ Regardless of how a node was found, this is the flow it will do:
 
 #### Writing the helper
 
-Your helper can be written in any language, it will receive JSON on its STDIN and should return JSON on its STDOUT.
+Your helper can be written in any language, it will receive JSON on its STDIN and should return JSON on its STDOUT. It should complete within 10 seconds and could be called concurrently.
 
 The input is in the format:
 
@@ -188,7 +186,7 @@ The input is in the format:
 }
 ```
 
-The CSR structure will be empty when the PKI feature is noe enabled, the `inventory` is the output from `rpcutil#inventory`, you'll be mainly interested in the `facts` hash I suspect.  The data is JSON encoded.
+The CSR structure will be empty when the PKI feature is not enabled, the `inventory` is the output from `rpcutil#inventory`, you'll be mainly interested in the `facts` hash I suspect. The data is JSON encoded.
 
 The output from your script should be like this:
 
@@ -205,7 +203,9 @@ The output from your script should be like this:
 }
 ```
 
-If you want to defer the provisioning - like perhaps you are still waiting for facts - set `defer` to true and supply a reason in `msg` which will be logged.
+If you set the `ProvisionModeDefault` compile time flag to `"true"` then you must set `plugin.choria.server.provision` to `"false"` else provisioning will fail to avoid a endless loop.
+
+If you want to defer the provisioning - like perhaps you are still waiting for facts to be generated - set `defer` to true and supply a reason in `msg` which will be logged. The node will be tried again on the following cycle.
 
 If you do not care for PKI then do not set `certificate` and `ca`.
 
