@@ -74,21 +74,21 @@ jobs:
     environment:
       PACKAGE: el6_32
       BUILD: foss
-      BUILDER: choria/packager:el7-go10.1
+      BUILDER: choria/packager:el7-go1.10
 
   build_el7_64bit_rpms:
     <<: *pkg_build
     environment:
       PACKAGE: el7_64
       BUILD: foss
-      BUILDER: choria/packager:el7-go10.1
+      BUILDER: choria/packager:el7-go1.10
 
   build_puppet_module:
     <<: *pkg_build
     environment:
       PACKAGE: puppet
       BUILD: foss
-      BUILDER: choria/packager:el7-go10.1-puppet
+      BUILDER: choria/packager:el7-go1.10-puppet
 
   gather_artifacts:
     docker:
