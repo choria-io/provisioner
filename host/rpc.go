@@ -59,7 +59,7 @@ func (h *Host) restart(ctx context.Context) error {
 
 	creq := &provision.RestartRequest{
 		Token: h.token,
-		Splay: 5,
+		Splay: 1,
 	}
 
 	_, err := h.rpcDo(ctx, "choria_provision", "restart", creq, func(pr protocol.Reply, reply *rpc.RPCReply) {

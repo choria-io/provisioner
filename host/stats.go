@@ -8,13 +8,24 @@ var (
 		Help: "How long it took to perform RPC requests",
 	}, []string{"site", "rpc"})
 
+	helperDuration = prometheus.NewSummaryVec(prometheus.SummaryOpts{
+		Name: "choria_provisioner_helper_time",
+		Help: "How long it took to run the helper",
+	}, []string{"site"})
+
 	rpcErrCtr = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "choria_provisioner_rpc_errors",
 		Help: "How many rpc related errors were encountered",
 	}, []string{"site", "rpc"})
+
+	helperErrCtr = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "choria_provisioner_helper_errors",
+		Help: "How many helper related errors were encountered",
+	}, []string{"site"})
 )
 
 func init() {
 	prometheus.MustRegister(rpcDuration)
 	prometheus.MustRegister(rpcErrCtr)
+	prometheus.MustRegister(helperErrCtr)
 }

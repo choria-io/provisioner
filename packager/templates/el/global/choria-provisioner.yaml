@@ -7,7 +7,7 @@ logfile: "/var/log/{{cpkg_name}}.log"
 loglevel: info
 helper: /etc/choria-provisioner/helper
 token: toomanysecrets
-tls: false
+choria_insecure: true
 site: TEST
 monitor_port: 8080
 
