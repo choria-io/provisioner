@@ -132,6 +132,8 @@ If you just want the binary and no packages use `rake build_binaries`.
 
 ## Provisioning nodes
 
+### Overview
+
 The agent has the following actions:
 
   * **gencsr** - generates a private key and CSR on the node, returns the CSR and directory they were stored in
@@ -140,6 +142,74 @@ The agent has the following actions:
   * **reprovision** - re-enter provisioning mode
 
 Each action takes an optional token which should match that compiled into the Choria binary via the `ProvisionToken` flag.
+
+You can either write your own provisioner end to end or use one we provide and plug into it with just the logic to hook into your CA and logic for generating configuration.
+
+### Use our provisioner
+
+A provisioner project is included that can be used to provision your nodes.  It has this generic flow:
+
+Nodes will be discovered at startup and then every `interval` period:
+
+  * Discover all nodes
+    * Add each node to the work list
+
+It will also listen on the network for registration events:
+
+  * Listen for node registration events
+    * Add each node to the work list
+
+Regardless of how a node was found, this is the flow it will do:
+
+  * Pass every node to a worker
+    * Fetch the inventory using `rpcutil#inventory`
+    * Request a CSR if the PKI feature is enabled using `choria_provision#gencsr`
+    * Call the `helper` with the inventory and CSR, expecting to be configured
+      * If the helper sets `defer` to true the node provisioning is ended and next cycle will handle it
+    * Configure the node using `choria_provision#configure`
+    * Restart the node using `choria_provision#restart`
+
+#### Writing the helper
+
+Your helper can be written in any language, it will receive JSON on its STDIN and should return JSON on its STDOUT.
+
+The input is in the format:
+
+```json
+{
+	"identity": "dev1.devco.net",
+	"csr": {
+		"csr": "-----BEGIN CERTIFICATE REQUEST-----....-----END CERTIFICATE REQUEST-----",
+		"ssldir": "/path/to/ssldir"
+	},
+	"inventory": "{\"agents\":[\"choria_provision\",\"choria_util\",\"discovery\",\"rpcutil\"],\"facts\":{},\"classes\":[],\"version\":\"0.0.0\",\"data_plugins\":[],\"main_collective\":\"provisioning\",\"collectives\":[\"provisioning\"]}"
+}
+```
+
+The CSR structure will be empty when the PKI feature is noe enabled, the `inventory` is the output from `rpcutil#inventory`, you'll be mainly interested in the `facts` hash I suspect.  The data is JSON encoded.
+
+The output from your script should be like this:
+
+```json
+{
+  "defer": false,
+  "msg": "Reason why the provisioning is being defered",
+  "certificate": "-----BEGIN CERTIFICATE-----......-----END CERTIFICATE-----",
+  "ca": "-----BEGIN CERTIFICATE-----......-----END CERTIFICATE-----",
+  "configuration": {
+    "plugin.choria.server.provision": "false",
+    "identity": "node1.example.net"
+  }
+}
+```
+
+If you want to defer the provisioning - like perhaps you are still waiting for facts - set `defer` to true and supply a reason in `msg` which will be logged.
+
+If you do not care for PKI then do not set `certificate` and `ca`.
+
+The `configuration` contains the config in key value pairs where everything should be strings, this gets written directly into the Choria Server configuration.
+
+### Write your own provisioner
 
 The intention is that you'll write a bit of code - a daemon in effect - that repeatedly scans the provisioning network for new nodes and provision them.  For a evented approach you can listen on the `choria.provisioning_data` topic for node registration data and discover them this way.
 
@@ -238,16 +308,12 @@ def genconfig(node, ssldir)
       "plugin.choria.srv_domain" => srvdomain,
 
       # rest standard stuff
-      "classesfile" => "/opt/puppetlabs/puppet/cache/state/classes.txt",
-      "collectives" => "mcollective",
+      "collectives" => "choria",
       "identity" => facts["fqdn"],
       "logfile" => "/var/log/choria.log",
-      "loglevel" => "info",
-      "plugin.choria.agent_provider.mcorpc.agent_shim" => "/usr/bin/choria_mcollective_agent_compat.rb",
-      "plugin.choria.agent_provider.mcorpc.config" => "/etc/puppetlabs/mcollective/choria-shim.cfg",
-      "plugin.choria.agent_provider.mcorpc.libdir" => "/opt/puppetlabs/mcollective/plugins",
+      "loglevel" => "warn",
       "plugin.rpcaudit.logfile" => "/var/log/choria-audit.log",
-      "plugin.yaml" => "/etc/puppetlabs/mcollective/generated-facts.yaml",
+      "plugin.yaml" => "/opt/acme/etc/node-metadata.json",
       "rpcaudit" => "1"
     }
 end

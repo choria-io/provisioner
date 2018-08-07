@@ -1,6 +1,12 @@
-hash: 0631f69c6bfd164963e3543af68b75e830bdc6f5266b8a68c76f3f5fc1786513
-updated: 2018-08-03T13:06:59.597583+02:00
+hash: c9db6c85cd5f9a6c92328adf5bd4dd57e8f35ce404a447b1213052dcc5c69f20
+updated: 2018-08-07T08:35:52.056806+02:00
 imports:
+- name: github.com/alecthomas/template
+  version: a0175ee3bccc567396460bf5acd36800cb10c49c
+  subpackages:
+  - parse
+- name: github.com/alecthomas/units
+  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
@@ -24,6 +30,11 @@ imports:
   - server/discovery/identity
   - server/registration
   - srvcache
+- name: github.com/choria-io/go-client
+  version: 9f8afdf705fdf1e08ed970d8a61a52936205119c
+  subpackages:
+  - client
+  - discovery/broadcast
 - name: github.com/choria-io/go-confkey
   version: 634d2c41860498507b0c7eeb2f8a33b1aa6a809d
 - name: github.com/choria-io/go-protocol
@@ -48,10 +59,12 @@ imports:
   - regex
   - shellsafe
 - name: github.com/choria-io/mcorpc-agent-provider
-  version: 33fa69cae7f6be38513efd52e51a24553758bda6
+  version: bf12fec848b026ead153a340f71add537233d66a
   subpackages:
   - mcorpc
   - mcorpc/audit
+  - mcorpc/client
+  - mcorpc/ddl/agent
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
   subpackages:
@@ -109,6 +122,8 @@ imports:
   version: e02fc20de94c78484cd5ffb007f8af96be030a45
 - name: github.com/xeipuuv/gojsonschema
   version: 511d08a359d14c0dd9c4302af52ee9abb6f93c2a
+- name: go.uber.org/atomic
+  version: 1ea20fb1cbb1cc08cbd0d913a96dead89aa18289
 - name: golang.org/x/crypto
   version: 9477e0b78b9ac3d0b03822fd95422e2fe07627cd
   subpackages:
@@ -124,6 +139,8 @@ imports:
   version: f7928cfef4d09d1b080aa2b6fd3ca9ba1567c733
   subpackages:
   - unix
+- name: gopkg.in/alecthomas/kingpin.v2
+  version: 947dcec5ba9c011838740e680966fd7087a71d0d
 - name: gopkg.in/yaml.v2
   version: d670f9405373e636a5a2765eea47fac0c9bc91a4
 testImports:
