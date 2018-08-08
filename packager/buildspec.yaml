@@ -1,5 +1,5 @@
 flags_map:
-  Version: github.com/choria-io/provisioning-agent/cmd.version
+  Version: github.com/choria-io/provisioning-agent/config.Version
   SHA: github.com/choria-io/provisioning-agent/cmd.sha
 
 foss:

@@ -27,13 +27,12 @@ var (
 	ctx     context.Context
 	cancel  func()
 	log     *logrus.Entry
-	version string
 	sha     string
 )
 
 func Run() {
 	app := kingpin.New("choria-provisioner", "The Choria Provisioning Framework")
-	app.Version(version)
+	app.Version(config.Version)
 	app.Author("R.I.Pienaar <rip@devco.net>")
 
 	app.Flag("debug", "Enables debug logging").BoolVar(&debug)

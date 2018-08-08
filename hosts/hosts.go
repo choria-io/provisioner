@@ -22,6 +22,7 @@ var (
 	log   *logrus.Entry
 	fw    *choria.Framework
 	conf  *config.Config
+	wg    = &sync.WaitGroup{}
 )
 
 // Process starts the provisioning process
@@ -41,11 +42,20 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 		return fmt.Errorf("could not create initial events connection: %s", err)
 	}
 
-	go listen(ctx, conn)
-	go finisher(ctx)
+	wg.Add(1)
+	go listen(ctx, wg, conn)
+
+	wg.Add(1)
+	go finisher(ctx, wg)
+
+	if conf.Management != nil {
+		wg.Add(1)
+		go startBackplane(ctx, wg)
+	}
 
 	for i := 0; i < cfg.Workers; i++ {
-		go provisioner(ctx, i+1)
+		wg.Add(1)
+		go provisioner(ctx, wg, i+1)
 	}
 
 	timer := time.NewTicker(cfg.IntervalDuration)
@@ -88,6 +98,11 @@ func add(host *host.Host) bool {
 }
 
 func discover(ctx context.Context, agent *rpc.RPC) {
+	if conf.Paused() {
+		log.Warnf("Skipping discovery while paused")
+		return
+	}
+
 	discoverCycleCtr.WithLabelValues(conf.Site).Inc()
 
 	err := discoverProvisionableNodes(ctx, agent)

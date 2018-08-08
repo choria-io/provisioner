@@ -1,5 +1,5 @@
-hash: c9db6c85cd5f9a6c92328adf5bd4dd57e8f35ce404a447b1213052dcc5c69f20
-updated: 2018-08-07T08:35:52.056806+02:00
+hash: de0fa24e52e938d6ef05b8862b7eec62ae390f494d9659291e66486b88bf497e
+updated: 2018-08-08T08:52:26.415481+02:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -11,6 +11,10 @@ imports:
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
+- name: github.com/choria-io/go-backplane
+  version: 08943949ac886959af849097993491b248e1d3fc
+  subpackages:
+  - backplane
 - name: github.com/choria-io/go-choria
   version: abe93087707fe6e1bf94f81456ff10753e52d062
   subpackages:
@@ -67,9 +71,6 @@ imports:
   - mcorpc/ddl/agent
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
-  subpackages:
-  - encoders/builtin
-  - util
 - name: github.com/golang/mock
   version: 8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c
   subpackages:
@@ -94,6 +95,7 @@ imports:
   version: 967789050ba94deca04a5e84cce8ad472ce313c1
   subpackages:
   - prometheus
+  - prometheus/promhttp
 - name: github.com/prometheus/client_model
   version: 99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c
   subpackages:
