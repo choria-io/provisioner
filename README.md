@@ -270,6 +270,8 @@ management:
         - choria2.example.net:4222
 ```
 
+A choria client configuration should be made in `/etc/choria-provisioner/choria.cfg`, it looks like a normal choria client config and would support SRV and all the usual settings.
+
 #### Backplane
 
 The provisioner includes a [Choria Backplane](https://github.com/choria-io/go-backplane) with Pausable and FactSource features enabled. Using this you can emergency pause the provisioner and all calls to RPC, Helpers and Discovery will be stopped.  No new nodes will be added via the event source.
