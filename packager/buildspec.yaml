@@ -6,6 +6,8 @@ foss:
   compile_targets:
     defaults:
       output: choria-provisioner-{{version}}-{{os}}-{{arch}}
+      pre:
+        - go generate
 
     64bit_linux:
       os: linux

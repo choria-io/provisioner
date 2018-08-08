@@ -18,11 +18,13 @@
 prog="{{cpkg_name}}"
 user="nobody"
 group="nobody"
-exec="{{bindir}}/{{cpkg_name}}"
+exec="{{cpkg_bindir}}/{{cpkg_name}}"
 pidfile="/var/run/${prog}/${prog}.pid"
 lockfile="/var/lock/subsys/${prog}"
 logfile="/var/log/${prog}.log"
 conffile="{{cpkg_etcdir}}/{{cpkg_name}}.yaml"
+cconffile="{{cpkg_etcdir}}/choria.cfg"
+args="run --config ${conffile} --choria-config ${cconffile} --pid ${pidfile}"
 
 # pull in sysconfig settings
 [ -e /etc/sysconfig/${prog} ] && . /etc/sysconfig/${prog}
@@ -30,18 +32,18 @@ conffile="{{cpkg_etcdir}}/{{cpkg_name}}.yaml"
 start() {
     [ -x $exec ] || exit 5
     [ -f $conffile ] || exit 6
+    [ -f $cconffile ] || exit 6
 
     umask 077
 
-    touch $logfile $pidfile
-
     echo -n $"Starting ${prog}: "
 
-    daemon \
-      --pidfile=${pidfile} \
-      " { nohup ${exec} ${args} > ${logfile} 2>&1 & }"
+    runuser -s /bin/bash $user -c "{ ${exec} ${args} >> ${logfile} 2>&1 & }" && sleep 0.5 && [ -f ${pidfile} ]
 
     RETVAL=$?
+
+    [ $RETVAL -eq 0 ] && success $"${prog} startup" || failure $"${prog} startup"
+
     echo
 
     [ $RETVAL -eq 0 ] && touch $lockfile
