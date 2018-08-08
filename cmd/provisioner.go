@@ -9,6 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/choria-io/go-protocol/protocol"
+
 	"github.com/choria-io/go-choria/choria"
 	cconf "github.com/choria-io/go-choria/config"
 	"github.com/choria-io/provisioning-agent/config"
@@ -70,10 +72,7 @@ func run() {
 
 	if cfg.Insecure {
 		ccfg.DisableTLS = true
-	}
-
-	if pidFile != "" {
-		writePID(pidFile)
+		protocol.Secure = "false"
 	}
 
 	fw, err := choria.NewWithConfig(ccfg)
@@ -86,6 +85,11 @@ func run() {
 	}
 
 	go interruptHandler(ctx, cancel)
+
+	if pidFile != "" {
+		writePID(pidFile)
+		defer os.Remove(pidFile)
+	}
 
 	err = hosts.Process(ctx, cfg, fw)
 	kingpin.FatalIfError(err, "Provisioning could not start: %s", err)
