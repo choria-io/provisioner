@@ -1,5 +1,5 @@
-hash: de0fa24e52e938d6ef05b8862b7eec62ae390f494d9659291e66486b88bf497e
-updated: 2018-08-08T08:52:26.415481+02:00
+hash: bd9f6ce85578eec9bfbe41cace206a7046576e624f555170cb3e755239e2d933
+updated: 2018-08-08T11:27:09.233651+02:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -12,11 +12,11 @@ imports:
   subpackages:
   - quantile
 - name: github.com/choria-io/go-backplane
-  version: 08943949ac886959af849097993491b248e1d3fc
+  version: 283ee6cabe95fd3f6016ad945d07e8112f3a6ad3
   subpackages:
   - backplane
 - name: github.com/choria-io/go-choria
-  version: abe93087707fe6e1bf94f81456ff10753e52d062
+  version: 632e18b78c0e8d67a2d4e3ba624963959ce58b94
   subpackages:
   - backoff
   - build
@@ -42,7 +42,7 @@ imports:
 - name: github.com/choria-io/go-confkey
   version: 634d2c41860498507b0c7eeb2f8a33b1aa6a809d
 - name: github.com/choria-io/go-protocol
-  version: 284592cb18f97f9854a797f6147142cc5ddc551c
+  version: c3117476636777d60c00a86b2d4b2b8fc56addb4
   subpackages:
   - protocol
   - protocol/v1
@@ -63,12 +63,17 @@ imports:
   - regex
   - shellsafe
 - name: github.com/choria-io/mcorpc-agent-provider
-  version: bf12fec848b026ead153a340f71add537233d66a
+  version: 33fa69cae7f6be38513efd52e51a24553758bda6
   subpackages:
   - mcorpc
   - mcorpc/audit
   - mcorpc/client
   - mcorpc/ddl/agent
+  - mcorpc/golang
+  - mcorpc/golang/choriautil
+  - mcorpc/golang/discovery
+  - mcorpc/golang/provision
+  - mcorpc/golang/rpcutil
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/golang/mock
