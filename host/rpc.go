@@ -8,7 +8,7 @@ import (
 	"github.com/choria-io/go-protocol/protocol"
 	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
 	rpc "github.com/choria-io/mcorpc-agent-provider/mcorpc/client"
-	"github.com/choria-io/provisioning-agent/agent"
+	provision "github.com/choria-io/provisioning-agent/agent"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -22,7 +22,11 @@ func (h *Host) rpcDo(ctx context.Context, agent string, action string, input int
 		return nil, fmt.Errorf("Provisioning is paused, cannot perform %s", name)
 	}
 
-	prov, err := rpc.New(h.fw, agent)
+	ddl, ok := provision.DDL[agent]
+	if !ok {
+		return nil, fmt.Errorf("could not find DDL for agent %s in the provision.DDL structure", agent)
+	}
+	prov, err := rpc.New(h.fw, agent, rpc.DDL(ddl))
 	if err != nil {
 		rpcErrCtr.WithLabelValues(h.cfg.Site, name).Inc()
 		return nil, fmt.Errorf("could not create %s client: %s", agent, err)

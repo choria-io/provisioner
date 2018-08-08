@@ -17,7 +17,7 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 		case host := <-work:
 			log.Infof("Provisioning %s", host.Identity)
 
-			err := provision(ctx, host)
+			err := provisionTarget(ctx, host)
 			if err != nil {
 				provErrCtr.WithLabelValues(conf.Site).Inc()
 				log.Errorf("Could not provision %s: %s", host.Identity, err)
@@ -31,7 +31,7 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 	}
 }
 
-func provision(ctx context.Context, target *host.Host) error {
+func provisionTarget(ctx context.Context, target *host.Host) error {
 	return target.Provision(ctx, fw)
 }
 
