@@ -18,6 +18,10 @@ func (h *Host) rpcDo(ctx context.Context, agent string, action string, input int
 	obs := prometheus.NewTimer(rpcDuration.WithLabelValues(h.cfg.Site, name))
 	defer obs.ObserveDuration()
 
+	if h.cfg.Paused() {
+		return nil, fmt.Errorf("Provisioning is paused, cannot perform %s", name)
+	}
+
 	prov, err := rpc.New(h.fw, agent)
 	if err != nil {
 		rpcErrCtr.WithLabelValues(h.cfg.Site, name).Inc()

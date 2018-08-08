@@ -238,7 +238,7 @@ token: toomanysecrets
 # if your provision network has no TLS set this
 choria_insecure: true
 
-# a site name, unused now but will be needed in future
+# a site name exposed to the backplane to assist with discovery, also used in stats
 site: testing
 
 # if not 0 then /metrics will be prometheus metrics
@@ -247,7 +247,34 @@ monitor_port: 9999
 features:
   # enables fetching of the CSR
   pki: true
+
+# Standard Backplane specific configuration here, see
+# https://github.com/choria-io/go-backplane for full reference
+# if this is unset the backplane is not enabled
+management:
+    name: provisioner
+    logfile: backplane.log
+    loglevel: info
+    tls:
+        scheme: puppet
+
+    auth:
+        full:
+            - sre.mcollective
+
+        read_only:
+            - 1stline.mcollective
+
+    brokers:
+        - choria1.example.net:4222
+        - choria2.example.net:4222
 ```
+
+#### Backplane
+
+The provisioner includes a [Choria Backplane](https://github.com/choria-io/go-backplane) with Pausable and FactSource features enabled. Using this you can emergency pause the provisioner and all calls to RPC, Helpers and Discovery will be stopped.  No new nodes will be added via the event source.
+
+Full details of configuration, RBAC and the backplane management utility can be found on the above project page.
 
 #### Statistics
 
@@ -264,6 +291,7 @@ The daemon keeps a number of Prometheus format stats and will expose it in `/met
 |choria_provisioner_helper_errors|How many times the helper failed to run|
 |choria_provisioner_discovery_errors|How many times the discovery failed to run|
 |choria_provisioner_provision_errors|How many times provisioning failed|
+|choria_provisioner_paused|1 when the backplane paused operations, 0 otherwise|
 
 #### Packages
 

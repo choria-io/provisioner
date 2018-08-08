@@ -3,7 +3,7 @@ package hosts
 import (
 	"context"
 	"fmt"
-	"time"
+	"sync"
 
 	"github.com/choria-io/provisioning-agent/host"
 
@@ -11,22 +11,6 @@ import (
 	"github.com/choria-io/go-choria/srvcache"
 )
 
-func startEventListener(ctx context.Context) {
-	for {
-		if ctx.Err() == nil {
-			conn, err := connect(ctx)
-			if err != nil {
-				log.Errorf("Initial connection for event stream failed: %s", err)
-				time.Sleep(time.Second)
-				continue
-			}
-
-			listen(ctx, conn)
-		}
-
-		return
-	}
-}
 func connect(ctx context.Context) (choria.Connector, error) {
 	if ctx.Err() != nil {
 		return nil, fmt.Errorf("Existing on shut down")
@@ -39,7 +23,9 @@ func brokerUrls() ([]srvcache.Server, error) {
 	return fw.MiddlewareServers()
 }
 
-func listen(ctx context.Context, conn choria.Connector) {
+func listen(ctx context.Context, wg *sync.WaitGroup, conn choria.Connector) {
+	defer wg.Done()
+
 	events := make(chan *choria.ConnectorMessage, 1000)
 
 	err := conn.QueueSubscribe(ctx, "events", "choria.provisioning_data", "", events)
@@ -51,6 +37,11 @@ func listen(ctx context.Context, conn choria.Connector) {
 	for {
 		select {
 		case e := <-events:
+			if conf.Paused() {
+				log.Warnf("Skipping event processing while paused")
+				continue
+			}
+
 			t, err := fw.NewTransportFromJSON(string(e.Data))
 			if err != nil {
 				log.Errorf("Could not create transport for received event: %s", err)

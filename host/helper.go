@@ -55,6 +55,10 @@ func runHelper(ctx context.Context, args []string, input string, cfg *config.Con
 	obs := prometheus.NewTimer(helperDuration.WithLabelValues(cfg.Site))
 	defer obs.ObserveDuration()
 
+	if cfg.Paused() {
+		return nil, fmt.Errorf("Provisioning is paused, cannot perform %s", cfg.Helper)
+	}
+
 	tctx, cancel := context.WithTimeout(ctx, time.Duration(10*time.Second))
 	defer cancel()
 

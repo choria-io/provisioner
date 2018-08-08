@@ -14,6 +14,10 @@ import:
 - package: github.com/sirupsen/logrus
 - package: gopkg.in/alecthomas/kingpin.v2
   version: ^2.2.6
+- package: github.com/choria-io/go-backplane
+  version: ^0.2.0
+  subpackages:
+  - backplane
 testImport:
 - package: github.com/golang/mock
   version: 8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c

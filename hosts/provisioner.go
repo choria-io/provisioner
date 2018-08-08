@@ -2,11 +2,14 @@ package hosts
 
 import (
 	"context"
+	"sync"
 
 	"github.com/choria-io/provisioning-agent/host"
 )
 
-func provisioner(ctx context.Context, i int) {
+func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
+	defer wg.Done()
+
 	log.Debugf("Provisioner worker %d starting", i)
 
 	for {
@@ -32,7 +35,9 @@ func provision(ctx context.Context, target *host.Host) error {
 	return target.Provision(ctx, fw)
 }
 
-func finisher(ctx context.Context) {
+func finisher(ctx context.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	for {
 		select {
 		case host := <-done:

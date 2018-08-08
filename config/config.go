@@ -6,27 +6,38 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sync"
 	"time"
 
+	"github.com/choria-io/go-backplane/backplane"
 	"github.com/ghodss/yaml"
 )
 
+// Version is the version of the app
+var Version = "0.0.0"
+
+// Config is the configuration structure
 type Config struct {
-	Workers     int    `json:"workers"`
-	Interval    string `json:"interval"`
-	Logfile     string `json:"logfile"`
-	Loglevel    string `json:"loglevel"`
-	Helper      string `json:"helper"`
-	Token       string `json:"token"`
-	Insecure    bool   `json:"choria_insecure"`
-	Site        string `json:"site"`
-	MonitorPort int    `json:"monitor_port"`
-	Features    struct {
+	Workers     int                              `json:"workers"`
+	Interval    string                           `json:"interval"`
+	Logfile     string                           `json:"logfile"`
+	Loglevel    string                           `json:"loglevel"`
+	Helper      string                           `json:"helper"`
+	Token       string                           `json:"token"`
+	Insecure    bool                             `json:"choria_insecure"`
+	Site        string                           `json:"site"`
+	MonitorPort int                              `json:"monitor_port"`
+	Management  *backplane.StandardConfiguration `yaml:"management"`
+
+	Features struct {
 		PKI bool `json:"pki"`
 	} `json:"features"`
 
 	IntervalDuration time.Duration `json:"-"`
 	File             string        `json:"-"`
+
+	paused bool
+	sync.Mutex
 }
 
 // Load reads configuration from a YAML file
@@ -62,6 +73,8 @@ func Load(file string) (*Config, error) {
 	if config.IntervalDuration < time.Minute {
 		return nil, errors.New("interval is too small, minmum is 1 minute.  Valid example values are 10m or 10h")
 	}
+
+	pausedGauge.WithLabelValues(config.Site).Set(0)
 
 	return config, nil
 }
