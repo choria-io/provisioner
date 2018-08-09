@@ -1,5 +1,11 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2018/08/09|      |Release 0.1.0                                                                                            |
+|2018/08/09|32    |Record successfully provisioned node counts                                                              |
+|2018/08/09|24    |Record busy workers in stats                                                                             |
+|2018/08/09|29    |Avoid nil pointer error when PKI feature is disabled                                                     |
+|2018/08/09|28    |Increase max token length to 128                                                                         |
+|2018/08/09|25    |Ensure helper run duration stat is registered                                                            |
 |2018/08/09|      |Release 0.0.3                                                                                            |
 |2018/08/09|21    |Fix various el6 startup issues                                                                           |
 |2018/08/09|19    |Embed the DDL files in the binary to ease deployment                                                     |
