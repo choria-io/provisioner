@@ -16,7 +16,7 @@ action "gencsr", :description => "Request a CSR from the Choria Server" do
           :validation => ".",
           :optional => true,
           :default => "",
-          :maxlength => 32
+          :maxlength => 128
 
     input :cn,
           :prompt => "Common Name",
@@ -83,7 +83,7 @@ action "configure", :description => "Configure the Choria Server" do
           :validation => ".",
           :optional => true,
           :default => "",
-          :maxlength => 32
+          :maxlength => 128
 
     input :config,
           :prompt  => "Configuration",
@@ -130,7 +130,7 @@ action "restart", :description => "Restart the Choria Server" do
           :validation => ".",
           :optional => true,
           :default => "",
-          :maxlength => 32
+          :maxlength => 128
 
     input :splay,
           :prompt  => "Splay time",
@@ -144,6 +144,8 @@ action "restart", :description => "Restart the Choria Server" do
 end
 
 action "reprovision", :description => "Reenable provision mode in a running Choria Server" do
+    display :always
+
     input :token,
           :prompt  => "Token",
           :description => "Authentication token to pass to the server",
@@ -151,7 +153,7 @@ action "reprovision", :description => "Reenable provision mode in a running Chor
           :validation => ".",
           :optional => true,
           :default => "",
-          :maxlength => 32
+          :maxlength => 128
 
     output :message,
            :description => "Status message from the Provisioner",

@@ -20,7 +20,7 @@
             "default": "",
             "optional": true,
             "validation": ".",
-            "maxlength": 32
+            "maxlength": 128
           },
           "config": {
             "prompt": "Configuration",
@@ -79,7 +79,7 @@
             "default": "",
             "optional": true,
             "validation": ".",
-            "maxlength": 32
+            "maxlength": 128
           },
           "cn": {
             "prompt": "Common Name",
@@ -161,7 +161,7 @@
             "default": "",
             "optional": true,
             "validation": ".",
-            "maxlength": 32
+            "maxlength": 128
           }
         },
         "output": {
@@ -184,7 +184,7 @@
             "default": "",
             "optional": true,
             "validation": ".",
-            "maxlength": 32
+            "maxlength": 128
           },
           "splay": {
             "prompt": "Splay time",
