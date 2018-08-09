@@ -294,6 +294,7 @@ The daemon keeps a number of Prometheus format stats and will expose it in `/met
 |choria_provisioner_discovery_errors|How many times the discovery failed to run|
 |choria_provisioner_provision_errors|How many times provisioning failed|
 |choria_provisioner_paused|1 when the backplane paused operations, 0 otherwise|
+|choria_provisioner_busy_workers|How many workers are busy processing servers|
 
 #### Packages
 

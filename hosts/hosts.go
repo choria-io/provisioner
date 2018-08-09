@@ -67,6 +67,8 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 
 	timer := time.NewTicker(cfg.IntervalDuration)
 
+	discoveredCtr.WithLabelValues(conf.Site).Add(0.0)
+
 	discover(ctx, agent)
 
 	for {
@@ -97,7 +99,7 @@ func add(host *host.Host) bool {
 		return false
 	}
 
-	log.Infof("Adding %s to the work queue", host)
+	log.Debugf("Adding %s to the work queue", host)
 	hosts[host.Identity] = host
 	work <- host
 

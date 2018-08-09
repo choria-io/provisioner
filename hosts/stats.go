@@ -27,6 +27,11 @@ var (
 		Name: "choria_provisioner_provision_errors",
 		Help: "How many provision related errors were encountered",
 	}, []string{"site"})
+
+	busyWorkerGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "choria_provisioner_busy_workers",
+		Help: "How many workers are busy provisioning nodes",
+	}, []string{"site"})
 )
 
 func init() {
@@ -35,5 +40,5 @@ func init() {
 	prometheus.MustRegister(discoverCycleCtr)
 	prometheus.MustRegister(errCtr)
 	prometheus.MustRegister(provErrCtr)
-
+	prometheus.MustRegister(busyWorkerGauge)
 }

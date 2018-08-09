@@ -32,6 +32,9 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 }
 
 func provisionTarget(ctx context.Context, target *host.Host) error {
+	busyWorkerGauge.WithLabelValues(conf.Site).Inc()
+	defer busyWorkerGauge.WithLabelValues(conf.Site).Dec()
+
 	return target.Provision(ctx, fw)
 }
 
