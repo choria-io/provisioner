@@ -26,6 +26,7 @@ var (
 
 func init() {
 	prometheus.MustRegister(rpcDuration)
+	prometheus.MustRegister(helperDuration)
 	prometheus.MustRegister(rpcErrCtr)
 	prometheus.MustRegister(helperErrCtr)
 }
