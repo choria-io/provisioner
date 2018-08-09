@@ -2,7 +2,6 @@ package hosts
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/choria-io/go-backplane/backplane"
@@ -11,6 +10,8 @@ import (
 func startBackplane(ctx context.Context, wg *sync.WaitGroup) error {
 	defer wg.Done()
 
+	log.Info("Starting choria management backplane")
+
 	opts := []backplane.Option{
 		backplane.ManageInfoSource(conf),
 		backplane.ManagePausable(conf),
@@ -18,7 +19,7 @@ func startBackplane(ctx context.Context, wg *sync.WaitGroup) error {
 
 	_, err := backplane.Run(ctx, wg, conf.Management, opts...)
 	if err != nil {
-		return (fmt.Errorf("Could not start backplane: %s", err))
+		log.Errorf("Could not start backplane: %s", err)
 	}
 
 	return nil
