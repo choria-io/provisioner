@@ -100,8 +100,11 @@ func (h *Host) configure(ctx context.Context) error {
 		Token:         h.token,
 		CA:            h.ca,
 		Certificate:   h.cert,
-		SSLDir:        h.CSR.SSLDir,
 		Configuration: string(cj),
+	}
+
+	if h.CSR != nil {
+		creq.SSLDir = h.CSR.SSLDir
 	}
 
 	_, err = h.rpcDo(ctx, "choria_provision", "configure", creq, func(pr protocol.Reply, reply *rpc.RPCReply) {
