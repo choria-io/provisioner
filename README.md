@@ -297,6 +297,10 @@ The daemon keeps a number of Prometheus format stats and will expose it in `/met
 |choria_provisioner_busy_workers|How many workers are busy processing servers|
 |choria_provisioner_provisioned|Host many nodes were successfully provisioned|
 
+A Grafana dashboard is included in `dashboard.json` that produce a set of graphs like here:
+
+![](provisioner-dashboard.png)
+
 #### Packages
 
 RPMs are hosted in the Choria yum repository for el6 and 7 64bit systems, packages are called `choria-provisioner`:
