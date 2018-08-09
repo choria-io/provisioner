@@ -57,7 +57,7 @@ func finisher(ctx context.Context, wg *sync.WaitGroup) {
 	for {
 		select {
 		case host := <-done:
-			log.Infof("Removing %s from the provision list", host.Identity)
+			log.Debugf("Removing %s from the provision list", host.Identity)
 			remove(host)
 		case <-ctx.Done():
 			log.Info("Finisher exiting on context")
