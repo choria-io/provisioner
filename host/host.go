@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/choria-io/go-choria/choria"
 	provision "github.com/choria-io/provisioning-agent/agent"
@@ -13,14 +12,13 @@ import (
 )
 
 type Host struct {
-	Identity        string              `json:"identity"`
-	CSR             *provision.CSRReply `json:"csr"`
-	Metadata        string              `json:"inventory"`
-	config          map[string]string
-	provisionExpire time.Time
-	provisioned     bool
-	ca              string
-	cert            string
+	Identity    string              `json:"identity"`
+	CSR         *provision.CSRReply `json:"csr"`
+	Metadata    string              `json:"inventory"`
+	config      map[string]string
+	provisioned bool
+	ca          string
+	cert        string
 
 	cfg       *config.Config
 	token     string
@@ -32,13 +30,12 @@ type Host struct {
 
 func NewHost(identity string, conf *config.Config) *Host {
 	return &Host{
-		Identity:        identity,
-		provisionExpire: time.Now().Add(time.Minute),
-		provisioned:     false,
-		mu:              &sync.Mutex{},
-		replylock:       &sync.Mutex{},
-		token:           conf.Token,
-		cfg:             conf,
+		Identity:    identity,
+		provisioned: false,
+		mu:          &sync.Mutex{},
+		replylock:   &sync.Mutex{},
+		token:       conf.Token,
+		cfg:         conf,
 	}
 }
 
@@ -53,9 +50,7 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	h.fw = fw
 	h.log = fw.Logger(h.Identity)
 
-	var err error
-
-	err = h.fetchInventory(ctx)
+	err := h.fetchInventory(ctx)
 	if err != nil {
 		return fmt.Errorf("could not provision %s: %s", h.Identity, err)
 	}

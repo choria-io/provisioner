@@ -3,6 +3,7 @@ package hosts
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/choria-io/provisioning-agent/host"
 )
@@ -23,7 +24,12 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 				log.Errorf("Could not provision %s: %s", host.Identity, err)
 			}
 
-			done <- host
+			// delay removing the node to avoid a race between discovery and node restarting splay
+			go func() {
+				<-time.NewTimer(20 * time.Second).C
+				done <- host
+			}()
+
 		case <-ctx.Done():
 			log.Infof("Worker %d exiting on context", i)
 			return
@@ -35,7 +41,14 @@ func provisionTarget(ctx context.Context, target *host.Host) error {
 	busyWorkerGauge.WithLabelValues(conf.Site).Inc()
 	defer busyWorkerGauge.WithLabelValues(conf.Site).Dec()
 
-	return target.Provision(ctx, fw)
+	err := target.Provision(ctx, fw)
+	if err != nil {
+		return err
+	}
+
+	provisionedCtr.WithLabelValues(conf.Site).Inc()
+
+	return nil
 }
 
 func finisher(ctx context.Context, wg *sync.WaitGroup) {
@@ -46,7 +59,6 @@ func finisher(ctx context.Context, wg *sync.WaitGroup) {
 		case host := <-done:
 			log.Infof("Removing %s from the provision list", host.Identity)
 			remove(host)
-
 		case <-ctx.Done():
 			log.Info("Finisher exiting on context")
 			return
