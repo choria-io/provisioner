@@ -68,6 +68,7 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	timer := time.NewTicker(cfg.IntervalDuration)
 
 	discoveredCtr.WithLabelValues(conf.Site).Add(0.0)
+	provisionedCtr.WithLabelValues(conf.Site).Add(0.0)
 
 	discover(ctx, agent)
 

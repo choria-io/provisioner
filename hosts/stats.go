@@ -32,6 +32,11 @@ var (
 		Name: "choria_provisioner_busy_workers",
 		Help: "How many workers are busy provisioning nodes",
 	}, []string{"site"})
+
+	provisionedCtr = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "choria_provisioner_provisioned",
+		Help: "How many nodes were succesfully provisioned",
+	}, []string{"site"})
 )
 
 func init() {
@@ -41,4 +46,5 @@ func init() {
 	prometheus.MustRegister(errCtr)
 	prometheus.MustRegister(provErrCtr)
 	prometheus.MustRegister(busyWorkerGauge)
+	prometheus.MustRegister(provisionedCtr)
 }
