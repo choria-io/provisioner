@@ -6,8 +6,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/choria-io/go-choria/events"
+
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-client/client"
+	"github.com/choria-io/go-client/discovery/broadcast"
 	rpc "github.com/choria-io/mcorpc-agent-provider/mcorpc/client"
 	provision "github.com/choria-io/provisioning-agent/agent"
 	"github.com/choria-io/provisioning-agent/config"
@@ -47,6 +50,11 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	conn, err := connect(ctx)
 	if err != nil {
 		return fmt.Errorf("could not create initial events connection: %s", err)
+	}
+
+	err = events.PublishEvent(events.Startup, "provisioner", fw.Config, conn)
+	if err != nil {
+		log.Errorf("Startup event could not be published", err)
 	}
 
 	wg.Add(1)
@@ -130,7 +138,8 @@ func discoverProvisionableNodes(ctx context.Context, agent *rpc.RPC) error {
 		return err
 	}
 
-	nodes, err := agent.Discover(ctx, f)
+	bd := broadcast.New(fw)
+	nodes, err := bd.Discover(ctx, broadcast.Collective("provisioning"), broadcast.Filter(f))
 	if err != nil {
 		return err
 	}

@@ -53,6 +53,7 @@ var _ = Describe("Provision/Agent", func() {
 		cfg, err = config.NewDefaultConfig()
 		Expect(err).ToNot(HaveOccurred())
 		cfg.DisableTLS = true
+		cfg.InitiatedByServer = true
 
 		fw, err = choria.NewWithConfig(cfg)
 		Expect(err).ToNot(HaveOccurred())
