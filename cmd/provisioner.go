@@ -73,6 +73,7 @@ func run() {
 	if cfg.Insecure {
 		ccfg.DisableTLS = true
 		protocol.Secure = "false"
+		ccfg.Choria.SecurityProvider = "file"
 	}
 
 	fw, err := choria.NewWithConfig(ccfg)

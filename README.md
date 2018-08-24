@@ -98,6 +98,19 @@ This is a stripped down packaging config based on the stock one, it will:
   * It will publish regularly the file `/opt/acme/etc/node-metadata.json` to `choria.provisioning_data` on the middleware
   * It will use `/opt/acme/etc/node-metadata.json` as a fact source so you can discover it or retrieve its facts using `rpcutil#inventory` action
 
+In this case you will have a static broker that will be connected to, this might be too limiting for your needs - perhaps you wish to use a regional or client appropriate provisioner host instead.  You can implement the `provtarget.TargetResolver` interface and then compile that into your binary by placing the following YAML in your go-choria `packager` directory:
+
+```yaml
+# packager/provision_target_provider.yaml
+---
+name: MyCorp Provisioning Target Provider
+repo: github.com/mycorp/ec2provtarget
+```
+
+In the above repo should be a method `ec2provtarget.Provisioner()` that returns an instance of your provisioner that implements `provtarget.TargetResolver`.  See the [default one](https://github.com/choria-io/go-choria/tree/master/provtarget/builddefaults) for an example.
+
+You can verify the resulting build with: `acme-choria buildinfo` and it should have a line like: `Provisioning Target Resolver: MyCorp Provisioning Target Provider`
+
 ### Using your own agent
 
 You might not like the provisioning flow exposed by this agent, no problem you can supply your own.
