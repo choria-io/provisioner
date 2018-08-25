@@ -3,9 +3,11 @@ package hosts
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/choria-io/provisioning-agent/host"
+	"github.com/tidwall/gjson"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/srvcache"
@@ -28,33 +30,69 @@ func listen(ctx context.Context, wg *sync.WaitGroup, conn choria.Connector) {
 
 	events := make(chan *choria.ConnectorMessage, 1000)
 
-	err := conn.QueueSubscribe(ctx, "events", "choria.provisioning_data", "", events)
+	err := conn.QueueSubscribe(ctx, "provisioning_events", "choria.provisioning_data", "", events)
 	if err != nil {
-		log.Errorf("Could not listen for events: %s", err)
+		log.Errorf("Could not listen for provisioning data events: %s", err)
+		return
+	}
+
+	err = conn.QueueSubscribe(ctx, "lifecycle_events", "choria.lifecycle.event", "", events)
+	if err != nil {
+		log.Errorf("Could not listen for lifecycle events: %s", err)
 		return
 	}
 
 	for {
 		select {
 		case e := <-events:
-			if conf.Paused() {
-				log.Warnf("Skipping event processing while paused")
-				continue
-			}
-
-			t, err := fw.NewTransportFromJSON(string(e.Data))
+			node, err := handle(e)
 			if err != nil {
-				log.Errorf("Could not create transport for received event: %s", err)
-				continue
+				log.Errorf("could not handle message: %s", err)
 			}
 
-			log.Infof("Adding %s to the provision list after receiving an event", t.SenderID())
-
-			if add(host.NewHost(t.SenderID(), conf)) {
+			if node != "" && add(host.NewHost(node, conf)) {
+				log.Infof("Adding %s to the provision list after receiving an event", node)
 				eventsCtr.WithLabelValues(conf.Site).Inc()
 			}
+
 		case <-ctx.Done():
 			return
 		}
 	}
+}
+
+func handle(msg *choria.ConnectorMessage) (string, error) {
+	if conf.Paused() {
+		log.Warnf("Skipping event processing while paused")
+		return "", nil
+	}
+
+	proto := gjson.GetBytes(msg.Data, "protocol")
+	if !proto.Exists() {
+		return "", fmt.Errorf("received a message with no protocol description")
+	}
+
+	if strings.HasPrefix(proto.String(), "choria:lifecycle:startup") {
+		return handleStartupEvent(msg)
+	}
+
+	return handleRegistration(msg)
+}
+
+func handleStartupEvent(msg *choria.ConnectorMessage) (string, error) {
+	component := gjson.GetBytes(msg.Data, "component").String()
+	if component != "provision_mode_server" {
+		return "", nil
+	}
+
+	return gjson.GetBytes(msg.Data, "identity").String(), nil
+}
+
+func handleRegistration(msg *choria.ConnectorMessage) (string, error) {
+	t, err := fw.NewTransportFromJSON(string(msg.Data))
+	if err != nil {
+		return "", fmt.Errorf("could not create transport: %s", err)
+	}
+
+	return t.SenderID(), nil
 }
