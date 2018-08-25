@@ -22,6 +22,8 @@ After this flow the node will join it's configured Member Collective with it's s
 
 You can invoke the `choria_provision#reprovision` action to ask it to leave its Member Collective and re-enter the provisioning flow.
 
+If you have a token compiled in you can restart a server when not in provisioning mode with the token via the `choria_provision#restart` action.
+
 This project includes a provisioner that you can use, it will call a `helper` that you provide and can write in any language to integrate with your CA and generate configuration.
 
 **WARNING** At present Choria Server does not yet support something like the Action Policy ACL system and inherently during provision there is no CA to provide Authentication against. While a token is supported the token is easily found in the `choria` binary.  Keep this in mind before adopting this approach.
@@ -167,9 +169,9 @@ Nodes will be discovered at startup and then every `interval` period:
   * Discover all nodes
     * Add each node to the work list
 
-It will also listen on the network for registration events:
+It will also listen on the network for registration and lifecycle events:
 
-  * Listen for node registration events
+  * Listen for node registration and lifecycle events
     * Add each node to the work list
 
 Regardless of how a node was found, this is the flow it will do:
@@ -181,6 +183,8 @@ Regardless of how a node was found, this is the flow it will do:
       * If the helper sets `defer` to true the node provisioning is ended and next cycle will handle it
     * Configure the node using `choria_provision#configure`
     * Restart the node using `choria_provision#restart`
+
+When this provisioner start up it will emit a `choria:lifecycle:startup:1` event with component `provisioner`.
 
 #### Writing the helper
 

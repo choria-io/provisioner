@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2018/08/25|      |Release 0.2.0                                                                                            |
+|2018/08/25|38    |Listen for node life cycle events where component is `provision_mode_server`                             |
+|2018/08/24|36    |Emit a startup life cycle event with component `provisioner`                                             |
 |2018/08/09|      |Release 0.1.0                                                                                            |
 |2018/08/09|32    |Record successfully provisioned node counts                                                              |
 |2018/08/09|24    |Record busy workers in stats                                                                             |
