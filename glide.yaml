@@ -1,7 +1,7 @@
 package: github.com/choria-io/provisioning-agent
 import:
 - package: github.com/choria-io/go-choria
-  version: ^0.5.1
+  version: 2b7bb55b53c5b01cc990a49bc094250582039bab
   subpackages:
   - build
   - choria
@@ -20,6 +20,7 @@ import:
   version: ^1.0.0
   subpackages:
   - backplane
+- package: github.com/tidwall/gjson
 testImport:
 - package: github.com/golang/mock
   version: 8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c
