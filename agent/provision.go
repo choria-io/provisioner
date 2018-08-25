@@ -322,8 +322,8 @@ func restartAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply
 	mu.Lock()
 	defer mu.Unlock()
 
-	if !agent.Choria.ProvisionMode() {
-		abort("Cannot restart a server that is not in provisioning mode", reply)
+	if !agent.Choria.ProvisionMode() && build.ProvisionToken == "" {
+		abort("Cannot restart a server that is not in provisioning mode or with no token set", reply)
 		return
 	}
 

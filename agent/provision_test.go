@@ -150,10 +150,11 @@ var _ = Describe("Provision/Agent", func() {
 	})
 
 	Describe("restartAction", func() {
-		It("Should only restart nodes in provision mode", func() {
+		It("Should not restart nodes not provision mode", func() {
+			build.ProvisionToken = ""
 			restartAction(ctx, &mcorpc.Request{}, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
-			Expect(reply.Statusmsg).To(Equal("Cannot restart a server that is not in provisioning mode"))
+			Expect(reply.Statusmsg).To(Equal("Cannot restart a server that is not in provisioning mode or with no token set"))
 		})
 
 		It("Should refuse to restart nodes that just goes back into provision mode", func() {
@@ -187,9 +188,21 @@ var _ = Describe("Provision/Agent", func() {
 			restartAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
 
+			// tests the path with no provisioning set but with a token set
+			build.ProvisionModeDefault = "false"
 			build.ProvisionToken = "toomanysecrets"
 			reply = &mcorpc.Reply{}
 
+			Expect(prov.Choria.ProvisionMode()).To(BeFalse())
+			restartAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
+
+			// tests the path with provision mode and no token
+			build.ProvisionModeDefault = "true"
+			build.ProvisionToken = ""
+			reply = &mcorpc.Reply{}
+
+			Expect(prov.Choria.ProvisionMode()).To(BeTrue())
 			restartAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 		})
