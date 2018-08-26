@@ -1,5 +1,5 @@
-hash: 48b9641ec08a3f95c6cc0cc0b1873410a2863467a284d6f6b63afcdb5cf91039
-updated: 2018-08-25T13:33:37.312458+02:00
+hash: d876ab753e88757287696a2075b58eb0ca8f116913e8d222f341b21f57da853b
+updated: 2018-08-26T18:41:36.670942+02:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -23,6 +23,8 @@ imports:
   - choria
   - config
   - events
+  - provtarget
+  - provtarget/builddefaults
   - puppet
   - registration
   - server
@@ -42,6 +44,8 @@ imports:
   - discovery/broadcast
 - name: github.com/choria-io/go-confkey
   version: 634d2c41860498507b0c7eeb2f8a33b1aa6a809d
+- name: github.com/choria-io/go-lifecycle
+  version: 7a10c2a1113a5bd45e8c5693136770658b6bb9d5
 - name: github.com/choria-io/go-protocol
   version: c3117476636777d60c00a86b2d4b2b8fc56addb4
   subpackages:
@@ -76,9 +80,6 @@ imports:
   - mcorpc/golang/rpcutil
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
-  subpackages:
-  - encoders/builtin
-  - util
 - name: github.com/golang/mock
   version: 8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c
   subpackages:
