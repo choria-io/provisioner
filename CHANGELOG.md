@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2018/08/26|      |Release 0.2.1                                                                                            |
+|2018/08/26|44    |Use lifecycle project to manage lifecycle events                                                         |
 |2018/08/25|      |Release 0.2.0                                                                                            |
 |2018/08/25|38    |Listen for node life cycle events where component is `provision_mode_server`                             |
 |2018/08/24|36    |Emit a startup life cycle event with component `provisioner`                                             |
