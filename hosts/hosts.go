@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/choria-io/go-choria/events"
+	"github.com/choria-io/go-lifecycle"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-client/client"
@@ -52,9 +52,9 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 		return fmt.Errorf("could not create initial events connection: %s", err)
 	}
 
-	err = events.PublishEvent(events.Startup, "provisioner", fw.Config, conn)
+	err = publishStartupEvent(conn)
 	if err != nil {
-		log.Errorf("Startup event could not be published", err)
+		log.Errorf("Could not publish startup event: %s", err)
 	}
 
 	wg.Add(1)
@@ -90,6 +90,20 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 			return nil
 		}
 	}
+}
+
+func publishStartupEvent(conn choria.Connector) error {
+	event, err := lifecycle.New(lifecycle.Startup, lifecycle.Component("provisioner"), lifecycle.Identity(fw.Config.Identity), lifecycle.Version(config.Version))
+	if err != nil {
+		return fmt.Errorf("could not create event: %s", err)
+	}
+
+	err = lifecycle.PublishEvent(event, conn)
+	if err != nil {
+		return fmt.Errorf("could not publish: %s", err)
+	}
+
+	return nil
 }
 
 func remove(host *host.Host) {

@@ -21,6 +21,8 @@ import:
   subpackages:
   - backplane
 - package: github.com/tidwall/gjson
+- package: github.com/choria-io/go-lifecycle
+  version: ^0.0.1
 testImport:
 - package: github.com/golang/mock
   version: 8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c
