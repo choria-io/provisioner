@@ -12,6 +12,7 @@ import (
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/config"
 	"github.com/choria-io/go-choria/server/agents"
+	lifecycle "github.com/choria-io/go-lifecycle"
 	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
 	"github.com/golang/mock/gomock"
 
@@ -39,6 +40,7 @@ var _ = Describe("Provision/Agent", func() {
 		prov      *mcorpc.Agent
 		reply     *mcorpc.Reply
 		ctx       context.Context
+		si        *agents.MockServerInfoSource
 		targetcfg string
 		targetlog string
 		targetdir string
@@ -58,9 +60,11 @@ var _ = Describe("Provision/Agent", func() {
 		fw, err = choria.NewWithConfig(cfg)
 		Expect(err).ToNot(HaveOccurred())
 
-		am = agents.New(requests, fw, nil, agents.NewMockServerInfoSource(mockctl), logrus.WithFields(logrus.Fields{"test": "1"}))
+		si = agents.NewMockServerInfoSource(mockctl)
+		am = agents.New(requests, fw, nil, si, logrus.WithFields(logrus.Fields{"test": "1"}))
 		prov, err = New(am)
 		Expect(err).ToNot(HaveOccurred())
+		prov.SetServerInfo(si)
 		logrus.SetLevel(logrus.FatalLevel)
 
 		allowRestart = false
@@ -193,6 +197,7 @@ var _ = Describe("Provision/Agent", func() {
 			build.ProvisionToken = "toomanysecrets"
 			reply = &mcorpc.Reply{}
 
+			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 			Expect(prov.Choria.ProvisionMode()).To(BeFalse())
 			restartAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
@@ -202,6 +207,7 @@ var _ = Describe("Provision/Agent", func() {
 			build.ProvisionToken = ""
 			reply = &mcorpc.Reply{}
 
+			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 			Expect(prov.Choria.ProvisionMode()).To(BeTrue())
 			restartAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
@@ -217,6 +223,8 @@ var _ = Describe("Provision/Agent", func() {
 				CallerID:  "choria=rip.mcollective",
 				SenderID:  "go.test",
 			}
+
+			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 
 			restartAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
@@ -265,6 +273,8 @@ var _ = Describe("Provision/Agent", func() {
 
 			req.Data = json.RawMessage(`{"token":"toomanysecrets"}`)
 
+			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
+
 			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 		})
@@ -272,6 +282,7 @@ var _ = Describe("Provision/Agent", func() {
 		It("Should write a sane config file without registration by default", func() {
 			cfg.ConfigFile = targetcfg
 			build.ProvisionToken = ""
+			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 
 			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
@@ -292,6 +303,8 @@ var _ = Describe("Provision/Agent", func() {
 			cfg.Choria.FileContentRegistrationData = "/tmp/choria_test.json"
 			cfg.Choria.FileContentRegistrationTarget = "default.registration"
 			build.ProvisionRegistrationData = ""
+
+			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 
 			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
@@ -354,6 +367,8 @@ var _ = Describe("Provision/Agent", func() {
 			build.ProvisionToken = "toomanysecrets"
 			reply = &mcorpc.Reply{}
 
+			si.EXPECT().NewEvent(lifecycle.Provisioned).Times(1)
+
 			configureAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 		})
@@ -368,6 +383,8 @@ var _ = Describe("Provision/Agent", func() {
 				CallerID:  "choria=rip.mcollective",
 				SenderID:  "go.test",
 			}
+
+			si.EXPECT().NewEvent(lifecycle.Provisioned).Times(1)
 
 			Expect(targetcfg).ToNot(BeAnExistingFile())
 			configureAction(ctx, req, reply, prov, nil)

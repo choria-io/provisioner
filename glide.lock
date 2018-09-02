@@ -1,5 +1,5 @@
-hash: d876ab753e88757287696a2075b58eb0ca8f116913e8d222f341b21f57da853b
-updated: 2018-08-26T18:41:36.670942+02:00
+hash: f3541577a0b191e966b08bc88c34711a6b4ed9a4906fec25c1bb8603b9da61e9
+updated: 2018-09-02T17:41:36.950173+02:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -12,17 +12,16 @@ imports:
   subpackages:
   - quantile
 - name: github.com/choria-io/go-backplane
-  version: 283ee6cabe95fd3f6016ad945d07e8112f3a6ad3
+  version: 4174a9a610a93399ee7f2e993fd2318fb44cc49d
   subpackages:
   - backplane
 - name: github.com/choria-io/go-choria
-  version: 2b7bb55b53c5b01cc990a49bc094250582039bab
+  version: 1a8af30cc7f5a239e9a5f0ba201ea5ba74103db8
   subpackages:
   - backoff
   - build
   - choria
   - config
-  - events
   - provtarget
   - provtarget/builddefaults
   - puppet
@@ -45,7 +44,7 @@ imports:
 - name: github.com/choria-io/go-confkey
   version: 634d2c41860498507b0c7eeb2f8a33b1aa6a809d
 - name: github.com/choria-io/go-lifecycle
-  version: 7a10c2a1113a5bd45e8c5693136770658b6bb9d5
+  version: d46c4b2ca99b1c31cfc83995484dc93d4fd7a3d5
 - name: github.com/choria-io/go-protocol
   version: c3117476636777d60c00a86b2d4b2b8fc56addb4
   subpackages:
@@ -94,7 +93,7 @@ imports:
   subpackages:
   - pbutil
 - name: github.com/nats-io/go-nats
-  version: 062418ea1c2181f52dc0f954f6204370519a868b
+  version: fb0396ee0bdb8018b0fef30d6d1de798ce99cd05
   subpackages:
   - encoders/builtin
   - util
