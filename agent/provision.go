@@ -18,6 +18,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/choria-io/go-lifecycle"
+
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/config"
@@ -254,6 +256,11 @@ func reprovisionAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.R
 		go restart(splay, agent.Log)
 	}
 
+	err = agent.ServerInfoSource.NewEvent(lifecycle.Shutdown)
+	if err != nil {
+		agent.Log.Errorf("Could not publish shutdown event: %s", err)
+	}
+
 	reply.Data = Reply{fmt.Sprintf("Restarting after %ds", splay)}
 }
 
@@ -315,6 +322,11 @@ func configureAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Rep
 
 	}
 
+	err = agent.ServerInfoSource.NewEvent(lifecycle.Provisioned)
+	if err != nil {
+		agent.Log.Errorf("Could not publish povisioned event: %s", err)
+	}
+
 	reply.Data = Reply{fmt.Sprintf("Wrote %d lines to %s", lines, agent.Config.ConfigFile)}
 }
 
@@ -357,6 +369,11 @@ func restartAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply
 
 	if allowRestart {
 		go restart(splay, agent.Log)
+	}
+
+	err = agent.ServerInfoSource.NewEvent(lifecycle.Shutdown)
+	if err != nil {
+		agent.Log.Errorf("Could not publish shutdown event: %s", err)
 	}
 
 	reply.Data = Reply{fmt.Sprintf("Restarting Choria Server after %ds", splay)}
