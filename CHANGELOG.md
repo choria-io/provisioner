@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2018/09/07|      |Release 0.2.2                                                                                            |
+|2018/09/07|48    |Ensure the choria config is found on el7 nodes                                                           |
 |2018/08/26|      |Release 0.2.1                                                                                            |
 |2018/08/26|44    |Use lifecycle project to manage lifecycle events                                                         |
 |2018/08/25|      |Release 0.2.0                                                                                            |
