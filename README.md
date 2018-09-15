@@ -117,16 +117,16 @@ You can verify the resulting build with: `acme-choria buildinfo` and it should h
 
 You might not like the provisioning flow exposed by this agent, no problem you can supply your own.
 
-Create `packaging/agents.yaml`
+Create `packaging/user_plugins.yaml`
 
 ```yaml
 ---
-agents:
-- name: choria_provision
-  repo: github.com/acme/prov_agent
+choria_provision: github.com/acme/prov_agent
 ```
 
 Arrange for this to be in the project using `glide get` and in the `buildspec.yaml` set `ProvisionAgent: "false"` in the flag section, it will now not activate this agent and instead use yours.
+
+It also need to implement the `plugin.Pluggable` interface that the Choria plugin system needs.
 
 ### Building
 
