@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/alecthomas/template"
+	"text/template"
 )
 
 const ftempl = `package provision

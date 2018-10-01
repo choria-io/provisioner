@@ -18,7 +18,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/choria-io/go-lifecycle"
+	lifecycle "github.com/choria-io/go-lifecycle"
 	updater "github.com/choria-io/go-updater"
 
 	"github.com/choria-io/go-choria/build"
@@ -83,7 +83,7 @@ func New(mgr server.AgentManager) (*mcorpc.Agent, error) {
 		Author:      "R.I.Pienaar <rip@devco.net>",
 		Version:     build.Version,
 		License:     build.License,
-		Timeout:     2,
+		Timeout:     20,
 		URL:         "http://choria.io",
 	}
 
