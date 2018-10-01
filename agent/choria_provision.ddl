@@ -159,3 +159,39 @@ action "reprovision", :description => "Reenable provision mode in a running Chor
            :description => "Status message from the Provisioner",
            :display_as => "Message"
 end
+
+action "release_update", :description => "Performs an in-place binary update and restarts Choria" do
+      display :always
+
+      input :token,
+            :prompt  => "Token",
+            :description => "Authentication token to pass to the server",
+            :type => :string,
+            :validation => ".",
+            :optional => true,
+            :default => "",
+            :maxlength => 128
+
+      input :repository,
+            :prompt => "Repository URL",
+            :description => "HTTP(S) server hosting the update repository",
+            :type => :string,
+            :validation => "^http(s*):\/\/",
+            :optional => false,
+            :default => "",
+            :maxlength => "512"
+
+      input :version,
+            :prompt => "Version to update to",
+            :description => "Package version to update to",
+            :type => :string,
+            :validation => ".+",
+            :optional => false,
+            :default => "",
+            :maxlength => "32"
+
+      output :message,
+             :description => "Status message from the Provisioner",
+             :display_as => "Message"
+  end
+  

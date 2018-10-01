@@ -1,5 +1,5 @@
-hash: f3541577a0b191e966b08bc88c34711a6b4ed9a4906fec25c1bb8603b9da61e9
-updated: 2018-09-02T17:41:36.950173+02:00
+hash: 12fa4d34e9708e45f7150597aa2a079ac2af12b391d44d2223f0d07b73c61323
+updated: 2018-10-01T13:10:52.059938+02:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -16,12 +16,13 @@ imports:
   subpackages:
   - backplane
 - name: github.com/choria-io/go-choria
-  version: 1a8af30cc7f5a239e9a5f0ba201ea5ba74103db8
+  version: dd726939b396fbcba4070c2bb0f9c0f962751c6c
   subpackages:
   - backoff
   - build
   - choria
   - config
+  - plugin
   - provtarget
   - provtarget/builddefaults
   - puppet
@@ -55,6 +56,8 @@ imports:
   subpackages:
   - filesec
   - puppetsec
+- name: github.com/choria-io/go-updater
+  version: dd12ee5118471007909aac6dbe8c4374b6907e5d
 - name: github.com/choria-io/go-validator
   version: 4ce2ef25983faa873cc4bcea0f1ef2a4273d42cc
   subpackages:
@@ -67,7 +70,7 @@ imports:
   - regex
   - shellsafe
 - name: github.com/choria-io/mcorpc-agent-provider
-  version: db0e90dac9f99b7020cae441072057fd480ce9cc
+  version: c6aa986d8a0ca81fca4994b3ce3dea22fd5f63fc
   subpackages:
   - mcorpc
   - mcorpc/audit
@@ -88,6 +91,8 @@ imports:
   version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
   subpackages:
   - proto
+- name: github.com/konsorten/go-windows-terminal-sequences
+  version: b729f2633dfe35f4d1d8a32385f6685610ce1cb5
 - name: github.com/matttproud/golang_protobuf_extensions
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
@@ -121,9 +126,9 @@ imports:
 - name: github.com/satori/go.uuid
   version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus
-  version: 3e01752db0189b9157070a0e1668a620f9a85da2
+  version: a67f783a3814b8729bd2dac5780b5f78f8dbd64d
 - name: github.com/tidwall/gjson
-  version: 1e3f6aeaa5bad08d777ea7807b279a07885dd8b2
+  version: 01f00f129617a6fe98941fb920d6c760241b54d2
 - name: github.com/tidwall/match
   version: 1731857f09b1f38450e2c12409748407822dc6be
 - name: github.com/xeipuuv/gojsonpointer
@@ -182,7 +187,7 @@ testImports:
   - reporters/stenographer/support/go-isatty
   - types
 - name: github.com/onsi/gomega
-  version: b6ea1ea48f981d0f615a154a45eabb9dd466556d
+  version: 7615b9433f86a8bdf29709bf288bc4fd0636a369
   subpackages:
   - format
   - internal/assertion

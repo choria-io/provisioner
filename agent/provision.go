@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/choria-io/go-lifecycle"
+	updater "github.com/choria-io/go-updater"
 
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
@@ -65,6 +66,12 @@ type ReprovisionRequest struct {
 	Token string `json:"token"`
 }
 
+type ReleaseUpdateRequest struct {
+	Token      string `json:"token"`
+	Repository string `json:"repository"`
+	Version    string `json:"version"`
+}
+
 var mu = &sync.Mutex{}
 var allowRestart = true
 var log *logrus.Entry
@@ -88,8 +95,50 @@ func New(mgr server.AgentManager) (*mcorpc.Agent, error) {
 	agent.MustRegisterAction("configure", configureAction)
 	agent.MustRegisterAction("restart", restartAction)
 	agent.MustRegisterAction("reprovision", reprovisionAction)
+	agent.MustRegisterAction("release_update", releaseUpdateAction)
 
 	return agent, nil
+}
+
+func releaseUpdateAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply, agent *mcorpc.Agent, conn choria.ConnectorInfo) {
+	mu.Lock()
+	defer mu.Unlock()
+
+	args := ReleaseUpdateRequest{}
+	if !mcorpc.ParseRequestData(&args, req, reply) {
+		return
+	}
+
+	if !checkToken(args.Token, reply) {
+		return
+	}
+
+	opts := []updater.Option{
+		updater.Version(args.Version),
+		updater.SourceRepo(args.Repository),
+		updater.Logger(agent.Log.Logger),
+	}
+
+	err := versionUpdater()(opts...)
+	if err != nil {
+		if err := updater.RollbackError(err); err != nil {
+			abort(fmt.Sprintf("Update to version %s failed, rollback also failed, server in broken state: %s", args.Version, err), reply)
+			return
+		}
+
+		abort(fmt.Sprintf("Update to version %s failed, release rolled back: %s", args.Version, err), reply)
+		return
+	}
+
+	err = agent.ServerInfoSource.NewEvent(lifecycle.Shutdown)
+	if err != nil {
+		agent.Log.Errorf("Could not publish shutdown event: %s", err)
+	}
+
+	reply.Data = Reply{"Restarting Choria Server after 2s"}
+	agent.Log.Warnf("Restarting server via request %s from %s (%s) with splay 2s", req.RequestID, req.CallerID, req.SenderID)
+
+	go restart(time.Duration(2*time.Second), agent.Log)
 }
 
 func csrAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply, agent *mcorpc.Agent, conn choria.ConnectorInfo) {
@@ -252,9 +301,7 @@ func reprovisionAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.R
 
 	splay := time.Duration(mrand.Intn(10) + 2)
 
-	if allowRestart {
-		go restart(splay, agent.Log)
-	}
+	go restart(splay, agent.Log)
 
 	err = agent.ServerInfoSource.NewEvent(lifecycle.Shutdown)
 	if err != nil {
@@ -367,9 +414,7 @@ func restartAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply
 
 	agent.Log.Warnf("Restarting server via request %s from %s (%s) with splay %d", req.RequestID, req.CallerID, req.SenderID, splay)
 
-	if allowRestart {
-		go restart(splay, agent.Log)
-	}
+	go restart(splay, agent.Log)
 
 	err = agent.ServerInfoSource.NewEvent(lifecycle.Shutdown)
 	if err != nil {
@@ -443,6 +488,10 @@ func writeConfig(settings map[string]string, req *mcorpc.Request, cfg *config.Co
 }
 
 func restart(splay time.Duration, log *logrus.Entry) {
+	if !allowRestart {
+		return
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -467,4 +516,14 @@ func checkToken(token string, reply *mcorpc.Reply) bool {
 	}
 
 	return true
+}
+
+var updaterf func(...updater.Option) error
+
+func versionUpdater() func(...updater.Option) error {
+	if updaterf != nil {
+		return updaterf
+	}
+
+	return updater.Apply
 }

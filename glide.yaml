@@ -1,7 +1,7 @@
 package: github.com/choria-io/provisioning-agent
 import:
 - package: github.com/choria-io/go-choria
-  version: 1a8af30cc7f5a239e9a5f0ba201ea5ba74103db8
+  version: dd726939b396fbcba4070c2bb0f9c0f962751c6c
   subpackages:
   - build
   - choria
@@ -9,7 +9,7 @@ import:
   - server
   - server/agents
 - package: github.com/choria-io/mcorpc-agent-provider
-  version: ^0.2.0
+  version: ^0.3.1
   subpackages:
   - mcorpc
   - mcorpc/client
@@ -23,6 +23,8 @@ import:
 - package: github.com/tidwall/gjson
 - package: github.com/choria-io/go-lifecycle
   version: ^0.2.0
+- package: github.com/choria-io/go-updater
+  version: dd12ee5118471007909aac6dbe8c4374b6907e5d
 testImport:
 - package: github.com/golang/mock
   version: 8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c
