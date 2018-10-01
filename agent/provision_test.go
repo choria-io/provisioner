@@ -3,10 +3,13 @@ package provision
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/choria-io/go-updater"
 
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
@@ -88,7 +91,58 @@ var _ = Describe("Provision/Agent", func() {
 
 	Describe("New", func() {
 		It("Should create all the actions", func() {
-			Expect(prov.ActionNames()).To(Equal([]string{"configure", "gencsr", "reprovision", "restart"}))
+			Expect(prov.ActionNames()).To(Equal([]string{"configure", "gencsr", "release_update", "reprovision", "restart"}))
+		})
+	})
+
+	Describe("releaseUpdateAction", func() {
+		It("should require a token", func() {
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{"token":"toomanysecrets"}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+			build.ProvisionToken = "xx"
+			releaseUpdateAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+		})
+
+		It("Should handle update errors", func() {
+			updaterf = func(_ ...updater.Option) error {
+				return errors.New("simulated eror")
+			}
+
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{"token":"toomanysecrets", "version":"0.7.0"}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+			build.ProvisionToken = "toomanysecrets"
+			releaseUpdateAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+			Expect(reply.Statusmsg).To(Equal("Update to version 0.7.0 failed, release rolled back: simulated eror"))
+		})
+
+		It("Should update and publish an event", func() {
+			updaterf = func(_ ...updater.Option) error {
+				return nil
+			}
+
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{"token":"toomanysecrets", "version":"0.7.0"}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+			build.ProvisionToken = "toomanysecrets"
+			allowRestart = false
+
+			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
+			releaseUpdateAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
+			Expect(reply.Statusmsg).To(Equal(""))
 		})
 	})
 
