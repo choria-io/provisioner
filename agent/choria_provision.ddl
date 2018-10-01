@@ -4,7 +4,7 @@ metadata :name => "choria_provision",
          :license => "Apache-2.0",
          :version => "0.0.1",
          :url => "https://choria.io",
-         :timeout => 2
+         :timeout => 20
 
 action "gencsr", :description => "Request a CSR from the Choria Server" do
     display :always

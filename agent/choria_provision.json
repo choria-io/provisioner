@@ -7,7 +7,7 @@
     "license": "Apache-2.0",
     "version": "0.0.1",
     "url": "https://choria.io",
-    "timeout": 2
+    "timeout": 20
   },
   "actions": [
     {
