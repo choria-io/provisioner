@@ -30,13 +30,25 @@ func listen(ctx context.Context, wg *sync.WaitGroup, conn choria.Connector) {
 
 	events := make(chan *choria.ConnectorMessage, 1000)
 
-	err := conn.QueueSubscribe(ctx, fw.NewRequestID(), "choria.provisioning_data", "", events)
+	rid, err := fw.NewRequestID()
+	if err != nil {
+		log.Errorf("Could not create provisioning data listener unique id: %s", err)
+		return
+	}
+
+	err = conn.QueueSubscribe(ctx, rid, "choria.provisioning_data", "", events)
 	if err != nil {
 		log.Errorf("Could not listen for provisioning data events: %s", err)
 		return
 	}
 
-	err = conn.QueueSubscribe(ctx, fw.NewRequestID(), "choria.lifecycle.event.startup.provision_mode_server", "", events)
+	rid, err = fw.NewRequestID()
+	if err != nil {
+		log.Errorf("Could not create lifecycle event listener unique id: %s", err)
+		return
+	}
+
+	err = conn.QueueSubscribe(ctx, rid, "choria.lifecycle.event.startup.provision_mode_server", "", events)
 	if err != nil {
 		log.Errorf("Could not listen for lifecycle events: %s", err)
 		return

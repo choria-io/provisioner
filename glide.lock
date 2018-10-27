@@ -1,5 +1,5 @@
-hash: 12fa4d34e9708e45f7150597aa2a079ac2af12b391d44d2223f0d07b73c61323
-updated: 2018-10-01T13:10:52.059938+02:00
+hash: f43a4f503c882e1feee9074bcc91050cc554aa48ca972a516f72072d0dda57f3
+updated: 2018-10-27T23:31:20.286348+01:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -16,7 +16,7 @@ imports:
   subpackages:
   - backplane
 - name: github.com/choria-io/go-choria
-  version: dd726939b396fbcba4070c2bb0f9c0f962751c6c
+  version: 712b4538dbe96c66d118dca98221fb9ef14e054e
   subpackages:
   - backoff
   - build
@@ -38,14 +38,14 @@ imports:
   - server/registration
   - srvcache
 - name: github.com/choria-io/go-client
-  version: 9f8afdf705fdf1e08ed970d8a61a52936205119c
+  version: 60f882dd021c8270ed359c37df45d728f754fa0b
   subpackages:
   - client
   - discovery/broadcast
 - name: github.com/choria-io/go-confkey
   version: 634d2c41860498507b0c7eeb2f8a33b1aa6a809d
 - name: github.com/choria-io/go-lifecycle
-  version: d46c4b2ca99b1c31cfc83995484dc93d4fd7a3d5
+  version: 1170dd4e29c13116122415e7140e1a092d6a966b
 - name: github.com/choria-io/go-protocol
   version: c3117476636777d60c00a86b2d4b2b8fc56addb4
   subpackages:
@@ -70,7 +70,7 @@ imports:
   - regex
   - shellsafe
 - name: github.com/choria-io/mcorpc-agent-provider
-  version: c6aa986d8a0ca81fca4994b3ce3dea22fd5f63fc
+  version: 279845170e27ad55f55a3ced2c442eb91ad5334d
   subpackages:
   - mcorpc
   - mcorpc/audit
@@ -82,6 +82,8 @@ imports:
   - mcorpc/golang/rpcutil
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
+- name: github.com/gofrs/uuid
+  version: 370558f003bfe29580cd0f698d8640daccdcc45c
 - name: github.com/golang/mock
   version: 8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c
   subpackages:
@@ -123,12 +125,10 @@ imports:
   version: b15cd069a83443be3154b719d0cc9fe8117f09fb
   subpackages:
   - xfs
-- name: github.com/satori/go.uuid
-  version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/sirupsen/logrus
-  version: a67f783a3814b8729bd2dac5780b5f78f8dbd64d
+  version: ad15b42461921f1fb3529b058c6786c6a45d5162
 - name: github.com/tidwall/gjson
-  version: 01f00f129617a6fe98941fb920d6c760241b54d2
+  version: 1e3f6aeaa5bad08d777ea7807b279a07885dd8b2
 - name: github.com/tidwall/match
   version: 1731857f09b1f38450e2c12409748407822dc6be
 - name: github.com/xeipuuv/gojsonpointer
