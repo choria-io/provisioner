@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2018/11/27|      |Release 0.3.0                                                                                            |
+|2018/10/01|53    |Initial support for self-updating Choria                                                                 |
 |2018/09/07|      |Release 0.2.2                                                                                            |
 |2018/09/07|48    |Ensure the choria config is found on el7 nodes                                                           |
 |2018/08/26|      |Release 0.2.1                                                                                            |
