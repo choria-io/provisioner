@@ -174,7 +174,7 @@ func csrAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply, ag
 
 	agent.Log.Infof("Creating a new CSR in %s", ssldir)
 
-	err := os.MkdirAll(ssldir, 0700)
+	err := os.MkdirAll(ssldir, 0771)
 	if err != nil {
 		abort(fmt.Sprintf("Could not create SSL Directory %s: %s", ssldir, err), reply)
 		return
@@ -230,7 +230,7 @@ func csrAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply, ag
 		},
 	)
 
-	err = ioutil.WriteFile(keyfile, keyPem, 0700)
+	err = ioutil.WriteFile(keyfile, keyPem, 0640)
 	if err != nil {
 		abort(fmt.Sprintf("Could not store private key: %s", err), reply)
 		return
@@ -244,7 +244,7 @@ func csrAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply, ag
 
 	pb := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE REQUEST", Bytes: csrBytes})
 
-	err = ioutil.WriteFile(csrfile, pb, 0700)
+	err = ioutil.WriteFile(csrfile, pb, 0644)
 	if err != nil {
 		abort(fmt.Sprintf("Could not store CSR: %s", err), reply)
 		return
@@ -354,14 +354,14 @@ func configureAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Rep
 
 	if args.Certificate != "" && args.SSLDir != "" && args.CA != "" {
 		target := filepath.Join(args.SSLDir, "certificate.pem")
-		err = ioutil.WriteFile(target, []byte(args.Certificate), 0700)
+		err = ioutil.WriteFile(target, []byte(args.Certificate), 0644)
 		if err != nil {
 			abort(fmt.Sprintf("Could not write Certificate to %s: %s", target, err), reply)
 			return
 		}
 
 		target = filepath.Join(args.SSLDir, "ca.pem")
-		err = ioutil.WriteFile(target, []byte(args.CA), 0700)
+		err = ioutil.WriteFile(target, []byte(args.CA), 0644)
 		if err != nil {
 			abort(fmt.Sprintf("Could not write CA to %s: %s", target, err), reply)
 			return
