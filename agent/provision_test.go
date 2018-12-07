@@ -9,13 +9,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/choria-io/go-updater"
-
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/config"
 	"github.com/choria-io/go-choria/server/agents"
 	lifecycle "github.com/choria-io/go-lifecycle"
+	updater "github.com/choria-io/go-updater"
 	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
 	"github.com/golang/mock/gomock"
 
@@ -200,10 +199,10 @@ var _ = Describe("Provision/Agent", func() {
 			Expect(csrr.SSLDir).To(Equal(filepath.Join(targetdir, "ssl")))
 			stat, err := os.Stat(filepath.Join(prov.Config.Choria.SSLDir, "private.pem"))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(stat.Mode()).To(Equal(os.FileMode(0700)))
+			Expect(stat.Mode()).To(Equal(os.FileMode(0640)))
 			stat, err = os.Stat(filepath.Join(prov.Config.Choria.SSLDir, "csr.pem"))
 			Expect(err).ToNot(HaveOccurred())
-			Expect(stat.Mode()).To(Equal(os.FileMode(0700)))
+			Expect(stat.Mode()).To(Equal(os.FileMode(0644)))
 		})
 	})
 
