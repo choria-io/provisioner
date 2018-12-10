@@ -55,7 +55,7 @@ func (h *Host) rpcDo(ctx context.Context, agent string, action string, input int
 
 	if result.Stats().ResponsesCount() != 1 {
 		rpcErrCtr.WithLabelValues(h.cfg.Site, name).Inc()
-		return nil, fmt.Errorf("cound not perform %s#%s: received %d responses while expecting a response from %s", agent, action, result.Stats().ResponsesCount(), h.Identity)
+		return nil, fmt.Errorf("could not perform %s#%s: received %d responses while expecting a response from %s", agent, action, result.Stats().ResponsesCount(), h.Identity)
 	}
 
 	return result.Stats(), nil
@@ -121,7 +121,7 @@ func (h *Host) configure(ctx context.Context) error {
 	return err
 }
 
-func (h *Host) fetchInventory(ctx context.Context) error {
+func (h *Host) fetchInventory(ctx context.Context) (err error) {
 	if len(h.Metadata) > 0 {
 		h.log.Infof("Already have metadata for %s, not retrieving again", h.Identity)
 		return nil
@@ -129,9 +129,18 @@ func (h *Host) fetchInventory(ctx context.Context) error {
 
 	h.log.Info("Fetching Inventory")
 
-	_, err := h.rpcDo(ctx, "rpcutil", "inventory", struct{}{}, func(pr protocol.Reply, reply *rpc.RPCReply) {
-		h.Metadata = string(reply.Data)
-	})
+	for try := 1; try <= 5; try++ {
+		if try > 0 {
+			h.log.Warnf("Could not fetch rpcutil#inventory on try %d / 5, retrying", try-1)
+		}
+
+		_, err = h.rpcDo(ctx, "rpcutil", "inventory", struct{}{}, func(pr protocol.Reply, reply *rpc.RPCReply) {
+			h.Metadata = string(reply.Data)
+		})
+		if err == nil {
+			return nil
+		}
+	}
 
 	return err
 }
