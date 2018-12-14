@@ -130,7 +130,7 @@ func (h *Host) fetchInventory(ctx context.Context) (err error) {
 	h.log.Info("Fetching Inventory")
 
 	for try := 1; try <= 5; try++ {
-		if try > 0 {
+		if try > 1 {
 			h.log.Warnf("Could not fetch rpcutil#inventory on try %d / 5, retrying", try-1)
 		}
 
