@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2018/12/14|      |Release 0.3.1                                                                                            |
+|2018/12/10|59    |Retry `rpcutil#inventory` up to 5 times during deploy to report fewer node provision failures            |
+|2018/12/07|58    |Use correct permissions when creating SSL files during provisioning - all were `0700`                    |
 |2018/11/27|      |Release 0.3.0                                                                                            |
 |2018/10/01|53    |Initial support for self-updating Choria                                                                 |
 |2018/09/07|      |Release 0.2.2                                                                                            |
