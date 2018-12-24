@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Reply is a generic reply used by most actions
 type Reply struct {
 	Message string `json:"message"`
 }
@@ -18,6 +19,7 @@ var mu = &sync.Mutex{}
 var allowRestart = true
 var log *logrus.Entry
 
+// New creates a new instance of the agent
 func New(mgr server.AgentManager) (*mcorpc.Agent, error) {
 	metadata := &agents.Metadata{
 		Name:        "choria_provision",
