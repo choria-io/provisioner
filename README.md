@@ -6,7 +6,7 @@ When an unconfigured Choria Server is in provisioning mode it will connect to a 
 
 You can think of this as a similar setup as the old Provisioning VLANs where new servers would join to PXE boot etc. but here we expose an API that let the provisioning environment control the node.
 
-The idea is that an automated system will discover nodes in the `provisioning` sub collective and guide them through the on-boarding process.  The on-boarding process can be entirely custom, one possible flow might be:
+The idea is that an automated system will discover nodes in the `provisioning` subcollective and guide them through the on-boarding process.  The on-boarding process can be entirely custom, one possible flow might be:
 
   * Discover all nodes in the `provisioning` subcollective with the `choria_provision` agent
     * For every discovered nodes
@@ -155,6 +155,7 @@ The agent has the following actions:
   * **configure** - configures a node with the given configuration, signed certificate and ca and path to the ssl store
   * **restart** - restarts the server after a random splay
   * **reprovision** - re-enter provisioning mode
+  * **release_update** - update the choria binary in-place from a repository
 
 Each action takes an optional token which should match that compiled into the Choria binary via the `ProvisionToken` flag.
 
@@ -228,7 +229,7 @@ If you do not care for PKI then do not set `certificate` and `ca`.
 
 The `configuration` contains the config in key value pairs where everything should be strings, this gets written directly into the Choria Server configuration.
 
-#### Sample cfssl Helper
+#### Sample CFSSL Helper
 
 Here's a sample helper that support enrolling nodes into a CFSSL CA, the CA is assumed to be running and listening on `localhost:8888`.  We use this helper in production and can provision 1000 nodes in under a minute using it - including enrolling in the CA.
 
@@ -343,7 +344,7 @@ features:
 # if this is unset the backplane is not enabled
 management:
     name: provisioner
-    logfile: backplane.log
+    logfile: /var/log/provisioner-backplane.log
     loglevel: info
     tls:
         scheme: puppet
@@ -407,190 +408,6 @@ sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 metadata_expire=300
 ```
-
-### Write your own provisioner
-
-Above we covered our own Choria Server Provisioner and we think you should use that instead of writing your own.  It's performant and stable, we use it regularly to provision 10s of thousands of nodes.
-
-For completeness we'll show a simple system written in Ruby that repeatedly scans the provisioning network for new nodes and provision them.  For a evented approach you can listen on the `choria.provisioning_data` topic for node registration data and discover them this way.
-
-We'll show a few snippets for how you might achieve a flow here.  This code is in Ruby and uses the [Choria RPC Client](https://choria.io/docs/development/mcorpc/clients/)
-
-### Discovery Provisionable Nodes
-
-All agents will join your target broker in the `provisioning` collective, all nodes there should be configurable really:
-
-```ruby
-c = rpcclient("choria_provision")
-
-# force the client into the right collective, your client
-# config should have this in the list of known collectives
-c.collective = "provisioning"
-
-nodes = c.discover
-```
-
-### Get the CSR from the nodes and sign it using [cfssl](https://github.com/cloudflare/cfssl)
-
-Above we got the list of configurable nodes, lets look how the per node iteration looks starting with CSR
-
-```ruby
-def request_success?(stats)
-  return false if stats.failcount > 0
-  return false if stats.okcount == 0
-  return false unless stats.noresponsefrom.empty?
-
-  true
-end
-
-def signcsr(node, client)
-    # get the client to talk to just the one node
-    client.discover(:nodes => [node])
-
-    # ask the node for a CSR
-    result = client.gencsr(:cn => node, :O => "Devco", :OU => "Orchestration", :token => @token).first
-    unless request_success?(client.stats)
-      raise("CSR Request failed: %s" % result[:statusmsg])
-    end
-
-    csr = result[:data][:csr]
-
-    # the node will construct a ssl dir relative to its config file if not configured
-    # and tell us where that is so we can use this later to make the configuration
-    ssldir = result[:data][:ssldir]
-
-    # here we use cfssl to sign it, we should use the HTTP API and not save it to the
-    # disk or shell out, but lets keep it easy
-    File.open("%s.csr" % node, "w") do |f|
-      f.print csr
-    end
-
-    signed = JSON.parse(%x[cfssl sign -ca ca.pem -ca-key ca-key.pem #{node}.csr])
-    unless signed["cert"]
-      raise("No signed certificate received from cfssl")
-    end
-
-    return [ssldir, signed]
-end
-```
-
-### Get facts and generate a configuration
-
-We'll fetch the facts from the node and use it to construct a configuration for it, facts are exposed via the `rpcutil#inventory` action.
-
-```ruby
-def genconfig(node, ssldir)
-    client = rpcclient("rpcutil")
-    client.discover(:nodes => [node])
-
-    # ask the node for its inventory
-    result = client.inventory().first
-    unless request_success?(client.stats)
-      raise("Inventory request failed: %s" % result[:statusmsg])
-    end
-
-    facts = result[:data][:facts]
-
-    # do some permutation based on facts, keeping it simple here
-    srvdomain = "example.net"
-    srvdomain = "dev.example.net" if facts["environment"] == "development"
-
-    {
-      # you must disable provisioning in the config as its on by default at compile time
-      "plugin.choria.server.provision" => "false",
-
-      # custom SSL config, not using Puppet CA here
-      "plugin.security.provider" => "file",
-      "plugin.security.file.certificate" => File.join(ssldir, "certificate.pem"),
-      "plugin.security.file.key" => File.join(ssldir, "private.pem"),
-      "plugin.security.file.ca" => File.join(ssldir, "ca.pem"),
-
-      # srv domain based on facts
-      "plugin.choria.srv_domain" => srvdomain,
-
-      # rest standard stuff
-      "collectives" => "choria",
-      "identity" => facts["fqdn"],
-      "logfile" => "/var/log/choria.log",
-      "loglevel" => "warn",
-      "plugin.rpcaudit.logfile" => "/var/log/choria-audit.log",
-      "plugin.yaml" => "/opt/acme/etc/node-metadata.json",
-      "rpcaudit" => "1"
-    }
-end
-```
-
-### Configure the node
-
-With the above SSL and configuration we can look at configuring the node:
-
-```ruby
-def configure(node, config, cert, ca, ssldir, client)
-    client.discover(:nodes => [node])
-
-    # we pass the config, CA, Signed Certificate and SSL directory onto the node
-    result = client.configure(:ca => ca.chomp, :certificate => cert.chomp, :config => config.to_json, :ssldir => ssldir, :token => @token).first
-    unless request_success?(client.stats)
-      raise("Configuration Request failed: %s" % result[:statusmsg])
-    end
-end
-```
-
-### Restart the node with a short splay
-
-Once configured we can restart the Choria Server on the node
-
-```ruby
-def restart(node, client)
-  client.discover(:nodes => [node])
-
-  result = client.restart(:splay => 2, :token => @token)
-  unless request_success?(client.stats)
-    raise("Restart Request failed: %s" % result[:statusmsg])
-  end
-end
-```
-
-### Pulling it all together
-
-```ruby
-#!/opt/puppetlabs/puppet/bin/ruby
-
-# our provisioning network has no TLS, tell the choria libraries to disable it
-$choria_unsafe_disable_nats_tls = true
-
-# the token as compiled into the choria binaries
-@token = "toomanysecrets"
-
-require "mcollective"
-
-include MCollective::RPC
-
-c = rpcclient("choria_provision")
-c.collective = "provisioning"
-ca = File.read("ca.pem")
-
-# above methods not shown
-
-while true
-  nodes = c.discover
-
-  nodes.each do |node|
-    begin
-      ssldir, signed = signcsr(node, c)
-      config = genconfig(node, ssldir)
-      configure(node, config, signed, ca, ssldir, c)
-      restart(node, c)
-    rescue
-      STDOUT.puts("Failed to provision %s: %s", [node, $!.to_s])
-    end
-  end
-
-  c.reset
-end
-```
-
-When you run this it will forever find all nodes and provision them.  In the real world you'll have something more complex but I wanted to show how this flow can work to take nodes from unconfigured to fully functional.
 
 ## Thanks
 
