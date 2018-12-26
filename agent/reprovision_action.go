@@ -59,8 +59,7 @@ func reprovisionAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.R
 		return
 	}
 
-	splay := time.Duration(rand.Intn(10) + 2)
-
+	splay := time.Duration(rand.Intn(10)+2) * time.Second
 	go restart(splay, agent.Log)
 
 	err = agent.ServerInfoSource.NewEvent(lifecycle.Shutdown)

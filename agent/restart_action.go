@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"strings"
 	"syscall"
 	"time"
 
@@ -54,9 +55,8 @@ func restartAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply
 		args.Splay = 10
 	}
 
-	splay := time.Duration(rand.Intn(args.Splay) + 2)
-
-	agent.Log.Warnf("Restarting server via request %s from %s (%s) with splay %d", req.RequestID, req.CallerID, req.SenderID, splay)
+	splay := time.Duration(rand.Intn(args.Splay)+2) * time.Second
+	agent.Log.Warnf("Restarting server via request %s from %s (%s) with splay %v", req.RequestID, req.CallerID, req.SenderID, splay)
 
 	go restart(splay, agent.Log)
 
@@ -76,11 +76,15 @@ func restart(splay time.Duration, log *logrus.Entry) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	log.Warnf("Restarting Choria Server after %ds splay time", splay)
-	time.Sleep(splay * time.Second)
+	allowRestart = false
+
+	log.Warnf("Restarting Choria Server after %v splay time", splay)
+	time.Sleep(splay)
+	log.Warnf("Initiating Choria Server restart using %s", strings.Join(os.Args, " "))
 
 	err := syscall.Exec(os.Args[0], os.Args, os.Environ())
 	if err != nil {
+		allowRestart = true
 		log.Errorf("Could not restart server: %s", err)
 	}
 }
