@@ -67,5 +67,5 @@ func reprovisionAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.R
 		agent.Log.Errorf("Could not publish shutdown event: %s", err)
 	}
 
-	reply.Data = Reply{fmt.Sprintf("Restarting after %ds", splay)}
+	reply.Data = Reply{fmt.Sprintf("Restarting after %v", splay)}
 }
