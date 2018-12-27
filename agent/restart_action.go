@@ -65,7 +65,7 @@ func restartAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply
 		agent.Log.Errorf("Could not publish shutdown event: %s", err)
 	}
 
-	reply.Data = Reply{fmt.Sprintf("Restarting Choria Server after %ds", splay)}
+	reply.Data = Reply{fmt.Sprintf("Restarting Choria Server after %v", splay)}
 }
 
 func restart(splay time.Duration, log *logrus.Entry) {
