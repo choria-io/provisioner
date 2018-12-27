@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2018/12/27|      |Release 0.3.2                                                                                            |
+|2018/12/26|67    |When restarting the Server in some cases the splay till restart could be 5k hours, it's now 2 seconds    |
 |2018/12/14|      |Release 0.3.1                                                                                            |
 |2018/12/10|59    |Retry `rpcutil#inventory` up to 5 times during deploy to report fewer node provision failures            |
 |2018/12/07|58    |Use correct permissions when creating SSL files during provisioning - all were `0700`                    |
