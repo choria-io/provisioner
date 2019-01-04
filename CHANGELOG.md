@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/01/04|      |Release 0.4.0                                                                                            |
+|2019/01/04|72    |Reject Choria client certificate patterns while signing nodes                                            |
+|2018/12/27|70    |Improve splay related logging during restart                                                             |
 |2018/12/27|      |Release 0.3.2                                                                                            |
 |2018/12/26|67    |When restarting the Server in some cases the splay till restart could be 5k hours, it's now 2 seconds    |
 |2018/12/14|      |Release 0.3.1                                                                                            |
