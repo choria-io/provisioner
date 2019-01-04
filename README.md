@@ -332,6 +332,15 @@ choria_insecure: true
 # a site name exposed to the backplane to assist with discovery, also used in stats
 site: testing
 
+# Certificate patterns that should never be signed from CSRs, these are ones choria
+# set aside as client only certificates and someone might configure a node to obtain
+# a signed cert otherwise.  When not set below is the default value
+cert_deny_list:
+  - "\.choria$"
+  - "\.mcollective$"
+  - "\.privileged.choria$"
+  - "\.privileged.mcollective$"
+
 # if not 0 then /metrics will be prometheus metrics
 monitor_port: 9999
 

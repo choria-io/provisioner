@@ -18,16 +18,17 @@ var Version = "0.0.0"
 
 // Config is the configuration structure
 type Config struct {
-	Workers     int                              `json:"workers"`
-	Interval    string                           `json:"interval"`
-	Logfile     string                           `json:"logfile"`
-	Loglevel    string                           `json:"loglevel"`
-	Helper      string                           `json:"helper"`
-	Token       string                           `json:"token"`
-	Insecure    bool                             `json:"choria_insecure"`
-	Site        string                           `json:"site"`
-	MonitorPort int                              `json:"monitor_port"`
-	Management  *backplane.StandardConfiguration `yaml:"management"`
+	Workers      int                              `json:"workers"`
+	Interval     string                           `json:"interval"`
+	Logfile      string                           `json:"logfile"`
+	Loglevel     string                           `json:"loglevel"`
+	Helper       string                           `json:"helper"`
+	Token        string                           `json:"token"`
+	Insecure     bool                             `json:"choria_insecure"`
+	Site         string                           `json:"site"`
+	MonitorPort  int                              `json:"monitor_port"`
+	Management   *backplane.StandardConfiguration `json:"management" yaml:"management"`
+	CertDenyList []string                         `json:"cert_deny_list"`
 
 	Features struct {
 		PKI bool `json:"pki"`
@@ -63,6 +64,15 @@ func Load(file string) (*Config, error) {
 	err = json.Unmarshal(j, &config)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse config file %s as YAML: %s", file, err)
+	}
+
+	if len(config.CertDenyList) == 0 {
+		config.CertDenyList = []string{
+			"\\.privileged.mcollective$",
+			"\\.privileged.choria$",
+			"\\.mcollective$",
+			"\\.choria$",
+		}
 	}
 
 	config.IntervalDuration, err = time.ParseDuration(config.Interval)
