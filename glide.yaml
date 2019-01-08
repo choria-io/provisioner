@@ -1,7 +1,7 @@
 package: github.com/choria-io/provisioning-agent
 import:
 - package: github.com/choria-io/go-choria
-  version: aac81e5094aafb2c90a9d945508a38483a20da7a
+  version: 47d66d6436d491f1155fd26b28a8b985a2fd2002
   subpackages:
   - build
   - choria
