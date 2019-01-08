@@ -1,5 +1,5 @@
-hash: 99c17e34596a123cb525c336f6aa8e1f967bb546d07394dbd8b77021f97d9362
-updated: 2019-01-03T15:41:47.228676+01:00
+hash: 02ab46a0c40f8ea9342bee7276ded1f70ba0a5b217533dc1f7262753aed77a8f
+updated: 2019-01-08T10:12:55.428932+01:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -16,7 +16,7 @@ imports:
   subpackages:
   - backplane
 - name: github.com/choria-io/go-choria
-  version: aac81e5094aafb2c90a9d945508a38483a20da7a
+  version: 47d66d6436d491f1155fd26b28a8b985a2fd2002
   subpackages:
   - backoff
   - build
@@ -129,7 +129,7 @@ imports:
   - nfs
   - xfs
 - name: github.com/sirupsen/logrus
-  version: bcd833dfe83d3cebad139e4a29ed79cb2318bf95
+  version: e1e72e9de974bd926e5c56f83753fba2df402ce5
 - name: github.com/tidwall/gjson
   version: 081192fa2e471ddff3ec98a3cc04fecfd031ed57
 - name: github.com/tidwall/match
