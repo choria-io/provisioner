@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/01/08|      |Release 0.4.2                                                                                            |
+|2019/01/08|78    |Improve robustness of event handling logic                                                               |
 |2019/01/08|      |Release 0.4.1                                                                                            |
 |2019/01/08|      |Update `go-choria` dependency to resolve panics during connection close                                  |
 |2019/01/04|      |Release 0.4.0                                                                                            |
