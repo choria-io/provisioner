@@ -3,11 +3,11 @@ package hosts
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 
+	"github.com/choria-io/go-lifecycle"
+
 	"github.com/choria-io/provisioning-agent/host"
-	"github.com/tidwall/gjson"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/srvcache"
@@ -79,25 +79,20 @@ func handle(msg *choria.ConnectorMessage) (string, error) {
 		return "", nil
 	}
 
-	proto := gjson.GetBytes(msg.Data, "protocol")
-	if !proto.Exists() {
-		return "", fmt.Errorf("received a message with no protocol description")
-	}
-
-	if strings.HasPrefix(proto.String(), "choria:lifecycle:startup") {
-		return handleStartupEvent(msg)
+	event, err := lifecycle.NewFromJSON(msg.Bytes())
+	if err == nil {
+		return handleEvent(event)
 	}
 
 	return handleRegistration(msg)
 }
 
-func handleStartupEvent(msg *choria.ConnectorMessage) (string, error) {
-	component := gjson.GetBytes(msg.Data, "component").String()
-	if component != "provision_mode_server" {
+func handleEvent(event lifecycle.Event) (string, error) {
+	if event.Type() != lifecycle.Startup {
 		return "", nil
 	}
 
-	return gjson.GetBytes(msg.Data, "identity").String(), nil
+	return event.Identity(), nil
 }
 
 func handleRegistration(msg *choria.ConnectorMessage) (string, error) {
