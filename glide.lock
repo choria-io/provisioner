@@ -1,5 +1,5 @@
-hash: 02ab46a0c40f8ea9342bee7276ded1f70ba0a5b217533dc1f7262753aed77a8f
-updated: 2019-01-08T10:12:55.428932+01:00
+hash: 4c5a74b561dc913ce6cd212bbc6aa8b861e16d70fa7c42c4787c2d8c64de6b69
+updated: 2019-01-09T17:35:29.525726938+01:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -16,7 +16,7 @@ imports:
   subpackages:
   - backplane
 - name: github.com/choria-io/go-choria
-  version: 47d66d6436d491f1155fd26b28a8b985a2fd2002
+  version: 8b3b70538ee7f6858e05a5d578c7abecad0aa90a
   subpackages:
   - backoff
   - build
