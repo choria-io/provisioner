@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/01/09|      |Release 0.4.3                                                                                            |
+|2019/01/09|      |Update `go-choria` dependency to resolve connection leaks                                                |
 |2019/01/08|      |Release 0.4.2                                                                                            |
 |2019/01/08|78    |Improve robustness of event handling logic                                                               |
 |2019/01/08|      |Release 0.4.1                                                                                            |
