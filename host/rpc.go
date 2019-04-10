@@ -130,8 +130,12 @@ func (h *Host) fetchInventory(ctx context.Context) (err error) {
 	h.log.Info("Fetching Inventory")
 
 	for try := 1; try <= 5; try++ {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+
 		if try > 1 {
-			h.log.Warnf("Could not fetch rpcutil#inventory on try %d / 5, retrying", try-1)
+			h.log.Warnf("Could not fetch rpcutil#inventory from %s on try %d / 5, retrying", h.Identity, try-1)
 		}
 
 		_, err = h.rpcDo(ctx, "rpcutil", "inventory", struct{}{}, func(pr protocol.Reply, reply *rpc.RPCReply) {
