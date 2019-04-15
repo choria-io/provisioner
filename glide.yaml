@@ -1,19 +1,22 @@
 package: github.com/choria-io/provisioning-agent
 import:
 - package: github.com/choria-io/go-choria
-  version: 8b3b70538ee7f6858e05a5d578c7abecad0aa90a
+  version: 0.10.1
   subpackages:
   - build
   - choria
   - config
   - server
   - server/agents
+- package: github.com/choria-io/go-client
+  version: 0.4.1
 - package: github.com/choria-io/mcorpc-agent-provider
   version: 0.3.3
   subpackages:
   - mcorpc
   - mcorpc/client
 - package: github.com/sirupsen/logrus
+  version: 1.4.0
 - package: gopkg.in/alecthomas/kingpin.v2
   version: ^2.2.6
 - package: github.com/choria-io/go-backplane
