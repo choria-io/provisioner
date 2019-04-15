@@ -1,5 +1,5 @@
-hash: 4c5a74b561dc913ce6cd212bbc6aa8b861e16d70fa7c42c4787c2d8c64de6b69
-updated: 2019-01-09T17:35:29.525726938+01:00
+hash: 3a2be45ca2ade4996394e78d92b30c7ff28b71feb62b19f35bc9fff22cfcd311
+updated: 2019-04-15T12:55:13.766904783+02:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -16,7 +16,7 @@ imports:
   subpackages:
   - backplane
 - name: github.com/choria-io/go-choria
-  version: 8b3b70538ee7f6858e05a5d578c7abecad0aa90a
+  version: a6ac6db87c3d9a45d7e8b3a8050c9930575869f5
   subpackages:
   - backoff
   - build
@@ -52,7 +52,7 @@ imports:
   - protocol
   - protocol/v1
 - name: github.com/choria-io/go-security
-  version: f15fe29b0b34036c5b96ceb5552fda389ee16bc3
+  version: b259ec5ee20647587b1f8a9b1316b333de4ce3ad
   subpackages:
   - filesec
   - puppetsec
@@ -83,7 +83,7 @@ imports:
 - name: github.com/ghodss/yaml
   version: 0ca9ea5df5451ffdf184b4428c902747c2c11cd7
 - name: github.com/gofrs/uuid
-  version: 7077aa61129615a0d7f45c49101cd011ab221c27
+  version: 6b08a5c5172ba18946672b49749cde22873dd7c2
 - name: github.com/golang/mock
   version: 8b2eeeb0ca5f56c78bec5efde9c4a21d9201126c
   subpackages:
@@ -129,7 +129,7 @@ imports:
   - nfs
   - xfs
 - name: github.com/sirupsen/logrus
-  version: e1e72e9de974bd926e5c56f83753fba2df402ce5
+  version: dae0fa8d5b0c810a8ab733fbd5510c7cae84eca4
 - name: github.com/tidwall/gjson
   version: 081192fa2e471ddff3ec98a3cc04fecfd031ed57
 - name: github.com/tidwall/match
@@ -170,7 +170,7 @@ testImports:
   - watch
   - winfile
 - name: github.com/onsi/ginkgo
-  version: 2e1be8f7d90e9d3e3e58b0ce470f2f14d075406f
+  version: eea6ad008b96acdaa524f5b409513bf062b500ad
   subpackages:
   - config
   - internal/codelocation
@@ -190,7 +190,7 @@ testImports:
   - reporters/stenographer/support/go-isatty
   - types
 - name: github.com/onsi/gomega
-  version: 65fb64232476ad9046e57c26cd0bff3d3a8dc6cd
+  version: 90e289841c1ed79b7a598a7cd9959750cb5e89e2
   subpackages:
   - format
   - internal/assertion

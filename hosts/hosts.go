@@ -21,7 +21,7 @@ import (
 var (
 	hosts = make(map[string]*host.Host)
 	work  = make(chan *host.Host, 1000)
-	done  = make(chan *host.Host, 100)
+	done  = make(chan *host.Host, 1000)
 	mu    = &sync.Mutex{}
 	log   *logrus.Entry
 	fw    *choria.Framework
@@ -117,13 +117,19 @@ func add(host *host.Host) bool {
 	mu.Lock()
 	defer mu.Unlock()
 
+	if len(work) == cap(work) {
+		log.Warnf("Work queue is full at %d entries, cannot add %s", len(work), host.Identity)
+		return false
+	}
+
 	_, known := hosts[host.Identity]
 	if known {
 		return false
 	}
 
-	log.Debugf("Adding %s to the work queue", host)
+	log.Debugf("Adding %s to the work queue with %d entries", host.Identity, len(hosts))
 	hosts[host.Identity] = host
+
 	work <- host
 
 	return true
@@ -153,13 +159,14 @@ func discoverProvisionableNodes(ctx context.Context, agent *rpc.RPC) error {
 	}
 
 	bd := broadcast.New(fw)
-	nodes, err := bd.Discover(ctx, broadcast.Collective("provisioning"), broadcast.Filter(f))
+	nodes, err := bd.Discover(ctx, broadcast.Collective("provisioning"), broadcast.Filter(f), broadcast.Timeout(1*time.Second))
 	if err != nil {
 		return err
 	}
 
 	for _, n := range nodes {
 		if add(host.NewHost(n, conf)) {
+			log.Infof("Adding %s to the provision list after discovering it", n)
 			discoveredCtr.WithLabelValues(conf.Site).Inc()
 		}
 	}

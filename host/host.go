@@ -105,6 +105,10 @@ func (h *Host) String() string {
 }
 
 func (h *Host) validateCSR() error {
+	if h.CSR == nil {
+		return fmt.Errorf("no CSR received")
+	}
+
 	if h.CSR.CSR == "" {
 		return fmt.Errorf("no CSR received")
 	}

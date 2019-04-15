@@ -26,7 +26,7 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 
 			// delay removing the node to avoid a race between discovery and node restarting splay
 			go func() {
-				<-time.NewTimer(20 * time.Second).C
+				<-time.NewTimer(60 * time.Second).C
 				done <- host
 			}()
 
