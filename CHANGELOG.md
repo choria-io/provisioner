@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/04/17|      |Release 0.4.4                                                                                            |
+|2019/04/15|85    |Handle work queue overflow better                                                                        |
+|2019/04/10|83    |Check context during retries to speed up shutdown                                                        |
 |2019/01/09|      |Release 0.4.3                                                                                            |
 |2019/01/09|      |Update `go-choria` dependency to resolve connection leaks                                                |
 |2019/01/08|      |Release 0.4.2                                                                                            |
