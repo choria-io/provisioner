@@ -2,16 +2,18 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.12
 
     working_directory: /go/src/github.com/choria-io/provisioning-agent
+
+    environment:
+      GO111MODULE: "on"
 
     steps:
       - checkout
       - setup_remote_docker
-      - run: go get github.com/Masterminds/glide
       - run: go get github.com/onsi/ginkgo/ginkgo
-      - run: glide install
+      - run: go mod vendor
       - run: ginkgo -r -skipMeasurements
       - run: mkdir -p /tmp/workspace
       - run: cd .. ; tar -czf /tmp/workspace/provisioning-agent.tgz provisioning-agent
