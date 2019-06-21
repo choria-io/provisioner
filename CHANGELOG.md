@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/06/21|      |Release 0.4.5                                                                                            |
+|2019/06/21|      |Support `go mod`                                                                                         |
 |2019/04/17|      |Release 0.4.4                                                                                            |
 |2019/04/15|85    |Handle work queue overflow better                                                                        |
 |2019/04/10|83    |Check context during retries to speed up shutdown                                                        |
