@@ -3,7 +3,6 @@ package provision
 import (
 	"sync"
 
-	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/server"
 	"github.com/choria-io/go-choria/server/agents"
 	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
@@ -21,12 +20,14 @@ var log *logrus.Entry
 
 // New creates a new instance of the agent
 func New(mgr server.AgentManager) (*mcorpc.Agent, error) {
+	bi := mgr.Choria().BuildInfo()
+
 	metadata := &agents.Metadata{
 		Name:        "choria_provision",
 		Description: "Choria Provisioner",
 		Author:      "R.I.Pienaar <rip@devco.net>",
-		Version:     build.Version,
-		License:     build.License,
+		Version:     bi.Version(),
+		License:     bi.License(),
 		Timeout:     20,
 		URL:         "http://choria.io",
 	}
