@@ -10,7 +10,6 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/choria-io/go-choria/choria"
-	"github.com/choria-io/go-choria/srvcache"
 )
 
 func connect(ctx context.Context) (choria.Connector, error) {
@@ -18,11 +17,7 @@ func connect(ctx context.Context) (choria.Connector, error) {
 		return nil, fmt.Errorf("Existing on shut down")
 	}
 
-	return fw.NewConnector(ctx, brokerUrls, fw.Certname(), log)
-}
-
-func brokerUrls() ([]srvcache.Server, error) {
-	return fw.MiddlewareServers()
+	return fw.NewConnector(ctx, fw.MiddlewareServers, fw.Certname(), log)
 }
 
 func listen(ctx context.Context, wg *sync.WaitGroup, conn choria.Connector) {
