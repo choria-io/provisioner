@@ -35,7 +35,7 @@ func releaseUpdateAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc
 	opts := []updater.Option{
 		updater.Version(args.Version),
 		updater.SourceRepo(args.Repository),
-		updater.Logger(agent.Log.Logger),
+		updater.Logger(agent.Log),
 	}
 
 	err := versionUpdater()(opts...)

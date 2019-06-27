@@ -95,7 +95,7 @@ func writeConfig(settings map[string]string, req *mcorpc.Request, cfg *config.Co
 
 	_, err := os.Stat(cfile)
 	if err == nil {
-		cfile, err = filepath.EvalSymlinks(cfg.ConfigFile)
+		cfile, err = filepath.EvalSymlinks(cfile)
 		if err != nil {
 			return 0, fmt.Errorf("cannot determine full path to config file %s: %s", cfile, err)
 		}
