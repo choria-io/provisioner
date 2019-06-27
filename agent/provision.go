@@ -34,6 +34,11 @@ func New(mgr server.AgentManager) (agents.Agent, error) {
 
 	agent := mcorpc.New("choria_provision", metadata, mgr.Choria(), log)
 
+	agent.SetActivationChecker(func() bool {
+		bi := mgr.Choria().BuildInfo()
+		return bi.ProvisionBrokerURLs() != "" && bi.ProvisionAgent()
+	})
+
 	agent.MustRegisterAction("gencsr", csrAction)
 	agent.MustRegisterAction("configure", configureAction)
 	agent.MustRegisterAction("restart", restartAction)
