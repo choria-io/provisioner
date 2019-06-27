@@ -64,8 +64,9 @@ var _ = Describe("Provision/Agent", func() {
 
 		si = agents.NewMockServerInfoSource(mockctl)
 		am = agents.New(requests, fw, nil, si, logrus.WithFields(logrus.Fields{"test": "1"}))
-		prov, err = New(am)
+		p, err := New(am)
 		Expect(err).ToNot(HaveOccurred())
+		prov = p.(*mcorpc.Agent)
 		prov.SetServerInfo(si)
 		logrus.SetLevel(logrus.FatalLevel)
 
