@@ -10,7 +10,7 @@ require (
 	github.com/choria-io/go-lifecycle v1.0.3-0.20190626160828-06aa540a56f9
 	github.com/choria-io/go-protocol v1.3.1
 	github.com/choria-io/go-updater v0.0.3
-	github.com/choria-io/mcorpc-agent-provider v0.4.2-0.20190626155401-34d637f83aea
+	github.com/choria-io/mcorpc-agent-provider v0.4.2-0.20190627111953-2cda62f3524a
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/mock v1.3.1
 	github.com/onsi/ginkgo v1.8.0
