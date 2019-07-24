@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/07/24|      |Release 0.5.0                                                                                            |
+|2019/06/27|94    |Support ActivationChecker                                                                                |
+|2019/06/26|92    |Turn the agent into a standard Choria Plugin                                                             |
 |2019/06/21|      |Release 0.4.5                                                                                            |
 |2019/06/21|      |Support `go mod`                                                                                         |
 |2019/04/17|      |Release 0.4.4                                                                                            |
