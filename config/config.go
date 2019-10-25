@@ -18,20 +18,22 @@ var Version = "0.0.0"
 
 // Config is the configuration structure
 type Config struct {
-	Workers      int                              `json:"workers"`
-	Interval     string                           `json:"interval"`
-	Logfile      string                           `json:"logfile"`
-	Loglevel     string                           `json:"loglevel"`
-	Helper       string                           `json:"helper"`
-	Token        string                           `json:"token"`
-	Insecure     bool                             `json:"choria_insecure"`
-	Site         string                           `json:"site"`
-	MonitorPort  int                              `json:"monitor_port"`
-	Management   *backplane.StandardConfiguration `json:"management" yaml:"management"`
-	CertDenyList []string                         `json:"cert_deny_list"`
+	Workers       int                              `json:"workers"`
+	Interval      string                           `json:"interval"`
+	Logfile       string                           `json:"logfile"`
+	Loglevel      string                           `json:"loglevel"`
+	Helper        string                           `json:"helper"`
+	Token         string                           `json:"token"`
+	Insecure      bool                             `json:"choria_insecure"`
+	Site          string                           `json:"site"`
+	MonitorPort   int                              `json:"monitor_port"`
+	Management    *backplane.StandardConfiguration `json:"management" yaml:"management"`
+	CertDenyList  []string                         `json:"cert_deny_list"`
+	JWTVerifyCert string                           `json:"jwt_verify_cert"`
 
 	Features struct {
 		PKI bool `json:"pki"`
+		JWT bool `json:"jwt"`
 	} `json:"features"`
 
 	IntervalDuration time.Duration `json:"-"`

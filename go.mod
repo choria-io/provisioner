@@ -11,8 +11,10 @@ require (
 	github.com/choria-io/go-protocol v1.3.2
 	github.com/choria-io/go-updater v0.0.3
 	github.com/choria-io/mcorpc-agent-provider v0.8.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/mock v1.3.1
+	github.com/nats-io/jwt v0.2.14
 	github.com/onsi/ginkgo v1.10.1
 	github.com/onsi/gomega v1.7.0
 	github.com/prometheus/client_golang v1.1.0
