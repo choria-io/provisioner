@@ -42,7 +42,7 @@ var _ = Describe("Provision/Agent", func() {
 		prov      *mcorpc.Agent
 		reply     *mcorpc.Reply
 		ctx       context.Context
-		si        *agents.MockServerInfoSource
+		si        *MockServerInfoSource
 		targetcfg string
 		targetlog string
 		targetdir string
@@ -62,7 +62,7 @@ var _ = Describe("Provision/Agent", func() {
 		fw, err = choria.NewWithConfig(cfg)
 		Expect(err).ToNot(HaveOccurred())
 
-		si = agents.NewMockServerInfoSource(mockctl)
+		si = NewMockServerInfoSource(mockctl)
 		am = agents.New(requests, fw, nil, si, logrus.WithFields(logrus.Fields{"test": "1"}))
 		p, err := New(am)
 		Expect(err).ToNot(HaveOccurred())
@@ -91,7 +91,7 @@ var _ = Describe("Provision/Agent", func() {
 
 	Describe("New", func() {
 		It("Should create all the actions", func() {
-			Expect(prov.ActionNames()).To(Equal([]string{"configure", "gencsr", "release_update", "reprovision", "restart"}))
+			Expect(prov.ActionNames()).To(Equal([]string{"configure", "gencsr", "jwt", "release_update", "reprovision", "restart"}))
 		})
 	})
 
@@ -370,6 +370,77 @@ var _ = Describe("Provision/Agent", func() {
 			Expect(cfg.LogFile).To(Equal(targetlog))
 			Expect(cfg.Registration).To(Equal([]string{"file_content"}))
 			Expect(cfg.Choria.FileContentRegistrationData).To(Equal("/tmp/choria_test.json"))
+		})
+	})
+
+	Describe("jwtAction", func() {
+		It("Should require a token", func() {
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{"token":"toomanysecrets"}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+
+			build.ProvisionToken = "fail"
+			build.ProvisionJWTFile = "testdata/provision.jwt"
+
+			jwtAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+			Expect(reply.Statusmsg).To(Equal("Incorrect provision token supplied"))
+
+			build.ProvisionToken = "toomanysecrets"
+			reply = &mcorpc.Reply{}
+
+			jwtAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
+			Expect(reply.Statusmsg).To(Equal(""))
+		})
+
+		It("Should handle unset JWT files", func() {
+			build.ProvisionToken = ""
+			build.ProvisionJWTFile = ""
+
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+			jwtAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+			Expect(reply.Statusmsg).To(Equal("No Provisioning JWT file has been configured"))
+		})
+
+		It("Should handle missing JWT files", func() {
+			build.ProvisionToken = ""
+			build.ProvisionJWTFile = "/nonexisting"
+
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+			jwtAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
+			Expect(reply.Statusmsg).To(Equal("Provisioning JWT file does not exist"))
+		})
+
+		It("Should read the JWT file", func() {
+			build.ProvisionToken = ""
+			build.ProvisionJWTFile = "testdata/provision.jwt"
+
+			req := &mcorpc.Request{
+				Data:      json.RawMessage(`{}`),
+				RequestID: "uniq_req_id",
+				CallerID:  "choria=rip.mcollective",
+				SenderID:  "go.test",
+			}
+			jwtAction(ctx, req, reply, prov, nil)
+			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
+			Expect(reply.Data.(JWTReply).JWT).To(Equal("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaHMiOnRydWUsImNodSI6InByb3YuZXhhbXBsZS5uZXQ6NDIyMiIsImNodCI6InNlY3JldCIsImNocGQiOnRydWV9.lLc9DAdjkdA-YAbhwHg3FVR9BklGFSZ7FxyzSbh9vCc"))
+			build.ProvisionJWTFile = ""
 		})
 	})
 
