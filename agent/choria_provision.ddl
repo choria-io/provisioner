@@ -160,6 +160,24 @@ action "reprovision", :description => "Reenable provision mode in a running Chor
            :display_as => "Message"
 end
 
+action "jwt", :description => "Retrieves the Provisioning JWT token if set" do
+      display :always
+
+      input :token,
+            :prompt  => "Token",
+            :description => "Authentication token to pass to the server",
+            :type => :string,
+            :validation => ".",
+            :optional => true,
+            :default => "",
+            :maxlength => 128
+
+      output :jwt,
+             :description => "The contents of the JWT token",
+             :display_as => "JWT Token",
+             :default => ""
+end
+
 action "release_update", :description => "Performs an in-place binary update and restarts Choria" do
       display :always
 
@@ -194,4 +212,3 @@ action "release_update", :description => "Performs an in-place binary update and
              :description => "Status message from the Provisioner",
              :display_as => "Message"
   end
-  

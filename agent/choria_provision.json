@@ -170,7 +170,7 @@
           "default": "",
           "optional": false,
           "validation": "^http(s*)://",
-          "maxlength": "512"
+          "maxlength": 512
         },
         "version": {
           "prompt": "Version to update to",
@@ -179,7 +179,7 @@
           "default": "",
           "optional": false,
           "validation": ".+",
-          "maxlength": "32"
+          "maxlength": 32
         }
       },
       "output": {
@@ -191,6 +191,29 @@
       },
       "display": "always",
       "description": "Performs an in-place binary update and restarts Choria"
+    },
+    {
+      "action": "jwt",
+      "input": {
+        "token": {
+          "prompt": "Token",
+          "description": "Authentication token to pass to the server",
+          "type": "string",
+          "default": "",
+          "optional": true,
+          "validation": ".",
+          "maxlength": 128
+        }
+      },
+      "output": {
+        "jwt": {
+          "description": "The contents of the JWT token",
+          "display_as": "JWT Token",
+          "default": ""
+        }
+      },
+      "display": "always",
+      "description": "Reenable provision mode in a running Choria Server"
     },
     {
       "action": "reprovision",
