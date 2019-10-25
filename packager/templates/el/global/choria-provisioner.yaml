@@ -10,6 +10,8 @@ token: toomanysecrets
 choria_insecure: true
 site: TEST
 monitor_port: 8080
+jwt_verify_cert: /etc/choria-provisioner/jwt-verify.pem
 
 features:
   pki: true
+  jwt: true

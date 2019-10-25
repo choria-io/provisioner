@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"regexp"
 	"strings"
 	"sync"
@@ -12,13 +13,26 @@ import (
 	"github.com/choria-io/go-choria/choria"
 	provision "github.com/choria-io/provisioning-agent/agent"
 	"github.com/choria-io/provisioning-agent/config"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/sirupsen/logrus"
 )
+
+type provClaims struct {
+	Secure      bool   `json:"chs"`
+	URLs        string `json:"chu"`
+	Token       string `json:"cht"`
+	SRVDomain   string `json:"chsrv"`
+	ProvDefault bool   `json:"chpd"`
+
+	jwt.StandardClaims
+}
 
 type Host struct {
 	Identity    string              `json:"identity"`
 	CSR         *provision.CSRReply `json:"csr"`
 	Metadata    string              `json:"inventory"`
+	JWT         *provClaims         `json:"jwt"`
+	rawJWT      string
 	config      map[string]string
 	provisioned bool
 	ca          string
@@ -53,6 +67,18 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 
 	h.fw = fw
 	h.log = fw.Logger(h.Identity)
+
+	if h.cfg.Features.JWT {
+		err := h.fetchJWT(ctx)
+		if err != nil {
+			return fmt.Errorf("could not fetch and validate JWT: %s: %s", h.Identity, err)
+		}
+
+		err = h.validateJWT()
+		if err != nil {
+			return fmt.Errorf("could not validate JWT: %s: %s", h.Identity, err)
+		}
+	}
 
 	err := h.fetchInventory(ctx)
 	if err != nil {
@@ -102,6 +128,33 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 
 func (h *Host) String() string {
 	return h.Identity
+}
+
+func (h *Host) validateJWT() error {
+	if h.rawJWT == "" {
+		return fmt.Errorf("no JWT received")
+	}
+
+	if h.cfg.JWTVerifyCert == "" {
+		return fmt.Errorf("no JWT verification certificate configured, cannot validate JWT")
+	}
+
+	claims := &provClaims{}
+	_, err := jwt.ParseWithClaims(h.rawJWT, claims, func(t *jwt.Token) (interface{}, error) {
+		pem, err := ioutil.ReadFile(h.cfg.JWTVerifyCert)
+		if err != nil {
+			return nil, fmt.Errorf("could not read JWT verification certificate: %s", err)
+		}
+
+		return jwt.ParseRSAPublicKeyFromPEM(pem)
+	})
+	if err != nil {
+		return err
+	}
+
+	h.JWT = claims
+
+	return nil
 }
 
 func (h *Host) validateCSR() error {

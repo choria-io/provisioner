@@ -121,6 +121,34 @@ func (h *Host) configure(ctx context.Context) error {
 	return err
 }
 
+func (h *Host) fetchJWT(ctx context.Context) (err error) {
+	if h.rawJWT == "" {
+		h.log.Infof("Already have JWT for %s, not retrieveing again", h.Identity)
+		return nil
+	}
+
+	h.log.Info("Fetching JWT")
+
+	jwtreq := &provision.JWTRequest{
+		Token: h.token,
+	}
+
+	for try := 1; try <= 5; try++ {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+
+		_, err = h.rpcDo(ctx, "choria_provision", "jwt", jwtreq, func(pr protocol.Reply, reply *rpc.RPCReply) {
+			h.rawJWT = string(reply.Data)
+		})
+		if err == nil {
+			return nil
+		}
+	}
+
+	return err
+}
+
 func (h *Host) fetchInventory(ctx context.Context) (err error) {
 	if len(h.Metadata) > 0 {
 		h.log.Infof("Already have metadata for %s, not retrieving again", h.Identity)
