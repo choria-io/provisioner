@@ -141,6 +141,10 @@ func (h *Host) validateJWT() error {
 
 	claims := &provClaims{}
 	_, err := jwt.ParseWithClaims(h.rawJWT, claims, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unsupported signing method in token")
+		}
+
 		pem, err := ioutil.ReadFile(h.cfg.JWTVerifyCert)
 		if err != nil {
 			return nil, fmt.Errorf("could not read JWT verification certificate: %s", err)
