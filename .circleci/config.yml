@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
 
     working_directory: /go/src/github.com/choria-io/provisioning-agent
 
@@ -24,14 +24,14 @@ jobs:
 
   build_el6_64bit_rpms: &pkg_build
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.13
 
     working_directory: /go/src/github.com/choria-io/provisioning-agent
 
     environment:
       PACKAGE: el6_64
       BUILD: foss
-      BUILDER: choria/packager:el5-go1.10
+      BUILDER: choria/packager:el5-go1.13
 
     steps: &std_build_steps
       - setup_remote_docker
@@ -76,25 +76,25 @@ jobs:
     environment:
       PACKAGE: el6_32
       BUILD: foss
-      BUILDER: choria/packager:el7-go1.10
+      BUILDER: choria/packager:el7-go1.13
 
   build_el7_64bit_rpms:
     <<: *pkg_build
     environment:
       PACKAGE: el7_64
       BUILD: foss
-      BUILDER: choria/packager:el7-go1.10
+      BUILDER: choria/packager:el7-go1.13
 
   build_puppet_module:
     <<: *pkg_build
     environment:
       PACKAGE: puppet
       BUILD: foss
-      BUILDER: choria/packager:el7-go1.10-puppet
+      BUILDER: choria/packager:el7-go1.13-puppet
 
   gather_artifacts:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.13
 
     steps:
       - attach_workspace:
@@ -124,7 +124,6 @@ jobs:
               package_cloud push choria/${REPO}/el/${d} ${i}
             done
           done
-
 
   release_packagecloud:
     <<: *packagecloud_push
@@ -175,32 +174,27 @@ workflows:
       - build_el6_64bit_rpms:
           requires:
             - test
-          filters:
-            *semver_only
+          filters: *semver_only
 
       - build_el7_64bit_rpms:
           requires:
             - test
-          filters:
-            *semver_only
+          filters: *semver_only
 
       - gather_artifacts:
           requires:
-             - build_el6_32bit_rpms
-             - build_el6_64bit_rpms
-             - build_el7_64bit_rpms
-          filters:
-            *semver_only
+            - build_el6_32bit_rpms
+            - build_el6_64bit_rpms
+            - build_el7_64bit_rpms
+          filters: *semver_only
 
       - release_hold:
           type: approval
           requires:
             - gather_artifacts
-          filters:
-            *semver_only
+          filters: *semver_only
 
       - release_packagecloud:
           requires:
             - release_hold
-          filters:
-            *semver_only
+          filters: *semver_only
