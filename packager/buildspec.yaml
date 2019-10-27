@@ -6,6 +6,8 @@ foss:
   compile_targets:
     defaults:
       output: choria-provisioner-{{version}}-{{os}}-{{arch}}
+      environment:
+        CGO_ENABLED: "0"
       pre:
         - go generate
 

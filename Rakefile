@@ -18,7 +18,7 @@ task :build do
     source = "/go/src/github.com/choria-io/provisioning-agent"
 
     ["el6_32", "el6_64", "el7_64"].each do |pkg|
-        sh 'docker run --rm -v `pwd`:%s -e SOURCE_DIR=%s -e ARTIFACTS=%s -e SHA1="%s" -e BUILD="%s" -e VERSION="%s" -e PACKAGE=%s choria/packager:el7-go1.10-puppet' % [
+        sh 'docker run --rm -v `pwd`:%s -e SOURCE_DIR=%s -e ARTIFACTS=%s -e SHA1="%s" -e BUILD="%s" -e VERSION="%s" -e PACKAGE=%s choria/packager:el7-go1.13-puppet' % [
             source,
             source,
             source,
@@ -39,7 +39,7 @@ task :build_binaries do
 
     source = "/go/src/github.com/choria-io/provisioning-agent"
 
-    sh 'docker run --rm  -v `pwd`:%s -e SOURCE_DIR=%s -e ARTIFACTS=%s -e SHA1="%s" -e BUILD="%s" -e VERSION="%s" -e BINARY_ONLY=1 choria/packager:el7-go1.10-puppet' % [
+    sh 'docker run --rm  -v `pwd`:%s -e SOURCE_DIR=%s -e ARTIFACTS=%s -e SHA1="%s" -e BUILD="%s" -e VERSION="%s" -e BINARY_ONLY=1 choria/packager:el7-go1.13-puppet' % [
         source,
         source,
         source,
