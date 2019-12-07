@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2019/12/07|      |Release 0.6.0                                                                                            |
+|2019/10/25|101   |Optionally fetch and validate JWT tokens                                                                 |
+|2019/10/25|99    |Support retrieving provisioning JWT token                                                                |
 |2019/07/24|      |Release 0.5.0                                                                                            |
 |2019/06/27|94    |Support ActivationChecker                                                                                |
 |2019/06/26|92    |Turn the agent into a standard Choria Plugin                                                             |
