@@ -30,6 +30,7 @@ type Config struct {
 	Management    *backplane.StandardConfiguration `json:"management" yaml:"management"`
 	CertDenyList  []string                         `json:"cert_deny_list"`
 	JWTVerifyCert string                           `json:"jwt_verify_cert"`
+	RegoPolicy    string                           `json:"rego_policy"`
 
 	Features struct {
 		PKI bool `json:"pki"`

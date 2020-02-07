@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/choria-io/go-lifecycle"
+	"github.com/choria-io/go-choria/lifecycle"
 
 	"github.com/choria-io/go-choria/choria"
-	"github.com/choria-io/go-client/client"
-	"github.com/choria-io/go-client/discovery/broadcast"
-	rpc "github.com/choria-io/mcorpc-agent-provider/mcorpc/client"
+	"github.com/choria-io/go-choria/client/client"
+	"github.com/choria-io/go-choria/client/discovery/broadcast"
+	rpc "github.com/choria-io/go-choria/providers/agent/mcorpc/client"
 	provision "github.com/choria-io/provisioning-agent/agent"
 	"github.com/choria-io/provisioning-agent/config"
 	"github.com/choria-io/provisioning-agent/host"

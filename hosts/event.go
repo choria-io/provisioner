@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/choria-io/go-lifecycle"
+	"github.com/choria-io/go-choria/lifecycle"
 
 	"github.com/choria-io/provisioning-agent/host"
 

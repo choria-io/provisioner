@@ -20,7 +20,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
-	addl "github.com/choria-io/mcorpc-agent-provider/mcorpc/ddl/agent"
+	addl "github.com/choria-io/go-choria/providers/agent/mcorpc/ddl/agent"
 )
 
 var provddl = ` + "`{{.ProvDDL}}`" + `

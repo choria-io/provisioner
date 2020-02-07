@@ -9,10 +9,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/choria-io/go-protocol/protocol"
+	"github.com/choria-io/go-choria/protocol"
 
 	"github.com/choria-io/go-choria/choria"
-	cconf "github.com/choria-io/go-config"
+	cconf "github.com/choria-io/go-choria/config"
 	"github.com/choria-io/provisioning-agent/config"
 	"github.com/choria-io/provisioning-agent/hosts"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

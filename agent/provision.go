@@ -4,9 +4,9 @@ import (
 	"sync"
 
 	"github.com/choria-io/go-choria/plugin"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 	"github.com/choria-io/go-choria/server"
 	"github.com/choria-io/go-choria/server/agents"
-	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
 	"github.com/sirupsen/logrus"
 )
 

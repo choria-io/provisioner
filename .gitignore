@@ -2,3 +2,4 @@ vendor
 choria-provisioner-*-*-*
 provisioning-agent
 *.rpm
+.idea

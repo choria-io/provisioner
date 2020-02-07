@@ -8,8 +8,8 @@ import (
 
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
-	lifecycle "github.com/choria-io/go-lifecycle"
-	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
+	lifecycle "github.com/choria-io/go-choria/lifecycle"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 )
 
 type ReprovisionRequest struct {

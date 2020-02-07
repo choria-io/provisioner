@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/choria-io/go-protocol/protocol"
-	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
-	rpc "github.com/choria-io/mcorpc-agent-provider/mcorpc/client"
+	"github.com/choria-io/go-choria/protocol"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc"
+	rpc "github.com/choria-io/go-choria/providers/agent/mcorpc/client"
 	provision "github.com/choria-io/provisioning-agent/agent"
 	"github.com/prometheus/client_golang/prometheus"
 )
