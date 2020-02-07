@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/choria-io/go-choria/choria"
-	lifecycle "github.com/choria-io/go-lifecycle"
+	lifecycle "github.com/choria-io/go-choria/lifecycle"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 	updater "github.com/choria-io/go-updater"
-	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
 )
 
 type ReleaseUpdateRequest struct {

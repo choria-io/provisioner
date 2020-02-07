@@ -3,12 +3,14 @@ package host
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os/exec"
 	"time"
 
+	"github.com/choria-io/go-choria/opa"
 	"github.com/choria-io/provisioning-agent/config"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -19,6 +21,74 @@ type ConfigResponse struct {
 	Certificate   string            `json:"certificate"`
 	CA            string            `json:"ca"`
 	Configuration map[string]string `json:"configuration"`
+}
+
+func (h *Host) shouldConfigure(ctx context.Context) (should bool, err error) {
+	if h.cfg.RegoPolicy == "" {
+		return true, nil
+	}
+
+	inventory := map[string]interface{}{}
+	if h.Metadata != "" {
+		err = json.Unmarshal([]byte(h.Metadata), &inventory)
+		if err != nil {
+			h.log.Errorf("host inventory unmarshaling failed while setting up OPA query: %s", err)
+		}
+	}
+
+	inputs := map[string]interface{}{
+		"identity":  h.Identity,
+		"inventory": inventory,
+		"claims":    map[string]interface{}{},
+		"csr":       "",
+	}
+
+	if h.JWT != nil {
+		inputs["claims"] = map[string]interface{}{
+			"secure":     h.JWT.Secure,
+			"urls":       h.JWT.URLs,
+			"token":      h.JWT.Token,
+			"srv_domain": h.JWT.SRVDomain,
+			"default":    h.JWT.ProvDefault,
+			"issued_at":  h.JWT.IssuedAt,
+			"expires_at": h.JWT.ExpiresAt,
+		}
+	}
+
+	if h.CSR != nil {
+		csrm, err := h.csrAsMap()
+		if err != nil {
+			h.log.Errorf("could not parse CSR: %s", err)
+		} else {
+			inputs["claims"].(map[string]interface{})["csr"] = csrm
+		}
+	}
+
+	rego, err := opa.New("io.choria.provisioner", "data.io.choria.allow", opa.Logger(h.log), opa.File(h.cfg.RegoPolicy))
+	if err != nil {
+		return false, err
+	}
+
+	return rego.Evaluate(ctx, inputs)
+}
+
+func (h *Host) csrAsMap() (csr map[string]interface{}, err error) {
+	if h.CSR == nil {
+		return nil, fmt.Errorf("no csr data set")
+	}
+
+	req, err := x509.ParseCertificateRequest([]byte(h.CSR.CSR))
+	if err != nil {
+		return nil, fmt.Errorf("invalid CSR: %s", err)
+	}
+
+	reqj, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("could not marshal CSR request: %s", err)
+	}
+
+	err = json.Unmarshal(reqj, &csr)
+	return csr, err
 }
 
 func (h *Host) getConfig(ctx context.Context) (*ConfigResponse, error) {

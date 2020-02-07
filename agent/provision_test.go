@@ -11,11 +11,11 @@ import (
 
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
+	"github.com/choria-io/go-choria/config"
+	lifecycle "github.com/choria-io/go-choria/lifecycle"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 	"github.com/choria-io/go-choria/server/agents"
-	"github.com/choria-io/go-config"
-	lifecycle "github.com/choria-io/go-lifecycle"
 	updater "github.com/choria-io/go-updater"
-	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
 	"github.com/golang/mock/gomock"
 
 	. "github.com/onsi/ginkgo"

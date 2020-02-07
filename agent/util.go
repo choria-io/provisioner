@@ -2,7 +2,7 @@ package provision
 
 import (
 	"github.com/choria-io/go-choria/build"
-	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 )
 
 func abort(msg string, reply *mcorpc.Reply) {

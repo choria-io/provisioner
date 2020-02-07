@@ -11,9 +11,9 @@ import (
 
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
-	"github.com/choria-io/go-config"
-	lifecycle "github.com/choria-io/go-lifecycle"
-	"github.com/choria-io/mcorpc-agent-provider/mcorpc"
+	"github.com/choria-io/go-choria/config"
+	"github.com/choria-io/go-choria/lifecycle"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 	"github.com/sirupsen/logrus"
 )
 
