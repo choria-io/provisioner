@@ -122,8 +122,8 @@ func (h *Host) configure(ctx context.Context) error {
 }
 
 func (h *Host) fetchJWT(ctx context.Context) (err error) {
-	if h.rawJWT == "" {
-		h.log.Infof("Already have JWT for %s, not retrieveing again", h.Identity)
+	if h.rawJWT != "" {
+		h.log.Infof("Already have JWT for %s, not retrieving again", h.Identity)
 		return nil
 	}
 
@@ -139,9 +139,20 @@ func (h *Host) fetchJWT(ctx context.Context) (err error) {
 		}
 
 		_, err = h.rpcDo(ctx, "choria_provision", "jwt", jwtreq, func(pr protocol.Reply, reply *rpc.RPCReply) {
-			h.rawJWT = string(reply.Data)
+			resp := &provision.JWTReply{}
+			err := json.Unmarshal(reply.Data, resp)
+			if err != nil {
+				h.log.Errorf("Invalid JSON data: %s", err)
+				return
+			}
+
+			h.rawJWT = resp.JWT
 		})
 		if err == nil {
+			if len(h.rawJWT) == 0 {
+				return fmt.Errorf("received an empty JWT")
+			}
+
 			return nil
 		}
 	}
