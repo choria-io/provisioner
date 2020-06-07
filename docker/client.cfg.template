@@ -1,0 +1,12 @@
+ssldir = /etc/choria-provisioner/ssl
+logger_type = console
+loglevel = info
+plugin.choria.middleware_hosts = {{BROKER_URL}}
+
+plugin.security.provider=file
+plugin.security.file.certificate=/etc/choria-provisioner/ssl/cert.pem
+plugin.security.file.key=/etc/choria-provisioner/ssl/key.pem
+plugin.security.file.ca=/etc/choria-provisioner/ssl/ca.pem
+
+plugin.nats.user = {{BROKER_USERNAME}}
+plugin.nats.pass = {{BROKER_PASSWORD}}
