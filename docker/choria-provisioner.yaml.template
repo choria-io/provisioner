@@ -1,0 +1,15 @@
+---
+workers: {{WORKERS}}
+interval: {{INTERVAL}}
+loglevel: {{LOGLEVEL}}
+choria_insecure: {{INSECURE}}
+site: {{SITE}}
+monitor_port: 8080
+jwt_verify_cert: /etc/choria-provisioner/ssl/jwt-verify.pem
+logfile: /dev/stdout
+helper: /helper/provision-helper
+token: {{TOKEN}}
+
+features:
+  pki: {{FEATURES_PKI}}
+  jwt: {{FEATURES_JWT}}
