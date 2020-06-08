@@ -26,15 +26,15 @@ then
   exit 1
 fi
 
-if [ -z "${CHORIA_BROKER_USERNAME}" ]
+if [ -z "${PROVISIONER_PASSWORD}" ]
 then
-  echo "Please set CHORIA_BROKER_USERNAME"
+  echo "Please set PROVISIONER_PASSWORD"
   exit 1
 fi
 
-if [ -z "${CHORIA_BROKER_PASSWORD}" ]
+if [ -z "${CHORIA_PASSWORD}" ]
 then
-  echo "Please set CHORIA_BROKER_PASSWORD"
+  echo "Please set CHORIA_PASSWORD"
   exit 1
 fi
 
@@ -82,8 +82,10 @@ sed -i'' "s/{{SITE}}/${PROV_SITE}/" choria-provisioner.yaml
 sed -i'' "s/{{TOKEN}}/${PROV_TOKEN}/" choria-provisioner.yaml
 sed -i'' "s/{{FEATURES_PKI}}/${PROV_FEATURES_PKI}/" choria-provisioner.yaml
 sed -i'' "s/{{FEATURES_JWT}}/${PROV_FEATURES_JWT}/" choria-provisioner.yaml
+sed -i'' "s/{{FEATURES_BROKER}}/${PROV_FEATURES_BROKER}/" choria-provisioner.yaml
+sed -i'' "s/{{PROVISIONER_PASSWORD}}/${PROVISIONER_PASSWORD}/" choria-provisioner.yaml
+sed -i'' "s/{{CHORIA_PASSWORD}}/${CHORIA_PASSWORD}/" choria-provisioner.yaml
 sed -i'' "s/{{BROKER_URL}}/${CHORIA_BROKER_URL}/" client.cfg
-sed -i'' "s/{{BROKER_USERNAME}}/${CHORIA_BROKER_USERNAME}/" client.cfg
-sed -i'' "s/{{BROKER_PASSWORD}}/${CHORIA_BROKER_PASSWORD}/" client.cfg
+sed -i'' "s/{{PROVISIONER_PASSWORD}}/${PROVISIONER_PASSWORD}/" client.cfg
 
 exec /usr/sbin/choria-provisioner --config choria-provisioner.yaml --choria-config client.cfg

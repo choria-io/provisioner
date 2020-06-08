@@ -13,6 +13,7 @@ import (
 	"github.com/choria-io/go-choria/opa"
 	"github.com/choria-io/provisioning-agent/config"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
 )
 
 type ConfigResponse struct {
@@ -64,7 +65,7 @@ func (h *Host) shouldConfigure(ctx context.Context) (should bool, err error) {
 		}
 	}
 
-	rego, err := opa.New("io.choria.provisioner", "data.io.choria.allow", opa.Logger(h.log), opa.File(h.cfg.RegoPolicy))
+	rego, err := opa.New("io.choria.provisioner", "data.io.choria.provisioner.allow", opa.Logger(h.log), opa.File(h.cfg.RegoPolicy))
 	if err != nil {
 		return false, err
 	}
@@ -99,7 +100,7 @@ func (h *Host) getConfig(ctx context.Context) (*ConfigResponse, error) {
 		return nil, fmt.Errorf("could not JSON encode host: %s", err)
 	}
 
-	err = runDecodedHelper(ctx, []string{}, string(input), r, h.cfg)
+	err = runDecodedHelper(ctx, []string{}, string(input), r, h.cfg, h.log)
 	if err != nil {
 		return nil, fmt.Errorf("could not invoke configure helper: %s", err)
 	}
@@ -107,7 +108,7 @@ func (h *Host) getConfig(ctx context.Context) (*ConfigResponse, error) {
 	return r, nil
 }
 
-func runDecodedHelper(ctx context.Context, args []string, input string, output interface{}, cfg *config.Config) error {
+func runDecodedHelper(ctx context.Context, args []string, input string, output interface{}, cfg *config.Config, log *logrus.Entry) error {
 	o, err := runHelper(ctx, args, input, cfg)
 	if err != nil {
 		return err
