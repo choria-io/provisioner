@@ -53,6 +53,9 @@ flags_map:
   ProvisionRegistrationData: github.com/choria-io/go-choria/build.ProvisionRegistrationData
   ProvisionFacts: github.com/choria-io/go-choria/build.ProvisionFacts
   ProvisionToken: github.com/choria-io/go-choria/build.ProvisionToken
+  ProvisionJWTFile: github.com/choria-io/go-choria/build.ProvisionJWTFile
+  ProvisioningBrokerUsername: github.com/choria-io/go-choria/build.ProvisioningBrokerUsername
+  ProvisioningBrokerPassword: github.com/choria-io/go-choria/build.ProvisioningBrokerPassword
 
 foss:
   compile_targets:

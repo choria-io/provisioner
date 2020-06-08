@@ -8,5 +8,5 @@ plugin.security.file.certificate=/etc/choria-provisioner/ssl/cert.pem
 plugin.security.file.key=/etc/choria-provisioner/ssl/key.pem
 plugin.security.file.ca=/etc/choria-provisioner/ssl/ca.pem
 
-plugin.nats.user = {{BROKER_USERNAME}}
-plugin.nats.pass = {{BROKER_PASSWORD}}
+plugin.nats.user = provisioner
+plugin.nats.pass = {{PROVISIONER_PASSWORD}}

@@ -9,7 +9,11 @@ jwt_verify_cert: /etc/choria-provisioner/ssl/jwt-verify.pem
 logfile: /dev/stdout
 helper: /helper/provision-helper
 token: {{TOKEN}}
+broker_provisioning_password: {{PROVISIONER_PASSWORD}}
+broker_choria_password: {{CHORIA_PASSWORD}}
+broker_port: 4222
 
 features:
   pki: {{FEATURES_PKI}}
   jwt: {{FEATURES_JWT}}
+  broker: {{FEATURES_BROKER}}

@@ -7,12 +7,13 @@ ENV PROV_INSECURE=false
 ENV PROV_SITE=docker
 ENV PROV_FEATURES_PKI=false
 ENV PROV_FEATURES_JWT=false
+ENV PROV_FEATURES_BROKER=false
 
 WORKDIR /etc/choria-provisioner/
 
 RUN curl -s https://packagecloud.io/install/repositories/choria/release/script.rpm.sh | bash && \
     yum -y update && \
-    yum -y install choria-provisioner && \
+    yum -y install choria-provisioner ruby && \
     rm /etc/choria-provisioner/choria-provisioner.yaml && \
     yum -y clean all
 
