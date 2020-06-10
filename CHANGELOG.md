@@ -1,5 +1,10 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/06/08|      |Add a basic Dockerfile                                                                                   |
+|2020/06/08|111   |Support embedding NATS Server to simplify deployment                                                     |
+|2020/06/08|      |Improve parsing of the JWT sent by the agent                                                             |
+|2020/06/07|108   |Fix activation checks in the agent                                                                       |
+|2020/02/07|      |Support monorepo Choria                                                                                  |
 |2019/12/07|      |Release 0.6.0                                                                                            |
 |2019/10/25|101   |Optionally fetch and validate JWT tokens                                                                 |
 |2019/10/25|99    |Support retrieving provisioning JWT token                                                                |

@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
 
     working_directory: /go/src/github.com/choria-io/provisioning-agent
 
@@ -22,16 +22,16 @@ jobs:
           paths:
             - provisioning-agent.tgz
 
-  build_el6_64bit_rpms: &pkg_build
+  build_el7_64bit_rpms: &pkg_build
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
 
     working_directory: /go/src/github.com/choria-io/provisioning-agent
 
     environment:
-      PACKAGE: el6_64
+      PACKAGE: el7_64
       BUILD: foss
-      BUILDER: choria/packager:el5-go1.13
+      BUILDER: choria/packager:el7-go1.14
 
     steps: &std_build_steps
       - setup_remote_docker
@@ -39,7 +39,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
 
-      - run: docker create -v /go -v /build/artifacts --name store alpine:3.4 /bin/true
+      - run: docker create -v /go -v /build/artifacts --name store alpine:latest /bin/true
       - run: cd .. ; tar -xzf /tmp/workspace/provisioning-agent.tgz
 
       - run: docker cp /go store:/
@@ -71,30 +71,16 @@ jobs:
           paths:
             - artifacts
 
-  build_el6_32bit_rpms:
-    <<: *pkg_build
-    environment:
-      PACKAGE: el6_32
-      BUILD: foss
-      BUILDER: choria/packager:el7-go1.13
-
-  build_el7_64bit_rpms:
-    <<: *pkg_build
-    environment:
-      PACKAGE: el7_64
-      BUILD: foss
-      BUILDER: choria/packager:el7-go1.13
-
   build_puppet_module:
     <<: *pkg_build
     environment:
       PACKAGE: puppet
       BUILD: foss
-      BUILDER: choria/packager:el7-go1.13-puppet
+      BUILDER: choria/packager:el7-go1.14-puppet
 
   gather_artifacts:
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
 
     steps:
       - attach_workspace:
@@ -117,7 +103,7 @@ jobs:
       - run: gem install package_cloud
 
       - run: |
-          for d in 6 7
+          for d in 7
           do
             for i in $(find /tmp/workspace -name \*.el${d}.\*.rpm | grep -v src.rpm)
             do
@@ -162,7 +148,7 @@ workflows:
             tags:
               only: /.+/
 
-      - build_el6_32bit_rpms:
+      - build_el7_64bit_rpms:
           requires:
             - test
           filters: &semver_only
@@ -171,20 +157,8 @@ workflows:
             branches:
               ignore: /.*/
 
-      - build_el6_64bit_rpms:
-          requires:
-            - test
-          filters: *semver_only
-
-      - build_el7_64bit_rpms:
-          requires:
-            - test
-          filters: *semver_only
-
       - gather_artifacts:
           requires:
-            - build_el6_32bit_rpms
-            - build_el6_64bit_rpms
             - build_el7_64bit_rpms
           filters: *semver_only
 
