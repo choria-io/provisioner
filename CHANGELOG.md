@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/06/14|      |Release 0.7.1                                                                                            |
+|2020/06/14|      |Support `certmanager` security model                                                                     |
+|2020/06/10|      |Release 0.7.0                                                                                            |
 |2020/06/08|      |Add a basic Dockerfile                                                                                   |
 |2020/06/08|111   |Support embedding NATS Server to simplify deployment                                                     |
 |2020/06/08|      |Improve parsing of the JWT sent by the agent                                                             |
