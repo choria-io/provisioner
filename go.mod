@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/choria-io/go-backplane v1.2.2-0.20200207101952-215ed5ea77ee
-	github.com/choria-io/go-choria v0.14.1-0.20200608150958-d78cceb9486e
+	github.com/choria-io/go-choria v0.14.1-0.20200614122803-7271341ad327
 	github.com/choria-io/go-updater v0.0.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/ghodss/yaml v1.0.0
