@@ -8,21 +8,22 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
+	"testing"
+	"time"
 
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/config"
-	lifecycle "github.com/choria-io/go-choria/lifecycle"
+	"github.com/choria-io/go-choria/lifecycle"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 	"github.com/choria-io/go-choria/server/agents"
-	updater "github.com/choria-io/go-updater"
+	"github.com/choria-io/go-updater"
 	"github.com/golang/mock/gomock"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
-
-	"testing"
 )
 
 func Test(t *testing.T) {
@@ -71,6 +72,7 @@ var _ = Describe("Provision/Agent", func() {
 		logrus.SetLevel(logrus.FatalLevel)
 
 		allowRestart = false
+		SetRestartAction(restart)
 		build.ProvisionModeDefault = "false"
 		build.ProvisionBrokerURLs = "nats://n1:4222"
 		build.ProvisionToken = ""
@@ -137,7 +139,6 @@ var _ = Describe("Provision/Agent", func() {
 				SenderID:  "go.test",
 			}
 			build.ProvisionToken = "toomanysecrets"
-			allowRestart = false
 
 			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 			releaseUpdateAction(ctx, req, reply, prov, nil)
@@ -227,6 +228,7 @@ var _ = Describe("Provision/Agent", func() {
 			}
 
 			restartAction(ctx, req, reply, prov, nil)
+			SetRestartAction(restart)
 			Expect(reply.Statuscode).To(Equal(mcorpc.Aborted))
 			Expect(reply.Statusmsg).To(Equal("Configuration testdata/provisioning.cfg enables provisioning, restart cannot continue"))
 		})
@@ -280,9 +282,17 @@ var _ = Describe("Provision/Agent", func() {
 
 			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 
+			didRestart := false
+			SetRestartAction(func(_ time.Duration, _ *logrus.Entry) {
+				didRestart = true
+			})
+
 			restartAction(ctx, req, reply, prov, nil)
+			runtime.Gosched()
+
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 			Expect(reply.Data.(Reply).Message).To(MatchRegexp("Restarting Choria Server after \\d+s"))
+			Expect(didRestart).To(BeTrue())
 		})
 	})
 

@@ -2,6 +2,7 @@ package provision
 
 import (
 	"sync"
+	"time"
 
 	"github.com/choria-io/go-choria/plugin"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc"
@@ -18,6 +19,7 @@ type Reply struct {
 var mu = &sync.Mutex{}
 var allowRestart = true
 var log *logrus.Entry
+
 var metadata = &agents.Metadata{
 	Name:        "choria_provision",
 	Description: "Choria Provisioner",
@@ -26,6 +28,12 @@ var metadata = &agents.Metadata{
 	License:     "Apache-2.0",
 	Timeout:     20,
 	URL:         "http://choria.io",
+}
+
+var restartCb = restart
+
+func init() {
+	SetRestartAction(restart)
 }
 
 // New creates a new instance of the agent
@@ -51,4 +59,13 @@ func New(mgr server.AgentManager) (agents.Agent, error) {
 // ChoriaPlugin creates the choria plugin hooks
 func ChoriaPlugin() plugin.Pluggable {
 	return mcorpc.NewChoriaAgentPlugin(metadata, New)
+}
+
+// SetRestartAction sets a custom restart function to call than the default that
+// causes a os.Exec() to be issued replacing the running instance with a new
+// process on the old pid
+func SetRestartAction(f func(splay time.Duration, log *logrus.Entry)) {
+	mu.Lock()
+	restartCb = f
+	mu.Unlock()
 }

@@ -58,7 +58,7 @@ func restartAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.Reply
 	splay := time.Duration(rand.Intn(args.Splay)+2) * time.Second
 	agent.Log.Warnf("Restarting server via request %s from %s (%s) with splay %v", req.RequestID, req.CallerID, req.SenderID, splay)
 
-	go restart(splay, agent.Log)
+	go restartCb(splay, agent.Log)
 
 	err = agent.ServerInfoSource.NewEvent(lifecycle.Shutdown)
 	if err != nil {
