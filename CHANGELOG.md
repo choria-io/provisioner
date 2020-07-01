@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/07/01|      |Release 0.8.0                                                                                            |
+|2020/07/01|119   |Use `os.Exit()` on windows after provisioning                                                            |
+|2020/06/16|117   |Support custom restart logic                                                                             |
 |2020/06/14|      |Release 0.7.1                                                                                            |
 |2020/06/14|      |Support `certmanager` security model                                                                     |
 |2020/06/10|      |Release 0.7.0                                                                                            |
