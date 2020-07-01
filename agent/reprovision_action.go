@@ -8,7 +8,6 @@ import (
 
 	"github.com/choria-io/go-choria/build"
 	"github.com/choria-io/go-choria/choria"
-	lifecycle "github.com/choria-io/go-choria/lifecycle"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 )
 
@@ -60,12 +59,7 @@ func reprovisionAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc.R
 	}
 
 	splay := time.Duration(rand.Intn(10)+2) * time.Second
-	go restart(splay, agent.Log)
-
-	err = agent.ServerInfoSource.NewEvent(lifecycle.Shutdown)
-	if err != nil {
-		agent.Log.Errorf("Could not publish shutdown event: %s", err)
-	}
+	go restartCb(splay, agent.ServerInfoSource, agent.Log)
 
 	reply.Data = Reply{fmt.Sprintf("Restarting after %v", splay)}
 }

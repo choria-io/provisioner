@@ -1,6 +1,7 @@
 package provision
 
 import (
+	"runtime"
 	"sync"
 	"time"
 
@@ -33,7 +34,13 @@ var metadata = &agents.Metadata{
 var restartCb = restart
 
 func init() {
-	SetRestartAction(restart)
+	switch {
+	case runtime.GOOS == "windows":
+		SetRestartAction(restartViaExit)
+	default:
+		SetRestartAction(restart)
+	}
+
 }
 
 // New creates a new instance of the agent
@@ -64,7 +71,7 @@ func ChoriaPlugin() plugin.Pluggable {
 // SetRestartAction sets a custom restart function to call than the default that
 // causes a os.Exec() to be issued replacing the running instance with a new
 // process on the old pid
-func SetRestartAction(f func(splay time.Duration, log *logrus.Entry)) {
+func SetRestartAction(f func(splay time.Duration, si agents.ServerInfoSource, log *logrus.Entry)) {
 	mu.Lock()
 	restartCb = f
 	mu.Unlock()

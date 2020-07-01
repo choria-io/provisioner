@@ -253,7 +253,6 @@ var _ = Describe("Provision/Agent", func() {
 			build.ProvisionToken = "toomanysecrets"
 			reply = &mcorpc.Reply{}
 
-			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 			Expect(prov.Choria.ProvisionMode()).To(BeFalse())
 			restartAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
@@ -263,7 +262,6 @@ var _ = Describe("Provision/Agent", func() {
 			build.ProvisionToken = ""
 			reply = &mcorpc.Reply{}
 
-			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 			Expect(prov.Choria.ProvisionMode()).To(BeTrue())
 			restartAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
@@ -280,10 +278,8 @@ var _ = Describe("Provision/Agent", func() {
 				SenderID:  "go.test",
 			}
 
-			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
-
 			didRestart := false
-			SetRestartAction(func(_ time.Duration, _ *logrus.Entry) {
+			SetRestartAction(func(_ time.Duration, _ agents.ServerInfoSource, _ *logrus.Entry) {
 				didRestart = true
 			})
 
@@ -337,8 +333,6 @@ var _ = Describe("Provision/Agent", func() {
 
 			req.Data = json.RawMessage(`{"token":"toomanysecrets"}`)
 
-			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
-
 			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
 		})
@@ -346,7 +340,6 @@ var _ = Describe("Provision/Agent", func() {
 		It("Should write a sane config file without registration by default", func() {
 			cfg.ConfigFile = targetcfg
 			build.ProvisionToken = ""
-			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 
 			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
@@ -367,8 +360,6 @@ var _ = Describe("Provision/Agent", func() {
 			cfg.Choria.FileContentRegistrationData = "/tmp/choria_test.json"
 			cfg.Choria.FileContentRegistrationTarget = "default.registration"
 			build.ProvisionRegistrationData = ""
-
-			si.EXPECT().NewEvent(lifecycle.Shutdown).Times(1)
 
 			reprovisionAction(ctx, req, reply, prov, nil)
 			Expect(reply.Statuscode).To(Equal(mcorpc.OK))
