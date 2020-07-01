@@ -57,7 +57,7 @@ func releaseUpdateAction(ctx context.Context, req *mcorpc.Request, reply *mcorpc
 	reply.Data = Reply{"Restarting Choria Server after 2s"}
 	agent.Log.Warnf("Restarting server via request %s from %s (%s) with splay 2s", req.RequestID, req.CallerID, req.SenderID)
 
-	go restart(time.Duration(2*time.Second), agent.Log)
+	go restartCb(2*time.Second, agent.ServerInfoSource, agent.Log)
 }
 
 func versionUpdater() func(...updater.Option) error {

@@ -7,4 +7,10 @@ RUN curl -s https://packagecloud.io/install/repositories/choria/release/script.r
     yum -y install choria-provisioner ruby && \
     yum -y clean all
 
+RUN groupadd --gid 2048 choria && \
+    useradd -c "Choria Orchestrator - choria.io" -m --uid 2048 --gid 2048 choria && \
+    chown -R choria:choria /etc/choria-provisioner
+
+USER choria
+
 CMD ["/usr/sbin/choria-provisioner", "--config choria-provisioner.yaml", "--choria-config client.cfg"]

@@ -317,3 +317,15 @@ func (m *MockServerInfoSource) UpTime() int64 {
 func (mr *MockServerInfoSourceMockRecorder) UpTime() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpTime", reflect.TypeOf((*MockServerInfoSource)(nil).UpTime))
 }
+
+// PrepareForShutdown mocks base method
+func (m *MockServerInfoSource) PrepareForShutdown() error {
+	ret := m.ctrl.Call(m, "PrepareForShutdown")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PrepareForShutdown indicates an expected call of PrepareForShutdown
+func (mr *MockServerInfoSourceMockRecorder) PrepareForShutdown() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrepareForShutdown", reflect.TypeOf((*MockServerInfoSource)(nil).PrepareForShutdown))
+}
