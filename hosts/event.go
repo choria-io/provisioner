@@ -20,7 +20,7 @@ func connect(ctx context.Context) (choria.Connector, error) {
 	return fw.NewConnector(ctx, fw.MiddlewareServers, fw.Certname(), log)
 }
 
-func listen(ctx context.Context, wg *sync.WaitGroup, conn choria.Connector) {
+func listen(ctx context.Context, wg *sync.WaitGroup, component string, conn choria.Connector) {
 	defer wg.Done()
 
 	events := make(chan *choria.ConnectorMessage, 1000)
@@ -43,7 +43,7 @@ func listen(ctx context.Context, wg *sync.WaitGroup, conn choria.Connector) {
 		return
 	}
 
-	err = conn.QueueSubscribe(ctx, rid, "choria.lifecycle.event.startup.provision_mode_server", "", events)
+	err = conn.QueueSubscribe(ctx, rid, fmt.Sprintf("choria.lifecycle.event.startup.%s", component), "", events)
 	if err != nil {
 		log.Errorf("Could not listen for lifecycle events: %s", err)
 		return

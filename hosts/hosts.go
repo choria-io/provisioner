@@ -58,7 +58,7 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	}
 
 	wg.Add(1)
-	go listen(ctx, wg, conn)
+	go listen(ctx, wg, cfg.LifecycleComponent, conn)
 
 	wg.Add(1)
 	go finisher(ctx, wg)

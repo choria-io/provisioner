@@ -335,6 +335,9 @@ choria_insecure: true
 # a site name exposed to the backplane to assist with discovery, also used in stats
 site: testing
 
+# sets a custom lifecycle component to listen on for events that trigger provisioning
+lifecycle_component: acme_provisioning
+
 # Certificate patterns that should never be signed from CSRs, these are ones choria
 # set aside as client only certificates and someone might configure a node to obtain
 # a signed cert otherwise.  When not set below is the default value
