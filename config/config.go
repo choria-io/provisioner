@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -24,6 +25,7 @@ type Config struct {
 	Loglevel                string                           `json:"loglevel"`
 	Helper                  string                           `json:"helper"`
 	Token                   string                           `json:"token"`
+	LifecycleComponent      string                           `json:"lifecycle_component"`
 	Insecure                bool                             `json:"choria_insecure"`
 	Site                    string                           `json:"site"`
 	MonitorPort             int                              `json:"monitor_port"`
@@ -51,7 +53,8 @@ type Config struct {
 // Load reads configuration from a YAML file
 func Load(file string) (*Config, error) {
 	config := &Config{
-		File: file,
+		LifecycleComponent: "provision_mode_server",
+		File:               file,
 	}
 
 	if _, err := os.Stat(file); os.IsNotExist(err) {
@@ -71,6 +74,14 @@ func Load(file string) (*Config, error) {
 	err = json.Unmarshal(j, &config)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse config file %s as YAML: %s", file, err)
+	}
+
+	if config.LifecycleComponent == "" {
+		config.LifecycleComponent = "provision_mode_server"
+	}
+
+	if strings.Contains(config.LifecycleComponent, ".") || strings.Contains(config.LifecycleComponent, ">") || strings.Contains(config.LifecycleComponent, "*") {
+		return nil, fmt.Errorf("invalid lifecycle component: %s", config.LifecycleComponent)
 	}
 
 	if len(config.CertDenyList) == 0 {
