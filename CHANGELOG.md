@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2020/09/28|      |Release 0.9.0                                                                                            |
+|2020/07/06|122   |Allow the provisioning component name to be configured                                                   |
 |2020/07/01|      |Release 0.8.0                                                                                            |
 |2020/07/01|119   |Use `os.Exit()` on windows after provisioning                                                            |
 |2020/06/16|117   |Support custom restart logic                                                                             |
