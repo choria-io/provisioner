@@ -137,10 +137,6 @@ workflows:
           requires:
             - build_el7_64bit_rpms
 
-      - nightly_packagecloud:
-          requires:
-            - gather_artifacts
-
   test_and_ship:
     jobs:
       - test:
