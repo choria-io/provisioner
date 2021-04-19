@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.14
+      - image: circleci/golang:1.16
 
     working_directory: /go/src/github.com/choria-io/provisioning-agent
 
@@ -13,7 +13,6 @@ jobs:
       - checkout
       - setup_remote_docker
       - run: go get github.com/onsi/ginkgo/ginkgo
-      - run: go mod vendor
       - run: ginkgo -r -skipMeasurements
       - run: mkdir -p /tmp/workspace
       - run: cd .. ; tar -czf /tmp/workspace/provisioning-agent.tgz provisioning-agent
@@ -24,14 +23,14 @@ jobs:
 
   build_el7_64bit_rpms: &pkg_build
     docker:
-      - image: circleci/golang:1.14
+      - image: circleci/golang:1.16
 
     working_directory: /go/src/github.com/choria-io/provisioning-agent
 
     environment:
       PACKAGE: el7_64
       BUILD: foss
-      BUILDER: choria/packager:el7-go1.14
+      BUILDER: choria/packager:el7-go1.16
 
     steps: &std_build_steps
       - setup_remote_docker
@@ -76,11 +75,11 @@ jobs:
     environment:
       PACKAGE: puppet
       BUILD: foss
-      BUILDER: choria/packager:el7-go1.14-puppet
+      BUILDER: choria/packager:el7-go1.16-puppet
 
   gather_artifacts:
     docker:
-      - image: circleci/golang:1.14
+      - image: circleci/golang:1.16
 
     steps:
       - attach_workspace:

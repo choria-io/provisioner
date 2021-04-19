@@ -11,9 +11,9 @@ import (
 	"sync"
 
 	"github.com/choria-io/go-choria/choria"
-	provision "github.com/choria-io/provisioning-agent/agent"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
 	"github.com/choria-io/provisioning-agent/config"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/sirupsen/logrus"
 )
 

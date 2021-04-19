@@ -8,7 +8,8 @@ import (
 	"github.com/choria-io/go-choria/protocol"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc"
 	rpc "github.com/choria-io/go-choria/providers/agent/mcorpc/client"
-	provision "github.com/choria-io/provisioning-agent/agent"
+	addl "github.com/choria-io/go-choria/providers/agent/mcorpc/ddl/agent"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -22,10 +23,11 @@ func (h *Host) rpcDo(ctx context.Context, agent string, action string, input int
 		return nil, fmt.Errorf("Provisioning is paused, cannot perform %s", name)
 	}
 
-	ddl, ok := provision.DDL[agent]
-	if !ok {
-		return nil, fmt.Errorf("could not find DDL for agent %s in the provision.DDL structure", agent)
+	ddl, err := addl.CachedDDL("choria_provision")
+	if err != nil {
+		return nil, fmt.Errorf("could not find DDL for agent choria_provision in the agent cache")
 	}
+
 	prov, err := rpc.New(h.fw, agent, rpc.DDL(ddl))
 	if err != nil {
 		rpcErrCtr.WithLabelValues(h.cfg.Site, name).Inc()
