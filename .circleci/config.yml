@@ -125,7 +125,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - main
     jobs:
       - test
       - build_el7_64bit_rpms:
