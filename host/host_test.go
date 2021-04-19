@@ -14,7 +14,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/choria-io/provisioning-agent/agent"
+	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
 	"github.com/choria-io/provisioning-agent/config"
 
 	. "github.com/onsi/ginkgo"

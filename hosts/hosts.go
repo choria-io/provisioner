@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/choria-io/go-choria/lifecycle"
+	addl "github.com/choria-io/go-choria/providers/agent/mcorpc/ddl/agent"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/client/client"
-	"github.com/choria-io/go-choria/client/discovery/broadcast"
 	rpc "github.com/choria-io/go-choria/providers/agent/mcorpc/client"
-	provision "github.com/choria-io/provisioning-agent/agent"
+	"github.com/choria-io/go-choria/providers/discovery/broadcast"
 	"github.com/choria-io/provisioning-agent/config"
 	"github.com/choria-io/provisioning-agent/host"
 	"github.com/sirupsen/logrus"
@@ -37,9 +37,9 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 
 	log.Infof("Choria Provisioner starting using configuration file %s. Discovery interval %s using %d workers", conf.File, conf.Interval, conf.Workers)
 
-	ddl, ok := provision.DDL["choria_provision"]
-	if !ok {
-		return fmt.Errorf("could not find DDL for agent choria_provision in the provision.DDL structure")
+	ddl, err := addl.CachedDDL("choria_provision")
+	if err != nil {
+		return fmt.Errorf("could not find DDL for agent choria_provision in the agent cache")
 	}
 
 	agent, err := rpc.New(fw, "choria_provision", rpc.DDL(ddl))
