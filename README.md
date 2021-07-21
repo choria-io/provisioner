@@ -28,125 +28,25 @@ This project includes a provisioner that you can use, it will call a `helper` th
 
 ## Configuring Choria Server
 
-Provisioning is off and cannot be enabled in the version of Choria shipped to the Open Source community, to use it you need to perform a custom build and make your own packages.  Choria provides the tools to do this.
+Provisioning is enabled in the Open Source server by means of a JWT token that you create during provisioning. The JWT token holds all of the information the server
+needs to find it's provisioning server and will present that token also to the provisioning server for authentication.
 
-The following section guides you through setting up a custom build that will produce a `acme-choria` RPM with completely custom paths etc.  It will have provisioning enabled and whenever it detects `plugin.choria.server.provision` is not set to `false` will enter provisioning mode by connecting to `choria-provision.example.net:4222`.
+The token is signed using a trusted private key, the provisioner will only provision nodes presenting a trusted key.
 
-### Creating a custom build specification
-
-The build specification is in the `go-choria` repository in `packager/buildspec.yaml`, lets see a custom one:
-
-```yaml
-flags_map:
-  TLS: github.com/choria-io/go-choria/build.TLS
-  maxBrokerClients: github.com/choria-io/go-choria/build.maxBrokerClients
-  Secure: github.com/choria-io/go-choria/vendor/github.com/choria-io/go-protocol/protocol.Secure
-  Version: github.com/choria-io/go-choria/build.Version
-  SHA: github.com/choria-io/go-choria/build.SHA
-  BuildTime: github.com/choria-io/go-choria/build.BuildDate
-  ProvisionBrokerURLs: github.com/choria-io/go-choria/build.ProvisionBrokerURLs
-  ProvisionModeDefault: github.com/choria-io/go-choria/build.ProvisionModeDefault
-  ProvisionAgent: github.com/choria-io/go-choria/build.ProvisionAgent
-  ProvisionSecure: github.com/choria-io/go-choria/build.ProvisionSecure
-  ProvisionRegistrationData: github.com/choria-io/go-choria/build.ProvisionRegistrationData
-  ProvisionFacts: github.com/choria-io/go-choria/build.ProvisionFacts
-  ProvisionToken: github.com/choria-io/go-choria/build.ProvisionToken
-  ProvisionJWTFile: github.com/choria-io/go-choria/build.ProvisionJWTFile
-  ProvisioningBrokerUsername: github.com/choria-io/go-choria/build.ProvisioningBrokerUsername
-  ProvisioningBrokerPassword: github.com/choria-io/go-choria/build.ProvisioningBrokerPassword
-
-foss:
-  compile_targets:
-    defaults:
-      output: choria-{{version}}-{{os}}-{{arch}}
-      pre:
-        - rm additional_agent_*.go || true
-        - go generate
-      flags:
-        ProvisionModeDefault: "true"
-        ProvisionBrokerURLs: "choria-provision.example.net:4222"
-        ProvisionSecure: "false"
-        ProvisionRegistrationData: "/opt/acme/etc/node-metadata.json"
-        ProvisionFacts: "/opt/acme/etc/node-metadata.json"
-        ProvisionToken: "toomanysecrets"
-
-    64bit_linux:
-      os: linux
-      arch: amd64
-
-  packages:
-    defaults:
-      name: acme-choria
-      bindir: /opt/acme-choria/sbin
-      etcdir: /opt/acme-choria/etc
-      release: 1
-      manage_conf: 1
-      contact: admins@example.net
-      rpm_group: Acme/Tools
-
-    el7_64:
-      template: el/el7
-      dist: el7
-      target_arch: x86_64
-      binary: 64bit_linux
+```nohighlight
+$ choria tool jwt provisioning.jwt key.pem --srv choria.example.net --token toomanysecrets
 ```
 
-This is a stripped down packaging config based on the stock one, it will:
+Here we create a `provisioning.jwt` that will instruct Choria to look for `_choria-provisioner._tcp.choria.example.net` SRV
+records to find the server to connect to.
 
-  * Build only a 64bit Linux binary
-  * Package a el7 64bit RPM with the name `acme-choria` and custom paths
-  * Provisioning is on by default unless specifically disabled in the configuration
-  * It will use this agent by default to enable provisioning, you can supply your own see below
-  * It will connect to `choria-provision.example.net:4222` with TLS disabled
-  * It will publish regularly the file `/opt/acme/etc/node-metadata.json` to `choria.provisioning_data` on the middleware
-  * It will use `/opt/acme/etc/node-metadata.json` as a fact source so you can discover it or retrieve its facts using `rpcutil#inventory` action
+Other options can be set for example to hard code provisioning URLs, username and passwords and more.
 
-In this case you will have a static broker that will be connected to, this might be too limiting for your needs - perhaps you wish to use a regional or client appropriate provisioner host instead.  You can implement the `provtarget.TargetResolver` interface and then compile that into your binary by placing the following YAML in your go-choria `packager` directory:
+When this file is placed in `/etc/choria/provisioning.jwt` and Choria starts without a configuration it will provision
+via these settings.
 
-```yaml
-# packager/provision_target_provider.yaml
----
-name: MyCorp Provisioning Target Provider
-repo: github.com/mycorp/ec2provtarget
-```
-
-In the above repo should be a method `ec2provtarget.Provisioner()` that returns an instance of your provisioner that implements `provtarget.TargetResolver`.  See the [default one](https://github.com/choria-io/go-choria/tree/master/provtarget/builddefaults) for an example.
-
-You can verify the resulting build with: `acme-choria buildinfo` and it should have a line like: `Provisioning Target Resolver: MyCorp Provisioning Target Provider`
-
-### Using your own agent
-
-You might not like the provisioning flow exposed by this agent, no problem you can supply your own.
-
-Create `packaging/user_plugins.yaml`
-
-```yaml
----
-choria_provision: github.com/acme/prov_agent
-```
-
-Arrange for this to be in the project using `glide get` and in the `buildspec.yaml` set `ProvisionAgent: "false"` in the flag section, it will now not activate this agent and instead use yours.
-
-It also need to implement the `plugin.Pluggable` interface that the Choria plugin system needs.
-
-### Building
-
-Do a `rake build` (needs docker) and after some work you'll have a rpm tailored to your own paths, name and with Provisioning enabled.
-
-```
-$ choria buildinfo
-# ...
-Server Settings:
-            Provisioning Brokers: choria-provision.example.net:4222
-            Provisioning Default: true
-      Default Provisioning Agent: true
-                Provisioning TLS: false
-  Provisioning Registration Data: /opt/acme/etc/node-metadata.json
-              Provisioning Facts: /opt/acme/etc/node-metadata.json
-# ...
-```
-
-If you just want the binary and no packages use `rake build_binaries`.
+Choria also support provisioning plugins to resolve this information dynamically but this requires custom binaries and should
+in general be avoided.
 
 ## Provisioning nodes
 

@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/07/21|      |Release 0.10.0                                                                                           |
+|2021/04/19|127   |Move the agent to go-choria repository                                                                   |
 |2020/09/28|      |Release 0.9.0                                                                                            |
 |2020/07/06|122   |Allow the provisioning component name to be configured                                                   |
 |2020/07/01|      |Release 0.8.0                                                                                            |

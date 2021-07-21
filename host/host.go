@@ -13,7 +13,7 @@ import (
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
 	"github.com/choria-io/provisioning-agent/config"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
 )
 
