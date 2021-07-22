@@ -8,8 +8,6 @@ foss:
       output: choria-provisioner-{{version}}-{{os}}-{{arch}}
       environment:
         CGO_ENABLED: "0"
-      pre:
-        - go generate
 
     64bit_linux:
       os: linux
