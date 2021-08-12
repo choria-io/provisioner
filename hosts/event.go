@@ -31,7 +31,7 @@ func listen(ctx context.Context, wg *sync.WaitGroup, component string, conn chor
 		return
 	}
 
-	err = conn.QueueSubscribe(ctx, rid, "choria.provisioning_data", "", events)
+	err = conn.QueueSubscribe(ctx, rid, "provisioning.registration.data", "", events)
 	if err != nil {
 		log.Errorf("Could not listen for provisioning data events: %s", err)
 		return
@@ -75,11 +75,11 @@ func handle(msg *choria.ConnectorMessage) (string, error) {
 	}
 
 	event, err := lifecycle.NewFromJSON(msg.Bytes())
-	if err == nil {
-		return handleEvent(event)
+	if err != nil {
+		return "", err
 	}
 
-	return handleRegistration(msg)
+	return handleEvent(event)
 }
 
 func handleEvent(event lifecycle.Event) (string, error) {
@@ -88,13 +88,4 @@ func handleEvent(event lifecycle.Event) (string, error) {
 	}
 
 	return event.Identity(), nil
-}
-
-func handleRegistration(msg *choria.ConnectorMessage) (string, error) {
-	t, err := fw.NewTransportFromJSON(string(msg.Data))
-	if err != nil {
-		return "", fmt.Errorf("could not create transport: %s", err)
-	}
-
-	return t.SenderID(), nil
 }
