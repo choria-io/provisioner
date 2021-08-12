@@ -9,13 +9,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/choria-io/go-choria/broker/network"
 	"github.com/choria-io/go-choria/choria"
 	cconf "github.com/choria-io/go-choria/config"
 	"github.com/choria-io/go-choria/protocol"
 	"github.com/choria-io/provisioning-agent/config"
 	"github.com/choria-io/provisioning-agent/hosts"
-	gnatsd "github.com/nats-io/nats-server/v2/server"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
@@ -77,18 +75,15 @@ func run() {
 		ccfg.Choria.SecurityProvider = "file"
 	}
 
+	if cfg.BrokerProvisionPassword != "" {
+		ccfg.Choria.NatsUser = "provisioner"
+		ccfg.Choria.NatsPass = cfg.BrokerProvisionPassword
+	}
+
 	fw, err := choria.NewWithConfig(ccfg)
 	kingpin.FatalIfError(err, "Provisioning could not configure Choria: %s", err)
 
 	log = fw.Logger("provisioner")
-
-	if cfg.Features.Broker {
-		if !cfg.Insecure {
-			kingpin.Fatalf("embedded broker is only supported when running in insecure mode")
-		}
-
-		go setupBroker(ctx, cfg.BrokerPort, cfg, log.WithField("component", "broker"))
-	}
 
 	if cfg.MonitorPort > 0 {
 		go setupPrometheus(cfg.MonitorPort)
@@ -132,81 +127,4 @@ func setupPrometheus(port int) {
 	log.Infof("Listening for /metrics on %d", port)
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
-}
-
-func setupBroker(ctx context.Context, port int, cfg *config.Config, log *logrus.Entry) {
-	log.Infof("Starting embedded broker on port %d", cfg.BrokerPort)
-
-	opts := gnatsd.Options{}
-	opts.ServerName = "broker." + cfg.Site
-	opts.Host = "0.0.0.0"
-	opts.Port = port
-	opts.MaxConn = 2000
-	opts.NoSigs = true
-	opts.Logtime = false
-	if log.Level == logrus.DebugLevel {
-		opts.Debug = true
-	}
-
-	if (cfg.BrokerProvisionPassword != "" || cfg.BrokerChoriaPassword != "") && (cfg.BrokerChoriaPassword == "" && cfg.BrokerProvisionPassword == "") {
-		log.Fatalf("Could not configure Broker: passwords for both Choria and Provisioning users should be set")
-		return
-	}
-
-	if cfg.BrokerChoriaPassword != "" && cfg.BrokerProvisionPassword != "" {
-		opts.Users = append(opts.Users, &gnatsd.User{
-			Username: "provisioner",
-			Password: cfg.BrokerProvisionPassword,
-			Permissions: &gnatsd.Permissions{
-				Publish: &gnatsd.SubjectPermission{
-					Allow: []string{
-						"provisioning.broadcast.agent.>",
-						"provisioning.node.>",
-						"choria.lifecycle.>",
-					},
-				},
-				Subscribe: &gnatsd.SubjectPermission{
-					Allow: []string{
-						"provisioning.>",
-						"choria.provisioning_data",
-						"choria.lifecycle.>",
-					},
-				},
-			},
-		})
-
-		opts.Users = append(opts.Users, &gnatsd.User{
-			Username: "choria",
-			Password: cfg.BrokerChoriaPassword,
-			Permissions: &gnatsd.Permissions{
-				Publish: &gnatsd.SubjectPermission{
-					Allow: []string{
-						"provisioning.reply.>",
-						"choria.lifecycle.>",
-						"choria.provisioning_data",
-					},
-				},
-				Subscribe: &gnatsd.SubjectPermission{
-					Allow: []string{
-						"provisioning.broadcast.agent.>",
-						"provisioning.node.>",
-					},
-				},
-			},
-		})
-	}
-
-	srv, err := gnatsd.NewServer(&opts)
-	if err != nil {
-		log.Fatalf("Could not start embedded Choria Broker: %s", err)
-		return
-	}
-
-	srv.SetLogger(network.NewLogger(log), opts.Debug, false)
-
-	go srv.Start()
-
-	<-ctx.Done()
-
-	srv.Shutdown()
 }

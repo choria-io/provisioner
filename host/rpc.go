@@ -5,122 +5,134 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/choria-io/go-choria/protocol"
-	"github.com/choria-io/go-choria/providers/agent/mcorpc"
-	rpc "github.com/choria-io/go-choria/providers/agent/mcorpc/client"
-	addl "github.com/choria-io/go-choria/providers/agent/mcorpc/ddl/agent"
+	"github.com/choria-io/go-choria/backoff"
+	provclient "github.com/choria-io/go-choria/client/choria_provisionclient"
+	"github.com/choria-io/go-choria/client/rpcutilclient"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func (h *Host) rpcDo(ctx context.Context, agent string, action string, input interface{}, cb rpc.Handler) (*rpc.Stats, error) {
-	name := fmt.Sprintf("%s#%s", agent, action)
+func (h *Host) rpcUtilClient(ctx context.Context, action string, tries int, cb func(context.Context, *rpcutilclient.RpcutilClient) error) error {
+	client, err := rpcutilclient.New(rpcutilclient.Choria(h.fw), rpcutilclient.Logger(h.log))
+	if err != nil {
+		return err
+	}
 
-	obs := prometheus.NewTimer(rpcDuration.WithLabelValues(h.cfg.Site, name))
-	defer obs.ObserveDuration()
+	client.OptionWorkers(1).OptionTargets([]string{h.Identity})
 
+	return h.rpcWrapper(ctx, fmt.Sprintf("rpcutil#%s", action), tries, func(ctx context.Context) error {
+		return cb(ctx, client)
+	})
+}
+
+func (h *Host) provisionClient(ctx context.Context, action string, tries int, cb func(context.Context, *provclient.ChoriaProvisionClient) error) error {
+	client, err := provclient.New(provclient.Choria(h.fw), provclient.Logger(h.log))
+	if err != nil {
+		return err
+	}
+
+	client.OptionWorkers(1).OptionTargets([]string{h.Identity})
+
+	return h.rpcWrapper(ctx, fmt.Sprintf("choria_provision#%s", action), tries, func(ctx context.Context) error {
+		return cb(ctx, client)
+	})
+}
+
+func (h *Host) rpcWrapper(ctx context.Context, action string, tries int, cb func(context.Context) error) error {
 	if h.cfg.Paused() {
-		return nil, fmt.Errorf("Provisioning is paused, cannot perform %s", name)
+		return fmt.Errorf("provisioning is paused, cannot perform %s", action)
 	}
 
-	ddl, err := addl.CachedDDL("choria_provision")
-	if err != nil {
-		return nil, fmt.Errorf("could not find DDL for agent choria_provision in the agent cache")
-	}
+	tctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
-	prov, err := rpc.New(h.fw, agent, rpc.DDL(ddl))
-	if err != nil {
-		rpcErrCtr.WithLabelValues(h.cfg.Site, name).Inc()
-		return nil, fmt.Errorf("could not create %s client: %s", agent, err)
-	}
-
-	handler := func(pr protocol.Reply, reply *rpc.RPCReply) {
-		h.replylock.Lock()
-		defer h.replylock.Unlock()
-
-		if reply.Statuscode != mcorpc.OK {
-			rpcErrCtr.WithLabelValues(h.cfg.Site, name).Inc()
-			h.log.Errorf("Failed reply from %s: %s", pr.SenderID(), reply.Statusmsg)
-			return
+	err := backoff.Default.For(tctx, func(try int) error {
+		if try > tries {
+			cancel()
+			return fmt.Errorf("maximum tries reached")
 		}
 
-		if pr.SenderID() == h.Identity {
-			cb(pr, reply)
+		if h.cfg.Paused() {
+			cancel()
+			return fmt.Errorf("provisioning is paused, cannot perform %s", action)
 		}
-	}
 
-	result, err := prov.Do(ctx, action, input, rpc.Targets([]string{h.Identity}), rpc.Collective("provisioning"), rpc.ReplyHandler(handler), rpc.Workers(1))
+		obs := prometheus.NewTimer(rpcDuration.WithLabelValues(h.cfg.Site, action))
+		defer obs.ObserveDuration()
+
+		return cb(tctx)
+	})
 	if err != nil {
-		rpcErrCtr.WithLabelValues(h.cfg.Site, name).Inc()
-		return nil, fmt.Errorf("could not perform %s#%s: %s", agent, action, err)
+		rpcErrCtr.WithLabelValues(h.cfg.Site, action).Inc()
 	}
 
-	if result.Stats().ResponsesCount() != 1 {
-		rpcErrCtr.WithLabelValues(h.cfg.Site, name).Inc()
-		return nil, fmt.Errorf("could not perform %s#%s: received %d responses while expecting a response from %s", agent, action, result.Stats().ResponsesCount(), h.Identity)
-	}
-
-	return result.Stats(), nil
-
+	return err
 }
 
 func (h *Host) restart(ctx context.Context) error {
-	h.log.Info("Restarting node")
+	return h.provisionClient(ctx, "restart", 1, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+		h.log.Info("Restarting node")
 
-	creq := &provision.RestartRequest{
-		Token: h.token,
-		Splay: 1,
-	}
-
-	_, err := h.rpcDo(ctx, "choria_provision", "restart", creq, func(pr protocol.Reply, reply *rpc.RPCReply) {
-		r := &provision.Reply{}
-		err := json.Unmarshal(reply.Data, r)
+		res, err := pc.Restart().Token(h.token).Splay(1).Do(ctx)
 		if err != nil {
-			h.log.Errorf("Could not parse reply from %s: %s", pr.SenderID(), err)
-			return
+			return err
 		}
 
-		h.log.Infof("Restart response: %s", r.Message)
-	})
+		if res.Stats().ResponsesCount() != 1 {
+			return fmt.Errorf("could not perform restart: received %d responses while expecting a response from %s", res.Stats().ResponsesCount(), h.Identity)
+		}
 
-	return err
+		res.EachOutput(func(r *provclient.RestartOutput) {
+			if !r.ResultDetails().OK() {
+				err = fmt.Errorf("invalid response from %s: %s (%d)", r.ResultDetails().Sender(), r.ResultDetails().StatusMessage(), r.ResultDetails().StatusCode())
+				return
+			}
+
+			h.log.Infof("Restart response: %s", r.Message())
+		})
+
+		return err
+	})
 }
 
 func (h *Host) configure(ctx context.Context) error {
-	if len(h.config) == 0 {
-		return fmt.Errorf("empty configuration")
-	}
-
-	h.log.Info("Configuring node")
-
-	cj, err := json.Marshal(h.config)
-	if err != nil {
-		return fmt.Errorf("could not encode configuration: %s", err)
-	}
-
-	creq := &provision.ConfigureRequest{
-		Token:         h.token,
-		CA:            h.ca,
-		Certificate:   h.cert,
-		Configuration: string(cj),
-	}
-
-	if h.CSR != nil {
-		creq.SSLDir = h.CSR.SSLDir
-	}
-
-	_, err = h.rpcDo(ctx, "choria_provision", "configure", creq, func(pr protocol.Reply, reply *rpc.RPCReply) {
-		r := &provision.Reply{}
-		err := json.Unmarshal(reply.Data, r)
-		if err != nil {
-			h.log.Errorf("Could not parse reply from %s: %s", pr.SenderID(), err)
-			return
+	return h.provisionClient(ctx, "configure", 1, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+		if len(h.config) == 0 {
+			return fmt.Errorf("empty configuration")
 		}
 
-		h.log.Infof("Configuration response: %s", r.Message)
-	})
+		h.log.Info("Configuring node")
 
-	return err
+		cj, err := json.Marshal(h.config)
+		if err != nil {
+			return fmt.Errorf("could not encode configuration: %s", err)
+		}
+
+		req := pc.Configure(string(cj)).Token(h.token).Ca(h.ca).Certificate(h.cert)
+		if h.CSR != nil {
+			req.Ssldir(h.CSR.SSLDir)
+		}
+
+		res, err := req.Do(ctx)
+		if err != nil {
+			return err
+		}
+
+		if res.Stats().ResponsesCount() != 1 {
+			return fmt.Errorf("could not configure: received %d responses while expecting a response from %s", res.Stats().ResponsesCount(), h.Identity)
+		}
+
+		res.EachOutput(func(r *provclient.ConfigureOutput) {
+			if !r.ResultDetails().OK() {
+				err = fmt.Errorf("invalid response from %s: %s (%d)", r.ResultDetails().Sender(), r.ResultDetails().StatusMessage(), r.ResultDetails().StatusCode())
+				return
+			}
+
+			h.log.Infof("Configure response: %s", r.Message())
+		})
+
+		return err
+	})
 }
 
 func (h *Host) fetchJWT(ctx context.Context) (err error) {
@@ -129,37 +141,29 @@ func (h *Host) fetchJWT(ctx context.Context) (err error) {
 		return nil
 	}
 
-	h.log.Info("Fetching JWT")
+	return h.provisionClient(ctx, "jwt", 5, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+		h.log.Info("Fetching JWT")
 
-	jwtreq := &provision.JWTRequest{
-		Token: h.token,
-	}
-
-	for try := 1; try <= 5; try++ {
-		if ctx.Err() != nil {
-			return ctx.Err()
+		res, err := pc.Jwt().Token(h.token).Do(ctx)
+		if err != nil {
+			return err
 		}
 
-		_, err = h.rpcDo(ctx, "choria_provision", "jwt", jwtreq, func(pr protocol.Reply, reply *rpc.RPCReply) {
-			resp := &provision.JWTReply{}
-			err := json.Unmarshal(reply.Data, resp)
-			if err != nil {
-				h.log.Errorf("Invalid JSON data: %s", err)
+		if res.Stats().ResponsesCount() != 1 {
+			return fmt.Errorf("could not retrieve JWT: received %d responses while expecting a response from %s", res.Stats().ResponsesCount(), h.Identity)
+		}
+
+		res.EachOutput(func(r *provclient.JwtOutput) {
+			if !r.ResultDetails().OK() {
+				err = fmt.Errorf("invalid response from %s: %s (%d)", r.ResultDetails().Sender(), r.ResultDetails().StatusMessage(), r.ResultDetails().StatusCode())
 				return
 			}
 
-			h.rawJWT = resp.JWT
+			h.rawJWT = r.Jwt()
 		})
-		if err == nil {
-			if len(h.rawJWT) == 0 {
-				return fmt.Errorf("received an empty JWT")
-			}
 
-			return nil
-		}
-	}
-
-	return err
+		return err
+	})
 }
 
 func (h *Host) fetchInventory(ctx context.Context) (err error) {
@@ -168,44 +172,64 @@ func (h *Host) fetchInventory(ctx context.Context) (err error) {
 		return nil
 	}
 
-	h.log.Info("Fetching Inventory")
+	return h.rpcUtilClient(ctx, "jwt", 5, func(ctx context.Context, rpcc *rpcutilclient.RpcutilClient) error {
+		h.log.Info("Fetching Inventory")
 
-	for try := 1; try <= 5; try++ {
-		if ctx.Err() != nil {
-			return ctx.Err()
+		res, err := rpcc.Inventory().Do(ctx)
+		if err != nil {
+			return err
 		}
 
-		if try > 1 {
-			h.log.Warnf("Could not fetch rpcutil#inventory from %s on try %d / 5, retrying", h.Identity, try-1)
+		if res.Stats().ResponsesCount() != 1 {
+			return fmt.Errorf("could not retrieve inventory: received %d responses while expecting a response from %s", res.Stats().ResponsesCount(), h.Identity)
 		}
 
-		_, err = h.rpcDo(ctx, "rpcutil", "inventory", struct{}{}, func(pr protocol.Reply, reply *rpc.RPCReply) {
-			h.Metadata = string(reply.Data)
+		res.EachOutput(func(r *rpcutilclient.InventoryOutput) {
+			if !r.ResultDetails().OK() {
+				err = fmt.Errorf("invalid response from %s: %s (%d)", r.ResultDetails().Sender(), r.ResultDetails().StatusMessage(), r.ResultDetails().StatusCode())
+				return
+			}
+
+			j, err := r.JSON()
+			if err != nil {
+				err = fmt.Errorf("could not obtain inventory JSON data: %s", err)
+				return
+			}
+
+			h.Metadata = string(j)
 		})
-		if err == nil {
-			return nil
-		}
-	}
 
-	return err
+		return err
+	})
+
 }
 
 func (h *Host) fetchCSR(ctx context.Context) error {
-	h.log.Info("Fetching CSR")
+	return h.provisionClient(ctx, "choria_provision#gencsr", 1, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+		h.log.Info("Fetching CSR")
 
-	csreq := &provision.CSRRequest{
-		Token: h.token,
-		CN:    h.Identity,
-	}
-
-	_, err := h.rpcDo(ctx, "choria_provision", "gencsr", csreq, func(pr protocol.Reply, reply *rpc.RPCReply) {
-		h.CSR = &provision.CSRReply{}
-		err := json.Unmarshal(reply.Data, h.CSR)
+		res, err := pc.Gencsr().Token(h.token).Cn(h.Identity).Do(ctx)
 		if err != nil {
-			h.log.Errorf("Could not parse reply from %s: %s", pr.SenderID(), err)
-			return
+			return err
 		}
-	})
 
-	return err
+		if res.Stats().ResponsesCount() != 1 {
+			return fmt.Errorf("could not fetch CSR: received %d responses while expecting a response from %s", res.Stats().ResponsesCount(), h.Identity)
+		}
+
+		res.EachOutput(func(r *provclient.GencsrOutput) {
+			if !r.ResultDetails().OK() {
+				err = fmt.Errorf("invalid response from %s: %s (%d)", r.ResultDetails().Sender(), r.ResultDetails().StatusMessage(), r.ResultDetails().StatusCode())
+				return
+			}
+
+			h.CSR = &provision.CSRReply{}
+			err = r.ParseGencsrOutput(h.CSR)
+			if err != nil {
+				h.log.Errorf("Could not parse reply from %s: %s", r.ResultDetails().Sender(), err)
+			}
+		})
+
+		return err
+	})
 }

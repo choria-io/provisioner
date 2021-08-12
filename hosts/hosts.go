@@ -57,15 +57,29 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 		log.Errorf("Could not publish startup event: %s", err)
 	}
 
+	discoverTrigger := make(chan struct{}, 1)
+
+	if conf.LeaderElectionName != "" {
+		conf.Pause()
+
+		wg.Add(1)
+		go startElection(ctx, wg, conn, conf, discoverTrigger, log)
+	}
+
 	wg.Add(1)
 	go listen(ctx, wg, cfg.LifecycleComponent, conn)
 
 	wg.Add(1)
 	go finisher(ctx, wg)
 
-	if conf.Management != nil {
+	switch {
+	case conf.Management != nil && conf.LeaderElectionName != "":
+		log.Warnf("Backplane management mode is not compatible with Leader elections")
+
+	case conf.Management != nil:
 		wg.Add(1)
 		go startBackplane(ctx, wg)
+
 	}
 
 	for i := 0; i < cfg.Workers; i++ {
@@ -83,6 +97,9 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	for {
 		select {
 		case <-timer.C:
+			discover(ctx, agent)
+
+		case <-discoverTrigger:
 			discover(ctx, agent)
 
 		case <-ctx.Done():

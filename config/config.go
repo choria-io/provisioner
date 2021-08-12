@@ -31,16 +31,15 @@ type Config struct {
 	MonitorPort             int                              `json:"monitor_port"`
 	BrokerPort              int                              `json:"broker_port"`
 	BrokerProvisionPassword string                           `json:"broker_provisioning_password"`
-	BrokerChoriaPassword    string                           `json:"broker_choria_password"`
 	Management              *backplane.StandardConfiguration `json:"management" yaml:"management"`
 	CertDenyList            []string                         `json:"cert_deny_list"`
 	JWTVerifyCert           string                           `json:"jwt_verify_cert"`
 	RegoPolicy              string                           `json:"rego_policy"`
+	LeaderElectionName      string                           `json:"leader_election_name"`
 
 	Features struct {
-		PKI    bool `json:"pki"`
-		JWT    bool `json:"jwt"`
-		Broker bool `json:"broker"`
+		PKI bool `json:"pki"`
+		JWT bool `json:"jwt"`
 	} `json:"features"`
 
 	IntervalDuration time.Duration `json:"-"`

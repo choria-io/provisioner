@@ -1,6 +1,6 @@
 # Auto Provisioning System For Choria Server
 
-Choria Server supports a Provisioning mode that assists bootstrapping the system in large environments or dynamic cloud based environments that might not be under strict CM control.
+Choria Server supports a Provisioning mode that assists bootstrapping the system in [large environments](https://choria.io/docs/concepts/large_scale/) or dynamic cloud based environments that might not be under strict CM control.
 
 When an unconfigured Choria Server is in provisioning mode it will connect to a compiled-in Middleware network and join the `provisioning` sub collective.  It will optionally publish it's metadata and expose it's facts.
 
@@ -8,7 +8,7 @@ You can think of this as a similar setup as the old Provisioning VLANs where new
 
 The idea is that an automated system will discover nodes in the `provisioning` subcollective and guide them through the on-boarding process.  The on-boarding process can be entirely custom, one possible flow might be:
 
-  * Discover all nodes in the `provisioning` subcollective with the `choria_provision` agent
+  * Discover all nodes in the `provisioning` sub-collective with the `choria_provision` agent
     * For every discovered nodes
         * Retrieve facts and metadata
         * Based on it's facts programmatically determine which Member Collective in a [Federation](https://choria.io/docs/federation/) this node should belong to.
@@ -47,6 +47,39 @@ via these settings.
 
 Choria also support provisioning plugins to resolve this information dynamically but this requires custom binaries and should
 in general be avoided.
+
+## Preparing a Broker Environment
+
+The broker used for provisioning is the same as for our fleet, in a special mode the broker will accept plain text connections on the same port as TLS ones. The plain connections may only be used for servers in provisioning mode with a `provisioning.jwt` token and very strict permissions are applied.  These plain text connections may not communicate with any other node.
+
+A further mitigation is in place by using the Choria Broker multi tenancy features these provisioning node servers are completely isolated from any provisioned machine.
+
+The Provisioner continues to connect over TLS and presents a Username and Password to communicate with these fenced off servers.
+
+```ini
+plugin.choria.network.provisioning.signer_cert = /etc/choria-provisioner/signer-public.pem
+plugin.choria.network.provisioning.client_password = provS3cret
+```
+
+This is the relevant snippet in the `broker.conf`, here the `/etc/choria-provisioner/signer-public.pem` is the public certificate used to sign the `provisioning.jwt`.
+
+When this broker starts it will log the following warning:
+
+```
+WARN[0001] Allowing non TLS connections for provisioning purposes  component=network
+```
+
+## High Availability
+
+The Choria Provisioner can be run in a HA cluster of any size, they will campaign for leadership using Choria Streams and whichever instance is leader will provision nodes.
+
+Campaigning will be on a backoff schedule up to 20 second between campaigns, this means there can be up to a minute of downtime during a failover scenario, generally that's fine for the Provisioner.
+
+If a Provisioner was on standby and becomes leader it will immediately perform a discovery to pick up any nodes ready for provisioning.
+
+To enable the Choria Broker must be of the kind described above in `Preparing a Broker Environment` and [Choria Streams](https://choria.io/docs/streams) must be enabled.
+
+Setting `leader_election_name: PROVISIONER` in the Provisioner configuration will enable campaigns, when this is set the Provisioners will start in the Paused mode.
 
 ## Provisioning nodes
 
@@ -99,13 +132,14 @@ The input is in the format:
 	"identity": "dev1.devco.net",
 	"csr": {
 		"csr": "-----BEGIN CERTIFICATE REQUEST-----....-----END CERTIFICATE REQUEST-----",
+        "public_key": "-----BEGIN PUBLIC KEY-----....-----END PUBLIC KEY-----",
 		"ssldir": "/path/to/ssldir"
 	},
 	"inventory": "{\"agents\":[\"choria_provision\",\"choria_util\",\"discovery\",\"rpcutil\"],\"facts\":{},\"classes\":[],\"version\":\"0.0.0\",\"data_plugins\":[],\"main_collective\":\"provisioning\",\"collectives\":[\"provisioning\"]}"
 }
 ```
 
-The CSR structure will be empty when the PKI feature is not enabled, the `inventory` is the output from `rpcutil#inventory`, you'll be mainly interested in the `facts` hash I suspect. The data is JSON encoded.
+The CSR structure will be empty when the PKI feature is not enabled, the `inventory` is the output from `rpcutil#inventory`, you'll be mainly interested in the `facts` hash I suspect. The data is JSON encoded. The `public_key` entry is available since Choria 0.23.0.
 
 The output from your script should be like this:
 
@@ -224,16 +258,14 @@ loglevel: info
 # path to your helper script
 helper: /usr/local/bin/provision
 
-# the token you compiled into choria
+# the token you compiled into choria or stored into the jwt
 token: toomanysecrets
-
-# if your provision network has no TLS set this
-choria_insecure: true
 
 # a site name exposed to the backplane to assist with discovery, also used in stats
 site: testing
 
 # sets a custom lifecycle component to listen on for events that trigger provisioning
+# not compatible with leader election based HA
 lifecycle_component: acme_provisioning
 
 # Certificate patterns that should never be signed from CSRs, these are ones choria
@@ -248,9 +280,19 @@ cert_deny_list:
 # if not 0 then /metrics will be prometheus metrics
 monitor_port: 9999
 
+# provisioning server will connect with this password to connect
+# the same one configured on the broker with plugin.choria.network.provisioning.client_password
+broker_provisioning_password: provS3cret
+
+# a public cert that will be used to verify the JWT on the node is one we know and signed by us
+# the same one configured on the broker with plugin.choria.network.provisioning.signer_cert
+jwt_verify_cert: /etc/choria_provisioner/jwt-signer.pem
+
 features:
   # enables fetching of the CSR
   pki: true
+  # fetches the provisioning jwt and verify it against jwt_verify_cert
+  jwt: false
 
 # Standard Backplane specific configuration here, see
 # https://github.com/choria-io/go-backplane for full reference
