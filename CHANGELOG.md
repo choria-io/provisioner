@@ -1,5 +1,8 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/08/13|      |Release 0.11.0                                                                                           |
+|2021/08/13|      |Rename project to `provisioner`                                                                          |
+|2021/08/13|133   |Large refactor, HA support, Use generated clients, remove embedded broker support                        |
 |2021/07/21|      |Release 0.10.0                                                                                           |
 |2021/04/19|127   |Move the agent to go-choria repository                                                                   |
 |2020/09/28|      |Release 0.9.0                                                                                            |
