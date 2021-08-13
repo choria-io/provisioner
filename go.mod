@@ -1,4 +1,4 @@
-module github.com/choria-io/provisioning-agent
+module github.com/choria-io/provisioner
 
 go 1.16
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/choria-io/provisioning-agent/cmd"
+	"github.com/choria-io/provisioner/cmd"
 )
 
 func main() {

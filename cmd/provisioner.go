@@ -12,8 +12,8 @@ import (
 	"github.com/choria-io/go-choria/choria"
 	cconf "github.com/choria-io/go-choria/config"
 	"github.com/choria-io/go-choria/protocol"
-	"github.com/choria-io/provisioning-agent/config"
-	"github.com/choria-io/provisioning-agent/hosts"
+	"github.com/choria-io/provisioner/config"
+	"github.com/choria-io/provisioner/hosts"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 

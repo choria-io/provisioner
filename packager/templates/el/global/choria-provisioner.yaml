@@ -1,5 +1,5 @@
 ---
-# refer to https://github.com/choria-io/provisioning-agent for
+# refer to https://github.com/choria-io/provisioner for
 # full details about the structure and contents of the config file
 workers: 4
 interval: 5m

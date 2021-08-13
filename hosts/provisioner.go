@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/choria-io/provisioning-agent/host"
+	"github.com/choria-io/provisioner/host"
 )
 
 func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {

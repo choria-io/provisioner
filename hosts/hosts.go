@@ -13,8 +13,8 @@ import (
 	"github.com/choria-io/go-choria/client/client"
 	rpc "github.com/choria-io/go-choria/providers/agent/mcorpc/client"
 	"github.com/choria-io/go-choria/providers/discovery/broadcast"
-	"github.com/choria-io/provisioning-agent/config"
-	"github.com/choria-io/provisioning-agent/host"
+	"github.com/choria-io/provisioner/config"
+	"github.com/choria-io/provisioner/host"
 	"github.com/sirupsen/logrus"
 )
 

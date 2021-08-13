@@ -7,7 +7,7 @@ import (
 
 	"github.com/choria-io/go-choria/lifecycle"
 
-	"github.com/choria-io/provisioning-agent/host"
+	"github.com/choria-io/provisioner/host"
 
 	"github.com/choria-io/go-choria/choria"
 )

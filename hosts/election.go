@@ -9,7 +9,7 @@ import (
 
 	"github.com/choria-io/go-choria/backoff"
 	"github.com/choria-io/go-choria/choria"
-	"github.com/choria-io/provisioning-agent/config"
+	"github.com/choria-io/provisioner/config"
 	"github.com/nats-io/jsm.go"
 	"github.com/nats-io/jsm.go/election"
 	"github.com/sirupsen/logrus"

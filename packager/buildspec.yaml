@@ -1,6 +1,6 @@
 flags_map:
-  Version: github.com/choria-io/provisioning-agent/config.Version
-  SHA: github.com/choria-io/provisioning-agent/cmd.sha
+  Version: github.com/choria-io/provisioner/config.Version
+  SHA: github.com/choria-io/provisioner/cmd.sha
 
 foss:
   compile_targets:
