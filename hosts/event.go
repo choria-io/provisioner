@@ -31,18 +31,6 @@ func listen(ctx context.Context, wg *sync.WaitGroup, component string, conn chor
 		return
 	}
 
-	err = conn.QueueSubscribe(ctx, rid, "provisioning.registration.data", "", events)
-	if err != nil {
-		log.Errorf("Could not listen for provisioning data events: %s", err)
-		return
-	}
-
-	rid, err = fw.NewRequestID()
-	if err != nil {
-		log.Errorf("Could not create lifecycle event listener unique id: %s", err)
-		return
-	}
-
 	err = conn.QueueSubscribe(ctx, rid, fmt.Sprintf("choria.lifecycle.event.startup.%s", component), "", events)
 	if err != nil {
 		log.Errorf("Could not listen for lifecycle events: %s", err)

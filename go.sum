@@ -99,8 +99,8 @@ github.com/cheekybits/genny v1.0.0/go.mod h1:+tQajlRqAUrPI7DOSpB0XAqZYtQakVtB7wX
 github.com/choria-io/go-backplane v1.2.2-0.20210806113708-062c2be58a34 h1:D0qKm6GJpCwUW/epkoGoOJFSwO17IkZR7rFuJpjs74Q=
 github.com/choria-io/go-backplane v1.2.2-0.20210806113708-062c2be58a34/go.mod h1:LBhI8wUwT+ooh0LSZeIJ/5btci0sN0M361VyE2qt9zA=
 github.com/choria-io/go-choria v0.22.1-0.20210806083533-24524f62e935/go.mod h1:7InEIEwx8LMgrQ+AD5onZ51szHQqUdAXnvDYvs0eoas=
-github.com/choria-io/go-choria v0.22.1-0.20210811095133-5825ef0b31b1 h1:E21N+LvniBcL/64fQDbtNqLpRdaa6DqY2OVuCuH2jJs=
-github.com/choria-io/go-choria v0.22.1-0.20210811095133-5825ef0b31b1/go.mod h1:+dVzx6FFXZMZK1VOXGj+f2cwdhf/BBL8Mr4GVaFp7g4=
+github.com/choria-io/go-choria v0.22.1-0.20210813112338-07f25c575ec0 h1:zJ6iXRK6O9NDGLkwkhR3jTXvS7RQo8wWdLLkde7YEhg=
+github.com/choria-io/go-choria v0.22.1-0.20210813112338-07f25c575ec0/go.mod h1:lsC1waLfNkNUoiXXPJetspDP6wZIgFZ2huHl4+PMU00=
 github.com/choria-io/go-updater v0.0.3 h1:lGUG5DHV/HTl4bRwUY8t1MFuWKPosVRRJWkBF6y1z88=
 github.com/choria-io/go-updater v0.0.3/go.mod h1:IK696pPQUWx7S/MZYckzPrG2hpDyV/Pkn46JS1n4rIw=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
@@ -382,8 +382,9 @@ github.com/nats-io/jwt/v2 v2.0.3/go.mod h1:VRP+deawSXyhNjXmxPCHskrR6Mq50BqpEI5SE
 github.com/nats-io/nats-server/v2 v2.3.3/go.mod h1:3mtbaN5GkCo/Z5T3nNj0I0/W1fPkKzLiDC6jjWJKp98=
 github.com/nats-io/nats-server/v2 v2.3.4/go.mod h1:3mtbaN5GkCo/Z5T3nNj0I0/W1fPkKzLiDC6jjWJKp98=
 github.com/nats-io/nats-server/v2 v2.3.5-0.20210808150006-52cfce24c426/go.mod h1:klRwY7zhnf22JhqtymKO7eIJd0/wxBQFbB1bu/x6v8g=
-github.com/nats-io/nats-server/v2 v2.3.5-0.20210812140705-e62192d2d594 h1:wfMOKaFQhjgmHV59Rz+PYYX2GBrqOmhAo4oAdPaFDUc=
 github.com/nats-io/nats-server/v2 v2.3.5-0.20210812140705-e62192d2d594/go.mod h1:WkQ6xJIQBE5T0G/FLOeGMwkqZHHrI5V71ulkAggdsRg=
+github.com/nats-io/nats-server/v2 v2.3.5-0.20210812191237-1d9a89147722 h1:P9wSrdxc+ZVHk83koz0xsc0HMwmRQDayYaFj3T2PErk=
+github.com/nats-io/nats-server/v2 v2.3.5-0.20210812191237-1d9a89147722/go.mod h1:WkQ6xJIQBE5T0G/FLOeGMwkqZHHrI5V71ulkAggdsRg=
 github.com/nats-io/nats-streaming-server v0.22.1/go.mod h1:1WpVkVV5NyZbHuGGxkaPWopLFnxNthO/TK/BkzFdnPE=
 github.com/nats-io/nats.go v1.11.0/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
 github.com/nats-io/nats.go v1.11.1-0.20210623165838-4b75fc59ae30/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=

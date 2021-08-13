@@ -50,11 +50,11 @@ in general be avoided.
 
 ## Preparing a Broker Environment
 
-The broker used for provisioning is the same as for our fleet, in a special mode the broker will accept plain text connections on the same port as TLS ones. The plain connections may only be used for servers in provisioning mode with a `provisioning.jwt` token and very strict permissions are applied.  These plain text connections may not communicate with any other node.
+The broker used for provisioning is the same as for our fleet, in a special mode the broker will accept unverified TLS connections on the same port as verified mTLS ones. The unverified connections may only be used for servers in provisioning mode with a `provisioning.jwt` token and very strict permissions are applied.  These unverified TLS connections may not communicate with any other node.
 
 A further mitigation is in place by using the Choria Broker multi tenancy features these provisioning node servers are completely isolated from any provisioned machine.
 
-The Provisioner continues to connect over TLS and presents a Username and Password to communicate with these fenced off servers.
+The Provisioner continues to connect over verified mTLS and presents a Username and Password to communicate with these fenced off servers.
 
 ```ini
 plugin.choria.network.provisioning.signer_cert = /etc/choria-provisioner/signer-public.pem
