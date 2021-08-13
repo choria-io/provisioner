@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: circleci/golang:1.16
 
-    working_directory: /go/src/github.com/choria-io/provisioning-agent
+    working_directory: /go/src/github.com/choria-io/provisioner
 
     environment:
       GO111MODULE: "on"
@@ -15,17 +15,17 @@ jobs:
       - run: go get github.com/onsi/ginkgo/ginkgo
       - run: ginkgo -r -skipMeasurements
       - run: mkdir -p /tmp/workspace
-      - run: cd .. ; tar -czf /tmp/workspace/provisioning-agent.tgz provisioning-agent
+      - run: cd .. ; tar -czf /tmp/workspace/provisioner.tgz provisioner
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
-            - provisioning-agent.tgz
+            - provisioner.tgz
 
   build_el7_64bit_rpms: &pkg_build
     docker:
       - image: circleci/golang:1.16
 
-    working_directory: /go/src/github.com/choria-io/provisioning-agent
+    working_directory: /go/src/github.com/choria-io/provisioner
 
     environment:
       PACKAGE: el7_64
@@ -39,7 +39,7 @@ jobs:
           at: /tmp/workspace
 
       - run: docker create -v /go -v /build/artifacts --name store alpine:latest /bin/true
-      - run: cd .. ; tar -xzf /tmp/workspace/provisioning-agent.tgz
+      - run: cd .. ; tar -xzf /tmp/workspace/provisioner.tgz
 
       - run: docker cp /go store:/
 
@@ -56,7 +56,7 @@ jobs:
             fi
           fi
 
-          docker run --volumes-from store --rm -e SOURCE_DIR=/go/src/github.com/choria-io/provisioning-agent -e SHA1=${CIRCLE_SHA1} -e BUILD=${BUILD} -e VERSION=${VERSION} -e ARTIFACTS=/build/artifacts -e PACKAGE=${PACKAGE} ${BUILDER}
+          docker run --volumes-from store --rm -e SOURCE_DIR=/go/src/github.com/choria-io/provisioner -e SHA1=${CIRCLE_SHA1} -e BUILD=${BUILD} -e VERSION=${VERSION} -e ARTIFACTS=/build/artifacts -e PACKAGE=${PACKAGE} ${BUILDER}
 
       - run: |
           mkdir -p /tmp/workspace/artifacts/${BUILD}/${PACKAGE}

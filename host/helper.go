@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/choria-io/go-choria/opa"
-	"github.com/choria-io/provisioning-agent/config"
+	"github.com/choria-io/provisioner/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
