@@ -33,7 +33,7 @@ func startElection(ctx context.Context, wg *sync.WaitGroup, conn choria.Connecto
 		log.Warnf("Became leader after winning election of %s", conf.LeaderElectionName)
 		select {
 		case trigger <- struct{}{}:
-			log.Info("Triggered a discovery after gaining leadership")
+			log.Info("Triggered a discovery after becoming leader")
 		}
 	}
 
