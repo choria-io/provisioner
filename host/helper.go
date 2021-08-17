@@ -19,6 +19,7 @@ import (
 type ConfigResponse struct {
 	Defer         bool              `json:"defer"`
 	Msg           string            `json:"msg"`
+	Key           string            `json:"key"`
 	Certificate   string            `json:"certificate"`
 	CA            string            `json:"ca"`
 	Configuration map[string]string `json:"configuration"`
