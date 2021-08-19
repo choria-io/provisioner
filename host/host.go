@@ -37,6 +37,8 @@ type Host struct {
 	provisioned bool
 	ca          string
 	cert        string
+	key         string
+	sslDir      string
 
 	cfg       *config.Config
 	token     string
@@ -110,6 +112,8 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	h.config = config.Configuration
 	h.ca = config.CA
 	h.cert = config.Certificate
+	h.key = config.Key
+	h.sslDir = config.SSLDir
 
 	err = h.configure(ctx)
 	if err != nil {

@@ -108,8 +108,8 @@ func (h *Host) configure(ctx context.Context) error {
 			return fmt.Errorf("could not encode configuration: %s", err)
 		}
 
-		req := pc.Configure(string(cj)).Token(h.token).Ca(h.ca).Certificate(h.cert)
-		if h.CSR != nil {
+		req := pc.Configure(string(cj)).Token(h.token).Ca(h.ca).Certificate(h.cert).Ssldir(h.sslDir).Key(h.key)
+		if h.CSR != nil && h.CSR.SSLDir != "" {
 			req.Ssldir(h.CSR.SSLDir)
 		}
 

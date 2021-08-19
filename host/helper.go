@@ -22,6 +22,7 @@ type ConfigResponse struct {
 	Key           string            `json:"key"`
 	Certificate   string            `json:"certificate"`
 	CA            string            `json:"ca"`
+	SSLDir        string            `json:"ssldir"`
 	Configuration map[string]string `json:"configuration"`
 }
 
