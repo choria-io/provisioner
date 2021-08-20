@@ -1,8 +1,11 @@
 package host
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
@@ -28,17 +31,19 @@ type provClaims struct {
 }
 
 type Host struct {
-	Identity    string              `json:"identity"`
-	CSR         *provision.CSRReply `json:"csr"`
-	Metadata    string              `json:"inventory"`
-	JWT         *provClaims         `json:"jwt"`
-	rawJWT      string
-	config      map[string]string
-	provisioned bool
-	ca          string
-	cert        string
-	key         string
-	sslDir      string
+	Identity        string              `json:"identity"`
+	CSR             *provision.CSRReply `json:"csr"`
+	Metadata        string              `json:"inventory"`
+	JWT             *provClaims         `json:"jwt"`
+	rawJWT          string
+	config          map[string]string
+	provisioned     bool
+	ca              string
+	cert            string
+	key             string
+	sslDir          string
+	serverPubKey    string
+	provisionPubKey string
 
 	cfg       *config.Config
 	token     string
@@ -115,6 +120,13 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	h.key = config.Key
 	h.sslDir = config.SSLDir
 
+	if h.key != "" {
+		err = h.encryptPrivateKey()
+		if err != nil {
+			return err
+		}
+	}
+
 	err = h.configure(ctx)
 	if err != nil {
 		return fmt.Errorf("configuration failed: %s", err)
@@ -126,6 +138,53 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	}
 
 	h.provisioned = true
+
+	return nil
+}
+
+func (h *Host) encryptPrivateKey() error {
+	if h.key == "" {
+		return fmt.Errorf("no key to encrypt")
+	}
+
+	if h.serverPubKey == "" {
+		return fmt.Errorf("private key received from helper but server did not start Diffie-Hellman exchange")
+	}
+
+	block, _ := pem.Decode([]byte(h.key))
+	if block == nil {
+		return fmt.Errorf("bad key received")
+	}
+
+	serverPubKey, err := hex.DecodeString(h.serverPubKey)
+	if err != nil {
+		return err
+	}
+
+	provPrivate, provPublic, err := choria.EDCHKeyPair()
+	if err != nil {
+		return err
+	}
+	h.provisionPubKey = fmt.Sprintf("%x", provPublic)
+
+	sharedSecret, err := choria.EDCHSharedSecret(provPrivate, serverPubKey)
+	if err != nil {
+		return err
+	}
+
+	//lint:ignore SA1019 there is no alternative
+	epb, err := x509.EncryptPEMBlock(rand.Reader, "RSA PRIVATE KEY", block.Bytes, sharedSecret, x509.PEMCipherAES256)
+	if err != nil {
+		return err
+	}
+
+	out := &bytes.Buffer{}
+	err = pem.Encode(out, epb)
+	if err != nil {
+		return err
+	}
+
+	h.key = out.String()
 
 	return nil
 }
