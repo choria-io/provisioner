@@ -108,7 +108,7 @@ func (h *Host) configure(ctx context.Context) error {
 			return fmt.Errorf("could not encode configuration: %s", err)
 		}
 
-		req := pc.Configure(string(cj)).Token(h.token).Ca(h.ca).Certificate(h.cert).Ssldir(h.sslDir).Key(h.key)
+		req := pc.Configure(string(cj)).Token(h.token).Ca(h.ca).Certificate(h.cert).Ssldir(h.sslDir).Key(h.key).EdchPublic(h.provisionPubKey)
 		if h.CSR != nil && h.CSR.SSLDir != "" {
 			req.Ssldir(h.CSR.SSLDir)
 		}
@@ -160,6 +160,7 @@ func (h *Host) fetchJWT(ctx context.Context) (err error) {
 			}
 
 			h.rawJWT = r.Jwt()
+			h.serverPubKey = r.EdchPublic()
 		})
 
 		return err
@@ -172,7 +173,7 @@ func (h *Host) fetchInventory(ctx context.Context) (err error) {
 		return nil
 	}
 
-	return h.rpcUtilClient(ctx, "jwt", 5, func(ctx context.Context, rpcc *rpcutilclient.RpcutilClient) error {
+	return h.rpcUtilClient(ctx, "inventory", 5, func(ctx context.Context, rpcc *rpcutilclient.RpcutilClient) error {
 		h.log.Info("Fetching Inventory")
 
 		res, err := rpcc.Inventory().Do(ctx)
@@ -205,7 +206,7 @@ func (h *Host) fetchInventory(ctx context.Context) (err error) {
 }
 
 func (h *Host) fetchCSR(ctx context.Context) error {
-	return h.provisionClient(ctx, "choria_provision#gencsr", 1, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+	return h.provisionClient(ctx, "gencsr", 1, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
 		h.log.Info("Fetching CSR")
 
 		res, err := pc.Gencsr().Token(h.token).Cn(h.Identity).Do(ctx)

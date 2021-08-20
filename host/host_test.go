@@ -1,21 +1,23 @@
 package host
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"strings"
 	"testing"
 
-	"github.com/sirupsen/logrus"
-
+	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
 	"github.com/choria-io/provisioner/config"
+	"github.com/sirupsen/logrus"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -84,6 +86,46 @@ var _ = Describe("Host", func() {
 			Expect(err).ToNot(HaveOccurred())
 			h.CSR.CSR = string(csr)
 			Expect(h.validateCSR()).To(BeNil())
+		})
+	})
+
+	Describe("encryptPrivateKey", func() {
+		It("Should correctly encrypt the private key", func() {
+			Expect(h.encryptPrivateKey()).To(MatchError("no key to encrypt"))
+
+			// create an unencrypted key
+			pk, err := rsa.GenerateKey(rand.Reader, 1024)
+			Expect(err).ToNot(HaveOccurred())
+			pkBytes := x509.MarshalPKCS1PrivateKey(pk)
+			pkPem := &bytes.Buffer{}
+			err = pem.Encode(pkPem, &pem.Block{Bytes: pkBytes, Type: "RSA PRIVATE KEY"})
+			Expect(err).ToNot(HaveOccurred())
+			h.key = pkPem.String()
+
+			// pubkey received from choria
+			h.serverPubKey = "88a9a0ed27dc93c29466ea2bef99e078342b27e7a1d789fc35a9131f86c3a022"
+
+			// encrypt it with the calculated shared secret based on serverPubKey
+			h.encryptPrivateKey()
+
+			blk, _ := pem.Decode([]byte(h.key))
+			Expect(blk).ToNot(BeNil())
+			Expect(x509.IsEncryptedPEMBlock(blk)).To(BeTrue())
+
+			// make sure the server can decode
+			srvPri, err := hex.DecodeString("67e4a9b3934a3030470ed7a30f89eeaf7dab7b492aa9ee02fb864d690b7e6eeb")
+			Expect(err).ToNot(HaveOccurred())
+
+			provPub, err := hex.DecodeString(h.provisionPubKey)
+			Expect(err).ToNot(HaveOccurred())
+
+			shared, err := choria.EDCHSharedSecret(srvPri, provPub)
+			Expect(err).ToNot(HaveOccurred())
+
+			clearBytes, err := x509.DecryptPEMBlock(blk, shared)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(clearBytes).To(Equal(pkBytes))
 		})
 	})
 })
