@@ -100,8 +100,8 @@ github.com/cheekybits/genny v1.0.0/go.mod h1:+tQajlRqAUrPI7DOSpB0XAqZYtQakVtB7wX
 github.com/choria-io/go-backplane v1.2.2-0.20210806113708-062c2be58a34 h1:D0qKm6GJpCwUW/epkoGoOJFSwO17IkZR7rFuJpjs74Q=
 github.com/choria-io/go-backplane v1.2.2-0.20210806113708-062c2be58a34/go.mod h1:LBhI8wUwT+ooh0LSZeIJ/5btci0sN0M361VyE2qt9zA=
 github.com/choria-io/go-choria v0.22.1-0.20210806083533-24524f62e935/go.mod h1:7InEIEwx8LMgrQ+AD5onZ51szHQqUdAXnvDYvs0eoas=
-github.com/choria-io/go-choria v0.22.1-0.20210820150647-ba049c4e050a h1:xo0I3wGB3W775zNLGFeNWKrGKBR/F1IwzX5Xvz9gw90=
-github.com/choria-io/go-choria v0.22.1-0.20210820150647-ba049c4e050a/go.mod h1:+rHzlnY/aUJCJgBMo1v/ipdQa2dim26wQs1DDG1ACoY=
+github.com/choria-io/go-choria v0.22.1-0.20210823105747-c653e8410b3e h1:VM/TdpJqNfA24Sjee5b1TU2u5HVm324wZ8WmzaxIHDU=
+github.com/choria-io/go-choria v0.22.1-0.20210823105747-c653e8410b3e/go.mod h1:KmHNyRtoY4oYbuqNydk9+zDUnD7LDgh3qiSxd/Tn6w0=
 github.com/choria-io/go-updater v0.0.3 h1:lGUG5DHV/HTl4bRwUY8t1MFuWKPosVRRJWkBF6y1z88=
 github.com/choria-io/go-updater v0.0.3/go.mod h1:IK696pPQUWx7S/MZYckzPrG2hpDyV/Pkn46JS1n4rIw=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
@@ -139,6 +139,7 @@ github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5Kwzbycv
 github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
 github.com/fatih/color v1.12.0 h1:mRhaKNwANqRgUBGKmnI5ZxEk7QXmjQeCcuYFMX2bfcc=
 github.com/fatih/color v1.12.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
+github.com/fatih/structtag v1.2.0/go.mod h1:mBJUNpUnHmRKrKlQQlmCrh5PuhftFbNv8Ys4/aAZl94=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
@@ -384,14 +385,13 @@ github.com/nats-io/jwt/v2 v2.0.3/go.mod h1:VRP+deawSXyhNjXmxPCHskrR6Mq50BqpEI5SE
 github.com/nats-io/nats-server/v2 v2.3.3/go.mod h1:3mtbaN5GkCo/Z5T3nNj0I0/W1fPkKzLiDC6jjWJKp98=
 github.com/nats-io/nats-server/v2 v2.3.4/go.mod h1:3mtbaN5GkCo/Z5T3nNj0I0/W1fPkKzLiDC6jjWJKp98=
 github.com/nats-io/nats-server/v2 v2.3.5-0.20210815194728-bf8fdf132077/go.mod h1:7mTh0KSxKc63xAVop97cFCIGRkWCv6HoX9lMXRSNOhU=
-github.com/nats-io/nats-server/v2 v2.3.5-0.20210819223006-7dcd75aa1d23 h1:MITyop160Ng7aW+sDyo3m/2BhPVXXHB0J1OPZepJdIQ=
-github.com/nats-io/nats-server/v2 v2.3.5-0.20210819223006-7dcd75aa1d23/go.mod h1:hhZAAAIrFEX1E+7VbiWeOz3c9CvWX5vgdCk7iKV9tfQ=
+github.com/nats-io/nats-server/v2 v2.3.5-0.20210820234538-059aa5e23a91 h1:LXDNiLydX2WGUPe8yblUDAfQKYOiRauabQU61PKrWoQ=
+github.com/nats-io/nats-server/v2 v2.3.5-0.20210820234538-059aa5e23a91/go.mod h1:qlB3H+x9WkGUS1heNr3IMHC7ZHSigBYrTzexYc11LM4=
 github.com/nats-io/nats-streaming-server v0.22.1/go.mod h1:1WpVkVV5NyZbHuGGxkaPWopLFnxNthO/TK/BkzFdnPE=
 github.com/nats-io/nats.go v1.11.0/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
 github.com/nats-io/nats.go v1.11.1-0.20210623165838-4b75fc59ae30/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
 github.com/nats-io/nats.go v1.11.1-0.20210803204434-91bdffe39f41/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
 github.com/nats-io/nats.go v1.11.1-0.20210813172934-9c00d13a8a19/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
-github.com/nats-io/nats.go v1.11.1-0.20210817011318-78b4cc260af9/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
 github.com/nats-io/nats.go v1.11.1-0.20210819195927-9053aa4200f0 h1:lffRgFiHXqxwf8lYNSXXeOZdOgAIOabGwOSwdttqCn0=
 github.com/nats-io/nats.go v1.11.1-0.20210819195927-9053aa4200f0/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
 github.com/nats-io/nkeys v0.2.0/go.mod h1:XdZpAbhgyyODYqjTawOnIOI7VlbKSarI9Gfy1tqEu/s=

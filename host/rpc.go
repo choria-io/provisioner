@@ -108,7 +108,7 @@ func (h *Host) configure(ctx context.Context) error {
 			return fmt.Errorf("could not encode configuration: %s", err)
 		}
 
-		req := pc.Configure(string(cj)).Token(h.token).Ca(h.ca).Certificate(h.cert).Ssldir(h.sslDir).Key(h.key).EdchPublic(h.provisionPubKey)
+		req := pc.Configure(string(cj)).Token(h.token).Ca(h.ca).Certificate(h.cert).Ssldir(h.sslDir).Key(h.key).EcdhPublic(h.provisionPubKey)
 		if h.CSR != nil && h.CSR.SSLDir != "" {
 			req.Ssldir(h.CSR.SSLDir)
 		}
@@ -160,7 +160,7 @@ func (h *Host) fetchJWT(ctx context.Context) (err error) {
 			}
 
 			h.rawJWT = r.Jwt()
-			h.serverPubKey = r.EdchPublic()
+			h.serverPubKey = r.EcdhPublic()
 		})
 
 		return err

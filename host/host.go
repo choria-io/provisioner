@@ -161,13 +161,13 @@ func (h *Host) encryptPrivateKey() error {
 		return err
 	}
 
-	provPrivate, provPublic, err := choria.EDCHKeyPair()
+	provPrivate, provPublic, err := choria.ECDHKeyPair()
 	if err != nil {
 		return err
 	}
 	h.provisionPubKey = fmt.Sprintf("%x", provPublic)
 
-	sharedSecret, err := choria.EDCHSharedSecret(provPrivate, serverPubKey)
+	sharedSecret, err := choria.ECDHSharedSecret(provPrivate, serverPubKey)
 	if err != nil {
 		return err
 	}
