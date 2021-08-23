@@ -119,7 +119,7 @@ var _ = Describe("Host", func() {
 			provPub, err := hex.DecodeString(h.provisionPubKey)
 			Expect(err).ToNot(HaveOccurred())
 
-			shared, err := choria.EDCHSharedSecret(srvPri, provPub)
+			shared, err := choria.ECDHSharedSecret(srvPri, provPub)
 			Expect(err).ToNot(HaveOccurred())
 
 			clearBytes, err := x509.DecryptPEMBlock(blk, shared)
