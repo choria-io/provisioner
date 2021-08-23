@@ -100,8 +100,8 @@ github.com/cheekybits/genny v1.0.0/go.mod h1:+tQajlRqAUrPI7DOSpB0XAqZYtQakVtB7wX
 github.com/choria-io/go-backplane v1.2.2-0.20210806113708-062c2be58a34 h1:D0qKm6GJpCwUW/epkoGoOJFSwO17IkZR7rFuJpjs74Q=
 github.com/choria-io/go-backplane v1.2.2-0.20210806113708-062c2be58a34/go.mod h1:LBhI8wUwT+ooh0LSZeIJ/5btci0sN0M361VyE2qt9zA=
 github.com/choria-io/go-choria v0.22.1-0.20210806083533-24524f62e935/go.mod h1:7InEIEwx8LMgrQ+AD5onZ51szHQqUdAXnvDYvs0eoas=
-github.com/choria-io/go-choria v0.22.1-0.20210823105747-c653e8410b3e h1:VM/TdpJqNfA24Sjee5b1TU2u5HVm324wZ8WmzaxIHDU=
-github.com/choria-io/go-choria v0.22.1-0.20210823105747-c653e8410b3e/go.mod h1:KmHNyRtoY4oYbuqNydk9+zDUnD7LDgh3qiSxd/Tn6w0=
+github.com/choria-io/go-choria v0.22.1-0.20210823154529-698b94290f98 h1:Gsn/LQtecVbSDIte5KvKuHuuI1/mTBtZWUVUgcKY1N8=
+github.com/choria-io/go-choria v0.22.1-0.20210823154529-698b94290f98/go.mod h1:KmHNyRtoY4oYbuqNydk9+zDUnD7LDgh3qiSxd/Tn6w0=
 github.com/choria-io/go-updater v0.0.3 h1:lGUG5DHV/HTl4bRwUY8t1MFuWKPosVRRJWkBF6y1z88=
 github.com/choria-io/go-updater v0.0.3/go.mod h1:IK696pPQUWx7S/MZYckzPrG2hpDyV/Pkn46JS1n4rIw=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=

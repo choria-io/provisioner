@@ -20,9 +20,14 @@ func (h *Host) rpcUtilClient(ctx context.Context, action string, tries int, cb f
 
 	client.OptionWorkers(1).OptionTargets([]string{h.Identity})
 
-	return h.rpcWrapper(ctx, fmt.Sprintf("rpcutil#%s", action), tries, func(ctx context.Context) error {
+	err = h.rpcWrapper(ctx, fmt.Sprintf("rpcutil#%s", action), tries, func(ctx context.Context) error {
 		return cb(ctx, client)
 	})
+	if err != nil {
+		return fmt.Errorf("rpc_util#%s failed: %s", action, err)
+	}
+
+	return nil
 }
 
 func (h *Host) provisionClient(ctx context.Context, action string, tries int, cb func(context.Context, *provclient.ChoriaProvisionClient) error) error {
@@ -33,9 +38,14 @@ func (h *Host) provisionClient(ctx context.Context, action string, tries int, cb
 
 	client.OptionWorkers(1).OptionTargets([]string{h.Identity})
 
-	return h.rpcWrapper(ctx, fmt.Sprintf("choria_provision#%s", action), tries, func(ctx context.Context) error {
+	err = h.rpcWrapper(ctx, fmt.Sprintf("choria_provision#%s", action), tries, func(ctx context.Context) error {
 		return cb(ctx, client)
 	})
+	if err != nil {
+		return fmt.Errorf("choria_provision#%s failed: %s", action, err)
+	}
+
+	return nil
 }
 
 func (h *Host) rpcWrapper(ctx context.Context, action string, tries int, cb func(context.Context) error) error {
@@ -47,7 +57,9 @@ func (h *Host) rpcWrapper(ctx context.Context, action string, tries int, cb func
 	defer cancel()
 
 	err := backoff.Default.For(tctx, func(try int) error {
+		h.log.Debugf("Trying action %s try %d/%d", action, try, tries)
 		if try > tries {
+			h.log.Errorf("Maximum %d tries reached for action %s", tries, action)
 			cancel()
 			return fmt.Errorf("maximum tries reached")
 		}
@@ -60,7 +72,13 @@ func (h *Host) rpcWrapper(ctx context.Context, action string, tries int, cb func
 		obs := prometheus.NewTimer(rpcDuration.WithLabelValues(h.cfg.Site, action))
 		defer obs.ObserveDuration()
 
-		return cb(tctx)
+		err := cb(tctx)
+		if err != nil {
+			h.log.Errorf("rpc handler for %s failed: %s", action, err)
+			return fmt.Errorf("rpc handler failed: %s", err)
+		}
+
+		return nil
 	})
 	if err != nil {
 		rpcErrCtr.WithLabelValues(h.cfg.Site, action).Inc()
@@ -70,7 +88,7 @@ func (h *Host) rpcWrapper(ctx context.Context, action string, tries int, cb func
 }
 
 func (h *Host) restart(ctx context.Context) error {
-	return h.provisionClient(ctx, "restart", 1, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+	return h.provisionClient(ctx, "restart", 3, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
 		h.log.Info("Restarting node")
 
 		res, err := pc.Restart().Token(h.token).Splay(1).Do(ctx)
@@ -96,7 +114,7 @@ func (h *Host) restart(ctx context.Context) error {
 }
 
 func (h *Host) configure(ctx context.Context) error {
-	return h.provisionClient(ctx, "configure", 1, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+	return h.provisionClient(ctx, "configure", 5, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
 		if len(h.config) == 0 {
 			return fmt.Errorf("empty configuration")
 		}
