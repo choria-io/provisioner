@@ -1,5 +1,7 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/08/17|      |Release 0.12.0                                                                                           |
+|2021/08/17|138   |Support provisioning private keys protected by Curve 25519 ECDH key exchange                             |
 |2021/08/13|      |Release 0.11.0                                                                                           |
 |2021/08/13|      |Rename project to `provisioner`                                                                          |
 |2021/08/13|133   |Large refactor, HA support, Use generated clients, remove embedded broker support                        |
