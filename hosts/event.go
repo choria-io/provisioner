@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/choria-io/go-choria/inter"
 	"github.com/choria-io/go-choria/lifecycle"
 
 	"github.com/choria-io/provisioner/host"
-
-	"github.com/choria-io/go-choria/choria"
 )
 
-func connect(ctx context.Context) (choria.Connector, error) {
+func connect(ctx context.Context) (inter.Connector, error) {
 	if ctx.Err() != nil {
 		return nil, fmt.Errorf("Existing on shut down")
 	}
@@ -20,10 +19,10 @@ func connect(ctx context.Context) (choria.Connector, error) {
 	return fw.NewConnector(ctx, fw.MiddlewareServers, fw.Certname(), log)
 }
 
-func listen(ctx context.Context, wg *sync.WaitGroup, component string, conn choria.Connector) {
+func listen(ctx context.Context, wg *sync.WaitGroup, component string, conn inter.Connector) {
 	defer wg.Done()
 
-	events := make(chan *choria.ConnectorMessage, 1000)
+	events := make(chan inter.ConnectorMessage, 1000)
 
 	rid, err := fw.NewRequestID()
 	if err != nil {
@@ -56,13 +55,13 @@ func listen(ctx context.Context, wg *sync.WaitGroup, component string, conn chor
 	}
 }
 
-func handle(msg *choria.ConnectorMessage) (string, error) {
+func handle(msg inter.ConnectorMessage) (string, error) {
 	if conf.Paused() {
 		log.Warnf("Skipping event processing while paused")
 		return "", nil
 	}
 
-	event, err := lifecycle.NewFromJSON(msg.Bytes())
+	event, err := lifecycle.NewFromJSON(msg.Data())
 	if err != nil {
 		return "", err
 	}

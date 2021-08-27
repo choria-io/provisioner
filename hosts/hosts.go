@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/choria-io/go-choria/inter"
 	"github.com/choria-io/go-choria/lifecycle"
 	addl "github.com/choria-io/go-choria/providers/agent/mcorpc/ddl/agent"
 
@@ -109,7 +110,7 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	}
 }
 
-func publishStartupEvent(conn choria.Connector) error {
+func publishStartupEvent(conn inter.Connector) error {
 	event, err := lifecycle.New(lifecycle.Startup, lifecycle.Component("provisioner"), lifecycle.Identity(fw.Config.Identity), lifecycle.Version(config.Version))
 	if err != nil {
 		return fmt.Errorf("could not create event: %s", err)
