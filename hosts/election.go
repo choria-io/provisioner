@@ -8,14 +8,14 @@ import (
 	"time"
 
 	"github.com/choria-io/go-choria/backoff"
-	"github.com/choria-io/go-choria/choria"
+	"github.com/choria-io/go-choria/inter"
 	"github.com/choria-io/provisioner/config"
 	"github.com/nats-io/jsm.go"
 	"github.com/nats-io/jsm.go/election"
 	"github.com/sirupsen/logrus"
 )
 
-func startElection(ctx context.Context, wg *sync.WaitGroup, conn choria.Connector, conf *config.Config, trigger chan struct{}, logger *logrus.Entry) error {
+func startElection(ctx context.Context, wg *sync.WaitGroup, conn inter.Connector, conf *config.Config, trigger chan struct{}, logger *logrus.Entry) error {
 	defer wg.Done()
 
 	log := logger.WithField("election", conf.LeaderElectionName)
