@@ -13,7 +13,7 @@ import (
 )
 
 func (h *Host) rpcUtilClient(ctx context.Context, action string, tries int, cb func(context.Context, *rpcutilclient.RpcutilClient) error) error {
-	client, err := rpcutilclient.New(rpcutilclient.Choria(h.fw), rpcutilclient.Logger(h.log))
+	client, err := rpcutilclient.New(h.fw, rpcutilclient.Logger(h.log))
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (h *Host) rpcUtilClient(ctx context.Context, action string, tries int, cb f
 }
 
 func (h *Host) provisionClient(ctx context.Context, action string, tries int, cb func(context.Context, *provclient.ChoriaProvisionClient) error) error {
-	client, err := provclient.New(provclient.Choria(h.fw), provclient.Logger(h.log))
+	client, err := provclient.New(h.fw, provclient.Logger(h.log))
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,16 @@ func (h *Host) configure(ctx context.Context) error {
 			return fmt.Errorf("could not encode configuration: %s", err)
 		}
 
-		req := pc.Configure(string(cj)).Token(h.token).Ca(h.ca).Certificate(h.cert).Ssldir(h.sslDir).Key(h.key).EcdhPublic(h.provisionPubKey)
+		req := pc.Configure(string(cj)).
+			Token(h.token).
+			Ca(h.ca).
+			Certificate(h.cert).
+			Ssldir(h.sslDir).
+			Key(h.key).
+			EcdhPublic(h.provisionPubKey).
+			ActionPolicies(h.actionPolicies).
+			OpaPolicies(h.opaPolicies)
+
 		if h.CSR != nil && h.CSR.SSLDir != "" {
 			req.Ssldir(h.CSR.SSLDir)
 		}

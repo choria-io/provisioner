@@ -149,6 +149,12 @@ The output from your script should be like this:
   "msg": "Reason why the provisioning is being defered",
   "certificate": "-----BEGIN CERTIFICATE-----......-----END CERTIFICATE-----",
   "ca": "-----BEGIN CERTIFICATE-----......-----END CERTIFICATE-----",
+  "opa_policies": {
+    "default.rego": "....."
+  },
+  "action_policies": {
+    "rpcutil.policy": "....."
+  },
   "configuration": {
     "plugin.choria.server.provision": "false",
     "identity": "node1.example.net"

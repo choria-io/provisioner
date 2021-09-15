@@ -17,13 +17,15 @@ import (
 )
 
 type ConfigResponse struct {
-	Defer         bool              `json:"defer"`
-	Msg           string            `json:"msg"`
-	Key           string            `json:"key"`
-	Certificate   string            `json:"certificate"`
-	CA            string            `json:"ca"`
-	SSLDir        string            `json:"ssldir"`
-	Configuration map[string]string `json:"configuration"`
+	Defer          bool              `json:"defer"`
+	Msg            string            `json:"msg"`
+	Key            string            `json:"key"`
+	Certificate    string            `json:"certificate"`
+	CA             string            `json:"ca"`
+	SSLDir         string            `json:"ssldir"`
+	Configuration  map[string]string `json:"configuration"`
+	ActionPolicies map[string]string `json:"action_policies"`
+	OPAPolicies    map[string]string `json:"opa_policies"`
 }
 
 func (h *Host) shouldConfigure(ctx context.Context) (should bool, err error) {
