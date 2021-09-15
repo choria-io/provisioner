@@ -44,6 +44,8 @@ type Host struct {
 	sslDir          string
 	serverPubKey    string
 	provisionPubKey string
+	actionPolicies  map[string]interface{}
+	opaPolicies     map[string]interface{}
 
 	cfg       *config.Config
 	token     string
@@ -119,6 +121,20 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	h.cert = config.Certificate
 	h.key = config.Key
 	h.sslDir = config.SSLDir
+	h.actionPolicies = make(map[string]interface{})
+	h.opaPolicies = make(map[string]interface{})
+
+	if len(config.OPAPolicies) > 0 {
+		for k, v := range config.OPAPolicies {
+			h.opaPolicies[k] = v
+		}
+	}
+
+	if len(config.ActionPolicies) > 0 {
+		for k, v := range config.ActionPolicies {
+			h.actionPolicies[k] = v
+		}
+	}
 
 	if h.key != "" {
 		err = h.encryptPrivateKey()
