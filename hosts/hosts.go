@@ -60,11 +60,11 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 
 	discoverTrigger := make(chan struct{}, 1)
 
-	if conf.LeaderElectionName != "" {
+	if conf.LeaderElection {
 		conf.Pause()
 
 		wg.Add(1)
-		go startElection(ctx, wg, conn, conf, discoverTrigger, log)
+		go startElection(ctx, wg, conn, fw, discoverTrigger, log)
 	}
 
 	wg.Add(1)
@@ -72,16 +72,6 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 
 	wg.Add(1)
 	go finisher(ctx, wg)
-
-	switch {
-	case conf.Management != nil && conf.LeaderElectionName != "":
-		log.Warnf("Backplane management mode is not compatible with Leader elections")
-
-	case conf.Management != nil:
-		wg.Add(1)
-		go startBackplane(ctx, wg)
-
-	}
 
 	for i := 0; i < cfg.Workers; i++ {
 		wg.Add(1)

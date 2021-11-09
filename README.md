@@ -73,13 +73,15 @@ WARN[0001] Allowing non TLS connections for provisioning purposes  component=net
 
 The Choria Provisioner can be run in a HA cluster of any size, they will campaign for leadership using Choria Streams and whichever instance is leader will provision nodes.
 
+**NOTE**: This requires Choria Broker 0.25.0 or newer.
+
 Campaigning will be on a backoff schedule up to 20 second between campaigns, this means there can be up to a minute of downtime during a failover scenario, generally that's fine for the Provisioner.
 
 If a Provisioner was on standby and becomes leader it will immediately perform a discovery to pick up any nodes ready for provisioning.
 
 To enable the Choria Broker must be of the kind described above in `Preparing a Broker Environment` and [Choria Streams](https://choria.io/docs/streams) must be enabled.
 
-Setting `leader_election_name: PROVISIONER` in the Provisioner configuration will enable campaigns, when this is set the Provisioners will start in the Paused mode.
+Setting `leader_election: true` in the Provisioner configuration will enable campaigns, when this is set the Provisioners will start in the Paused mode.
 
 ## Provisioning nodes
 
@@ -267,7 +269,7 @@ helper: /usr/local/bin/provision
 # the token you compiled into choria or stored into the jwt
 token: toomanysecrets
 
-# a site name exposed to the backplane to assist with discovery, also used in stats
+# a site name exposed stats for differentiating different clusters
 site: testing
 
 # sets a custom lifecycle component to listen on for events that trigger provisioning
@@ -299,36 +301,9 @@ features:
   pki: true
   # fetches the provisioning jwt and verify it against jwt_verify_cert
   jwt: false
-
-# Standard Backplane specific configuration here, see
-# https://github.com/choria-io/go-backplane for full reference
-# if this is unset the backplane is not enabled
-management:
-    name: provisioner
-    logfile: /var/log/provisioner-backplane.log
-    loglevel: info
-    tls:
-        scheme: puppet
-
-    auth:
-        full:
-            - sre.mcollective
-
-        read_only:
-            - 1stline.mcollective
-
-    brokers:
-        - choria1.example.net:4222
-        - choria2.example.net:4222
 ```
 
 A choria client configuration should be made in `/etc/choria-provisioner/choria.cfg`, it looks like a normal choria client config and would support SRV and all the usual settings.
-
-#### Backplane
-
-The provisioner includes a [Choria Backplane](https://github.com/choria-io/go-backplane) with Pausable and FactSource features enabled. Using this you can emergency pause the provisioner and all calls to RPC, Helpers and Discovery will be stopped.  No new nodes will be added via the event source.
-
-Full details of configuration, RBAC and the backplane management utility can be found on the above project page.
 
 #### Statistics
 
