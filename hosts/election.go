@@ -1,36 +1,29 @@
+// Copyright (c) 2021, R.I. Pienaar and the Choria Project contributors
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package hosts
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"sync"
-	"time"
 
 	"github.com/choria-io/go-choria/backoff"
 	"github.com/choria-io/go-choria/inter"
-	"github.com/choria-io/provisioner/config"
-	"github.com/nats-io/jsm.go"
-	"github.com/nats-io/jsm.go/election"
+	election "github.com/choria-io/go-choria/providers/election/streams"
 	"github.com/sirupsen/logrus"
 )
 
-func startElection(ctx context.Context, wg *sync.WaitGroup, conn inter.Connector, conf *config.Config, trigger chan struct{}, logger *logrus.Entry) error {
+func startElection(ctx context.Context, wg *sync.WaitGroup, conn inter.Connector, fw inter.Framework, trigger chan struct{}, logger *logrus.Entry) error {
 	defer wg.Done()
 
-	log := logger.WithField("election", conf.LeaderElectionName)
-
-	log.Infof("Starting leader election against %s", conf.LeaderElectionName)
+	log := logger.WithField("election", "provisioner")
+	log.Infof("Starting leader election against 'provisioner'")
 	conf.Pause()
-
-	mgr, err := jsm.New(conn.Nats())
-	if err != nil {
-		return err
-	}
 
 	won := func() {
 		conf.Resume()
-		log.Warnf("Became leader after winning election of %s", conf.LeaderElectionName)
+		log.Warn("Became leader after winning election")
 		select {
 		case trigger <- struct{}{}:
 			log.Info("Triggered a discovery after becoming leader")
@@ -39,15 +32,20 @@ func startElection(ctx context.Context, wg *sync.WaitGroup, conn inter.Connector
 
 	lost := func() {
 		conf.Paused()
-		log.Warnf("Lost leadership of %s", conf.LeaderElectionName)
+		log.Warn("Lost leadership")
 	}
 
-	elect, err := election.NewElection(fmt.Sprintf("%s-%d", conf.Site, os.Getpid()), won, lost, conf.LeaderElectionName, mgr, election.WithBackoff(backoff.TwentySec), election.WithDebug(logger.Debugf), election.WithHeartBeatInterval(time.Second))
+	elect, err := fw.NewElection(ctx, conn, "provisioner", true, election.OnWon(won), election.OnLost(lost), election.WithBackoff(backoff.TwentySec), election.WithDebug(log.Debugf))
 	if err != nil {
 		return err
 	}
 
-	go func() { elect.Start(ctx) }()
+	go func() {
+		err := elect.Start(ctx)
+		if err != nil {
+			log.Fatalf("Leader election failed to start: %s", err)
+		}
+	}()
 
 	return nil
 }

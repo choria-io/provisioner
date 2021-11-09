@@ -1,3 +1,7 @@
+// Copyright (c) 2018-2021, R.I. Pienaar and the Choria Project contributors
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package config
 
 import (
@@ -10,7 +14,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/choria-io/go-backplane/backplane"
 	"github.com/ghodss/yaml"
 )
 
@@ -19,23 +22,22 @@ var Version = "0.0.0"
 
 // Config is the configuration structure
 type Config struct {
-	Workers                 int                              `json:"workers"`
-	Interval                string                           `json:"interval"`
-	Logfile                 string                           `json:"logfile"`
-	Loglevel                string                           `json:"loglevel"`
-	Helper                  string                           `json:"helper"`
-	Token                   string                           `json:"token"`
-	LifecycleComponent      string                           `json:"lifecycle_component"`
-	Insecure                bool                             `json:"choria_insecure"`
-	Site                    string                           `json:"site"`
-	MonitorPort             int                              `json:"monitor_port"`
-	BrokerPort              int                              `json:"broker_port"`
-	BrokerProvisionPassword string                           `json:"broker_provisioning_password"`
-	Management              *backplane.StandardConfiguration `json:"management" yaml:"management"`
-	CertDenyList            []string                         `json:"cert_deny_list"`
-	JWTVerifyCert           string                           `json:"jwt_verify_cert"`
-	RegoPolicy              string                           `json:"rego_policy"`
-	LeaderElectionName      string                           `json:"leader_election_name"`
+	Workers                 int      `json:"workers"`
+	Interval                string   `json:"interval"`
+	Logfile                 string   `json:"logfile"`
+	Loglevel                string   `json:"loglevel"`
+	Helper                  string   `json:"helper"`
+	Token                   string   `json:"token"`
+	LifecycleComponent      string   `json:"lifecycle_component"`
+	Insecure                bool     `json:"choria_insecure"`
+	Site                    string   `json:"site"`
+	MonitorPort             int      `json:"monitor_port"`
+	BrokerPort              int      `json:"broker_port"`
+	BrokerProvisionPassword string   `json:"broker_provisioning_password"`
+	CertDenyList            []string `json:"cert_deny_list"`
+	JWTVerifyCert           string   `json:"jwt_verify_cert"`
+	RegoPolicy              string   `json:"rego_policy"`
+	LeaderElection          bool     `json:"leader_election"`
 
 	Features struct {
 		PKI bool `json:"pki"`
