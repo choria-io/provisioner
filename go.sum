@@ -93,8 +93,8 @@ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cheekybits/genny v1.0.0/go.mod h1:+tQajlRqAUrPI7DOSpB0XAqZYtQakVtB7wXkRAgjxjQ=
-github.com/choria-io/go-choria v0.24.2-0.20211109115258-3d1ed6304e7e h1:PWWWt+A1QNmc4tn1r26+q5oQ34mjT4x4rTQe3MjRuQo=
-github.com/choria-io/go-choria v0.24.2-0.20211109115258-3d1ed6304e7e/go.mod h1:cAV4T4nHtfMQx5viCvF3lxi9S10QlfXOmYzWLO76Il0=
+github.com/choria-io/go-choria v0.24.2-0.20211110100713-2fa176a32420 h1:1I//OHKcZADYn8jQ4L114qU7GDuJVZHxI00oOtQ04XI=
+github.com/choria-io/go-choria v0.24.2-0.20211110100713-2fa176a32420/go.mod h1:zQDK6/tswpRtNTpqizKOwWHAVBK3isFFNKlRzMgmN7c=
 github.com/choria-io/go-updater v0.0.3 h1:lGUG5DHV/HTl4bRwUY8t1MFuWKPosVRRJWkBF6y1z88=
 github.com/choria-io/go-updater v0.0.3/go.mod h1:IK696pPQUWx7S/MZYckzPrG2hpDyV/Pkn46JS1n4rIw=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
@@ -387,8 +387,9 @@ github.com/nats-io/jsm.go v0.0.27-0.20211104110847-190fe12fb667/go.mod h1:4NyV7q
 github.com/nats-io/jwt/v2 v2.1.0 h1:1UbfD5g1xTdWmSeRV8bh/7u+utTiBsRtWhLl1PixZp4=
 github.com/nats-io/jwt/v2 v2.1.0/go.mod h1:0tqz9Hlu6bCBFLWAASKhE5vUA4c24L9KPUUgvwumE/k=
 github.com/nats-io/nats-server/v2 v2.6.2/go.mod h1:CNi6dJQ5H+vWqaoWKjCGtqBt7ai/xOTLiocUqhK6ews=
-github.com/nats-io/nats-server/v2 v2.6.4-0.20211103202824-fe3abafaeb79 h1:P6RhsdrgYkpai/SMWBcNrt1FvOSIbjvAtvIcVsTUiUA=
 github.com/nats-io/nats-server/v2 v2.6.4-0.20211103202824-fe3abafaeb79/go.mod h1:LlMieumxNUnCloOTVFv7Wog0YnasScxARUMXVXv9/+M=
+github.com/nats-io/nats-server/v2 v2.6.5-0.20211109014002-91d6531b8bdb h1:XhJDDZ2y/yt01ydg4qPmsHDgtqGosvXkimCJn7A0JQc=
+github.com/nats-io/nats-server/v2 v2.6.5-0.20211109014002-91d6531b8bdb/go.mod h1:LlMieumxNUnCloOTVFv7Wog0YnasScxARUMXVXv9/+M=
 github.com/nats-io/nats-streaming-server v0.23.0/go.mod h1:1asNNRpUKbgwoPqRLEWbJE65uqmWjG1YN/Xlo3WgkTY=
 github.com/nats-io/nats.go v1.11.0/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
 github.com/nats-io/nats.go v1.13.0/go.mod h1:BPko4oXsySz4aSWeFgOHLZs3G4Jq4ZAyE6/zMCxRT6w=
