@@ -31,7 +31,7 @@ func startElection(ctx context.Context, wg *sync.WaitGroup, conn inter.Connector
 	}
 
 	lost := func() {
-		conf.Paused()
+		conf.Pause()
 		log.Warn("Lost leadership")
 	}
 
