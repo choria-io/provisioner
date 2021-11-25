@@ -12,33 +12,22 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"regexp"
 	"strings"
 	"sync"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
+	"github.com/choria-io/go-choria/tokens"
 	"github.com/choria-io/provisioner/config"
-	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
 )
 
-type provClaims struct {
-	Secure      bool   `json:"chs"`
-	URLs        string `json:"chu"`
-	Token       string `json:"cht"`
-	SRVDomain   string `json:"chsrv"`
-	ProvDefault bool   `json:"chpd"`
-
-	jwt.StandardClaims
-}
-
 type Host struct {
-	Identity        string              `json:"identity"`
-	CSR             *provision.CSRReply `json:"csr"`
-	Metadata        string              `json:"inventory"`
-	JWT             *provClaims         `json:"jwt"`
+	Identity        string                     `json:"identity"`
+	CSR             *provision.CSRReply        `json:"csr"`
+	Metadata        string                     `json:"inventory"`
+	JWT             *tokens.ProvisioningClaims `json:"jwt"`
 	rawJWT          string
 	config          map[string]string
 	provisioned     bool
@@ -222,19 +211,7 @@ func (h *Host) validateJWT() error {
 		return fmt.Errorf("no JWT verification certificate configured, cannot validate JWT")
 	}
 
-	claims := &provClaims{}
-	_, err := jwt.ParseWithClaims(h.rawJWT, claims, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("unsupported signing method in token")
-		}
-
-		pem, err := ioutil.ReadFile(h.cfg.JWTVerifyCert)
-		if err != nil {
-			return nil, fmt.Errorf("could not read JWT verification certificate: %s", err)
-		}
-
-		return jwt.ParseRSAPublicKeyFromPEM(pem)
-	})
+	claims, err := tokens.ParseProvisioningTokenWithKeyfile(h.rawJWT, h.cfg.JWTVerifyCert)
 	if err != nil {
 		return err
 	}
