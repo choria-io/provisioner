@@ -15,6 +15,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
@@ -26,6 +27,7 @@ import (
 type Host struct {
 	Identity        string                     `json:"identity"`
 	CSR             *provision.CSRReply        `json:"csr"`
+	ED25519PubKey   *provision.ED25519Reply    `json:"ed25519_pubkey"`
 	Metadata        string                     `json:"inventory"`
 	JWT             *tokens.ProvisioningClaims `json:"jwt"`
 	rawJWT          string
@@ -39,6 +41,9 @@ type Host struct {
 	provisionPubKey string
 	actionPolicies  map[string]interface{}
 	opaPolicies     map[string]interface{}
+	nonce           string
+	edPubK          string
+	signedServerJWT string
 
 	cfg       *config.Config
 	token     string
@@ -82,6 +87,13 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 		}
 	}
 
+	if h.cfg.Features.ED25519 {
+		err := h.fetchEd25519PubKey(ctx)
+		if err != nil {
+			return fmt.Errorf("could not fetch ed25519 public key: %s", err)
+		}
+	}
+
 	err := h.fetchInventory(ctx)
 	if err != nil {
 		return fmt.Errorf("could not provision %s: %s", h.Identity, err)
@@ -117,6 +129,13 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	h.actionPolicies = make(map[string]interface{})
 	h.opaPolicies = make(map[string]interface{})
 
+	if config.ServerClaims != nil {
+		err = h.generateServerJWT(config)
+		if err != nil {
+			return err
+		}
+	}
+
 	if len(config.OPAPolicies) > 0 {
 		for k, v := range config.OPAPolicies {
 			h.opaPolicies[k] = v
@@ -147,6 +166,69 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	}
 
 	h.provisioned = true
+
+	return nil
+}
+
+func (h *Host) generateServerJWT(c *ConfigResponse) error {
+	if h.edPubK == "" {
+		return fmt.Errorf("no ed25519 public key set")
+	}
+
+	if h.cfg.JWTSigningKey == "" {
+		return fmt.Errorf("no jwt signing key configured using jwt_signing_key")
+	}
+
+	if h.cfg.ServerJWTValidityDuration == 0 {
+		return fmt.Errorf("no default validity configured")
+	}
+
+	var (
+		org         = "choria"
+		validity    = h.cfg.ServerJWTValidityDuration
+		collectives = []string{"mcollective"}
+		pubSubs     []string
+		permissions *tokens.ServerPermissions
+	)
+
+	if cc, ok := c.Configuration["collectives"]; ok {
+		collectives = strings.Split(cc, ",")
+	}
+
+	if c.ServerClaims != nil {
+		if c.ServerClaims.OrganizationUnit != "" {
+			org = c.ServerClaims.OrganizationUnit
+		}
+		if !c.ServerClaims.ExpiresAt.IsZero() {
+			validity = time.Until(c.ServerClaims.ExpiresAt.Time)
+		}
+		if len(c.ServerClaims.Collectives) > 0 {
+			collectives = c.ServerClaims.Collectives
+		}
+		if len(c.ServerClaims.AdditionalPublishSubjects) > 0 {
+			pubSubs = c.ServerClaims.AdditionalPublishSubjects
+		}
+		if c.ServerClaims.Permissions != nil {
+			permissions = c.ServerClaims.Permissions
+		}
+	}
+
+	pk, err := hex.DecodeString(h.edPubK)
+	if err != nil {
+		return err
+	}
+
+	claims, err := tokens.NewServerClaims(h.Identity, collectives, org, permissions, pubSubs, pk, "Choria Provisioner", validity)
+	if err != nil {
+		return err
+	}
+
+	signed, err := tokens.SignTokenWithKeyFile(claims, h.cfg.JWTSigningKey)
+	if err != nil {
+		return err
+	}
+
+	h.signedServerJWT = signed
 
 	return nil
 }

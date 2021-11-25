@@ -15,21 +15,23 @@ import (
 	"time"
 
 	"github.com/choria-io/go-choria/opa"
+	"github.com/choria-io/go-choria/tokens"
 	"github.com/choria-io/provisioner/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
 
 type ConfigResponse struct {
-	Defer          bool              `json:"defer"`
-	Msg            string            `json:"msg"`
-	Key            string            `json:"key"`
-	Certificate    string            `json:"certificate"`
-	CA             string            `json:"ca"`
-	SSLDir         string            `json:"ssldir"`
-	Configuration  map[string]string `json:"configuration"`
-	ActionPolicies map[string]string `json:"action_policies"`
-	OPAPolicies    map[string]string `json:"opa_policies"`
+	Defer          bool                 `json:"defer"`
+	Msg            string               `json:"msg"`
+	Key            string               `json:"key"`
+	Certificate    string               `json:"certificate"`
+	CA             string               `json:"ca"`
+	SSLDir         string               `json:"ssldir"`
+	ServerClaims   *tokens.ServerClaims `json:"server_claims"`
+	Configuration  map[string]string    `json:"configuration"`
+	ActionPolicies map[string]string    `json:"action_policies"`
+	OPAPolicies    map[string]string    `json:"opa_policies"`
 }
 
 func (h *Host) shouldConfigure(ctx context.Context) (should bool, err error) {

@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/choria-io/go-choria/choria"
 	"github.com/ghodss/yaml"
 )
 
@@ -36,16 +37,20 @@ type Config struct {
 	BrokerProvisionPassword string   `json:"broker_provisioning_password"`
 	CertDenyList            []string `json:"cert_deny_list"`
 	JWTVerifyCert           string   `json:"jwt_verify_cert"`
+	JWTSigningKey           string   `json:"jwt_signing_key"`
+	ServerJWTValidity       string   `json:"server_jwt_validity"`
 	RegoPolicy              string   `json:"rego_policy"`
 	LeaderElection          bool     `json:"leader_election"`
 
 	Features struct {
-		PKI bool `json:"pki"`
-		JWT bool `json:"jwt"`
+		PKI     bool `json:"pki"`
+		JWT     bool `json:"jwt"`
+		ED25519 bool `json:"ed25519"`
 	} `json:"features"`
 
-	IntervalDuration time.Duration `json:"-"`
-	File             string        `json:"-"`
+	ServerJWTValidityDuration time.Duration `json:"-"`
+	IntervalDuration          time.Duration `json:"-"`
+	File                      string        `json:"-"`
 
 	paused bool
 	sync.Mutex
@@ -94,9 +99,27 @@ func Load(file string) (*Config, error) {
 		}
 	}
 
-	config.IntervalDuration, err = time.ParseDuration(config.Interval)
+	if config.Features.PKI && config.Features.ED25519 {
+		return nil, fmt.Errorf("can only enable one of pki or ed25519 features")
+	}
+
+	if config.Features.ED25519 {
+		config.Features.JWT = true
+	}
+
+	config.IntervalDuration, err = choria.ParseDuration(config.Interval)
 	if err != nil {
 		return nil, fmt.Errorf("invalid duration: %s", err)
+	}
+
+	if config.ServerJWTValidity == "" {
+		config.ServerJWTValidity = "1y"
+		config.ServerJWTValidityDuration = 365 * 24 * time.Hour
+	} else {
+		config.ServerJWTValidityDuration, err = choria.ParseDuration(config.ServerJWTValidity)
+		if err != nil {
+			return nil, fmt.Errorf("invalid server jwt validity duration: %s", err)
+		}
 	}
 
 	if config.IntervalDuration < time.Minute {
