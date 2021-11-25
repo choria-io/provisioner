@@ -6,6 +6,7 @@ package host
 
 import (
 	"bytes"
+	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -17,9 +18,11 @@ import (
 	"io/ioutil"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
+	"github.com/choria-io/go-choria/tokens"
 	"github.com/choria-io/provisioner/config"
 	"github.com/sirupsen/logrus"
 
@@ -52,6 +55,59 @@ var _ = Describe("Host", func() {
 				},
 			},
 		}
+	})
+
+	Describe("generateServerJWT", func() {
+		var (
+			pubK ed25519.PublicKey
+			err  error
+		)
+
+		BeforeEach(func() {
+			pubK, _, err = choria.Ed25519KeyPair()
+			Expect(err).ToNot(HaveOccurred())
+
+			h.edPubK = hex.EncodeToString(pubK)
+			h.cfg.JWTSigningKey = "testdata/jwt-signer.pem"
+			h.cfg.ServerJWTValidityDuration = time.Hour
+		})
+
+		It("Should handle no pub key", func() {
+			h.edPubK = ""
+			Expect(h.generateServerJWT(nil)).To(MatchError("no ed25519 public key set"))
+		})
+
+		It("Should handle no signing key", func() {
+			h.edPubK = "x"
+			h.cfg.JWTSigningKey = ""
+			Expect(h.generateServerJWT(nil)).To(MatchError("no jwt signing key configured using jwt_signing_key"))
+		})
+
+		It("Should use the collectives from the server if known", func() {
+			config := &ConfigResponse{
+				Configuration: map[string]string{
+					"collectives": "one,two",
+				},
+			}
+
+			err = h.generateServerJWT(config)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(h.signedServerJWT).ToNot(Equal(""))
+
+			claims, err := tokens.ParseServerTokenWithKeyfile(h.signedServerJWT, "testdata/jwt-signer-public.pem")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(claims.Collectives).To(Equal([]string{"one", "two"}))
+			Expect(claims.OrganizationUnit).To(Equal("choria"))
+			Expect(claims.Permissions).To(BeNil())
+			Expect(claims.AdditionalPublishSubjects).To(HaveLen(0))
+			Expect(claims.Issuer).To(Equal("Choria Provisioner"))
+			Expect(claims.ChoriaIdentity).To(Equal(h.Identity))
+			until := time.Until(claims.ExpiresAt.Time)
+			Expect(until).To(BeNumerically("~", time.Hour, time.Second))
+			Expect(claims.PublicKey).To(Equal(h.edPubK))
+		})
+
+		It("Should use the configured claims", func() {})
 	})
 
 	Describe("validateCSR", func() {

@@ -12,10 +12,15 @@ The idea is that an automated system will discover nodes in the `provisioning` s
     * For every discovered nodes
         * Retrieve facts and metadata
         * Based on it's facts programmatically determine which Member Collective in a [Federation](https://choria.io/docs/federation/) this node should belong to.
-        * Ask the node for a CSR, potentially supplying a custom CN, OU, O, C and L
-        * Sign the CSR the node provided against your own CA
+        * For x509 based nodes
+            * Ask the node for a CSR, potentially supplying a custom CN, OU, O, C and L
+            * Sign the CSR the node provided against your own CA
+        * For ed25519 based nodes
+            * Ask the node for a public key and signed nonce
         * Construct a configuration tailored to this node, setting things like SRV domain or hard coded brokers
-        * Send the configuration, certificate and CA chain to the node where it will configure itself
+        * For ed25519 based nodes   
+            * Generate and sign a server JWT
+        * Send the configuration, server JWT, certificate and CA chain to the node where it will configure itself
         * Request the node restarts itself within a provided splay time
 
 After this flow the node will join it's configured Member Collective with it's signed Certificate and CA known it becomes a normal node like any other.
@@ -82,46 +87,6 @@ If a Provisioner was on standby and becomes leader it will immediately perform a
 To enable the Choria Broker must be of the kind described above in `Preparing a Broker Environment` and [Choria Streams](https://choria.io/docs/streams) must be enabled.
 
 Setting `leader_election: true` in the Provisioner configuration will enable campaigns, when this is set the Provisioners will start in the Paused mode.
-
-## Provisioning nodes
-
-The agent has the following actions:
-
-  * **gencsr** - generates a private key and CSR on the node, returns the CSR and directory they were stored in
-  * **configure** - configures a node with the given configuration, signed certificate and ca and path to the ssl store
-  * **restart** - restarts the server after a random splay
-  * **reprovision** - re-enter provisioning mode
-  * **release_update** - update the choria binary in-place from a repository
-
-Each action takes an optional token which should match that compiled into the Choria binary via the `ProvisionToken` flag.
-
-You can either write your own provisioner end to end or use one we provide and plug into it with just the logic to hook into your CA and logic for generating configuration.
-
-### Use our provisioner
-
-A provisioner project is included that can be used to provision your nodes, it allows you to hook in a program to compute the config and integrate with your SSL.  It has this generic flow:
-
-Nodes will be discovered at startup and then every `interval` period:
-
-  * Discover all nodes
-    * Add each node to the work list
-
-It will also listen on the network for registration and lifecycle events:
-
-  * Listen for node registration and lifecycle events
-    * Add each node to the work list
-
-Regardless of how a node was found, this is the flow it will do:
-
-  * Pass every node to a worker
-    * Fetch the inventory using `rpcutil#inventory`
-    * Request a CSR if the PKI feature is enabled using `choria_provision#gencsr`
-    * Call the `helper` with the inventory and CSR, expecting to be configured
-      * If the helper sets `defer` to true the node provisioning is ended and next cycle will handle it
-    * Configure the node using `choria_provision#configure`
-    * Restart the node using `choria_provision#restart`
-
-When this provisioner start up it will emit a `choria:lifecycle:startup:1` event with component `provisioner`.
 
 #### Writing the helper
 

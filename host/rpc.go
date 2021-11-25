@@ -6,10 +6,12 @@ package host
 
 import (
 	"context"
+	"crypto/ed25519"
 	"encoding/json"
 	"fmt"
 
 	"github.com/choria-io/go-choria/backoff"
+	"github.com/choria-io/go-choria/choria"
 	provclient "github.com/choria-io/go-choria/client/choria_provisionclient"
 	"github.com/choria-io/go-choria/client/rpcutilclient"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
@@ -95,7 +97,7 @@ func (h *Host) restart(ctx context.Context) error {
 	return h.provisionClient(ctx, "restart", 3, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
 		h.log.Info("Restarting node")
 
-		res, err := pc.Restart().Token(h.token).Splay(1).Do(ctx)
+		res, err := pc.Restart(h.token).Splay(1).Do(ctx)
 		if err != nil {
 			return err
 		}
@@ -138,7 +140,8 @@ func (h *Host) configure(ctx context.Context) error {
 			Key(h.key).
 			EcdhPublic(h.provisionPubKey).
 			ActionPolicies(h.actionPolicies).
-			OpaPolicies(h.opaPolicies)
+			OpaPolicies(h.opaPolicies).
+			ServerJwt(h.signedServerJWT)
 
 		if h.CSR != nil && h.CSR.SSLDir != "" {
 			req.Ssldir(h.CSR.SSLDir)
@@ -166,6 +169,50 @@ func (h *Host) configure(ctx context.Context) error {
 	})
 }
 
+func (h *Host) fetchEd25519PubKey(ctx context.Context) error {
+	if h.edPubK != "" && h.sslDir != "" && h.ED25519PubKey != nil {
+		h.log.Infof("Already have ED25519 public key, not retrieving again")
+		return nil
+	}
+
+	return h.provisionClient(ctx, "gen25519", 5, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+		h.log.Infof("Fetching ED25519 public key")
+		h.nonce, _ = choria.NewRequestID()
+
+		res, err := pc.Gen25519(h.nonce, h.token).Do(ctx)
+		if err != nil {
+			return err
+		}
+
+		if res.Stats().ResponsesCount() != 1 {
+			return fmt.Errorf("could not retrieve ED25519 public key: received %d responses while expecting a response from %s", res.Stats().ResponsesCount(), h.Identity)
+		}
+
+		res.EachOutput(func(r *provclient.Gen25519Output) {
+			if !r.ResultDetails().OK() {
+				err = fmt.Errorf("invalid response from %s: %s (%d)", r.ResultDetails().Sender(), r.ResultDetails().StatusMessage(), r.ResultDetails().StatusCode())
+				return
+			}
+
+			if !ed25519.Verify([]byte(r.PublicKey()), []byte(h.nonce), []byte(r.Signature())) {
+				err = fmt.Errorf("invalid nonce signature")
+				return
+			}
+
+			h.ED25519PubKey = &provision.ED25519Reply{}
+			err = r.ParseGen25519Output(h.ED25519PubKey)
+			if err != nil {
+				err = fmt.Errorf("could not parse gen25519 reply: %s", err)
+			}
+
+			h.edPubK = r.PublicKey()
+			h.sslDir = r.Directory()
+		})
+
+		return err
+	})
+}
+
 func (h *Host) fetchJWT(ctx context.Context) (err error) {
 	if h.rawJWT != "" {
 		h.log.Infof("Already have JWT for %s, not retrieving again", h.Identity)
@@ -175,7 +222,7 @@ func (h *Host) fetchJWT(ctx context.Context) (err error) {
 	return h.provisionClient(ctx, "jwt", 5, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
 		h.log.Info("Fetching JWT")
 
-		res, err := pc.Jwt().Token(h.token).Do(ctx)
+		res, err := pc.Jwt(h.token).Do(ctx)
 		if err != nil {
 			return err
 		}
@@ -240,7 +287,7 @@ func (h *Host) fetchCSR(ctx context.Context) error {
 	return h.provisionClient(ctx, "gencsr", 1, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
 		h.log.Info("Fetching CSR")
 
-		res, err := pc.Gencsr().Token(h.token).Cn(h.Identity).Do(ctx)
+		res, err := pc.Gencsr(h.token).Cn(h.Identity).Do(ctx)
 		if err != nil {
 			return err
 		}

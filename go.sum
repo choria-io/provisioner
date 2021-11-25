@@ -97,8 +97,8 @@ github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cheekybits/genny v1.0.0/go.mod h1:+tQajlRqAUrPI7DOSpB0XAqZYtQakVtB7wXkRAgjxjQ=
-github.com/choria-io/go-choria v0.24.2-0.20211125100859-6d262985ad55 h1:4hwpgYcxRamx/z1B4hMexDFZlkUvuYGp7jmP6H1rp2k=
-github.com/choria-io/go-choria v0.24.2-0.20211125100859-6d262985ad55/go.mod h1:sqeF43erK4cIGLSk7lP+VC1MPEQgDhEX/pDQ8O5wWDg=
+github.com/choria-io/go-choria v0.24.2-0.20211125143553-43cc9c8e45df h1:5D+/5wCz+sYLkqXqKxpUoWip81VHL/gIhNxbP8tQV0M=
+github.com/choria-io/go-choria v0.24.2-0.20211125143553-43cc9c8e45df/go.mod h1:sqeF43erK4cIGLSk7lP+VC1MPEQgDhEX/pDQ8O5wWDg=
 github.com/choria-io/go-updater v0.0.3 h1:lGUG5DHV/HTl4bRwUY8t1MFuWKPosVRRJWkBF6y1z88=
 github.com/choria-io/go-updater v0.0.3/go.mod h1:IK696pPQUWx7S/MZYckzPrG2hpDyV/Pkn46JS1n4rIw=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
