@@ -13,4 +13,6 @@ RUN groupadd --gid 2048 choria && \
 
 USER choria
 
-CMD ["/usr/sbin/choria-provisioner", "--config choria-provisioner.yaml", "--choria-config client.cfg"]
+ENTRYPOINT ["/usr/sbin/choria-provisioner"]
+
+CMD ["--config choria-provisioner.yaml", "--choria-config client.cfg"]

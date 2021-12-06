@@ -12,7 +12,7 @@
 Name: %{pkgname}
 Version: %{version}
 Release: %{release}.%{dist}
-Summary: The Choria Server Provisioner
+Summary: Choria Server Provisioner
 License: Apache-2.0
 URL: https://choria.io
 Group: System Tools
@@ -30,17 +30,15 @@ Automatically provisions Choria Servers
 
 %install
 rm -rf %{buildroot}
-%{__install} -d -m0755  %{buildroot}/etc/sysconfig
-%{__install} -d -m0755  %{buildroot}/etc/init.d
+%{__install} -d -m0755  %{buildroot}/usr/lib/systemd/system
 %{__install} -d -m0755  %{buildroot}/etc/logrotate.d
 %{__install} -d -m0755  %{buildroot}%{bindir}
 %{__install} -d -m0755  %{buildroot}%{etcdir}
 %{__install} -d -m0755  %{buildroot}/var/log
-%{__install} -d -m0756  %{buildroot}/var/run/%{pkgname}
-%{__install} -m0644 dist/choria-provisioner.init %{buildroot}/etc/init.d/%{pkgname}
-%{__install} -m0644 dist/choria-provisioner.sysconfig %{buildroot}/etc/sysconfig/%{pkgname}
+%{__install} -d -m0756  %{buildroot}/var/lib/%{pkgname}
+%{__install} -m0644 dist/choria-provisioner.service %{buildroot}/usr/lib/systemd/system/%{pkgname}.service
 %{__install} -m0644 dist/choria-provisioner-logrotate %{buildroot}/etc/logrotate.d/%{pkgname}
-%{__install} -m0640 dist/choria-provisioner.yaml %{buildroot}%{etcdir}/%{pkgname}.yaml
+%{__install} -m0640 dist/config.yaml %{buildroot}%{etcdir}/%{pkgname}.yaml
 %{__install} -m0755 %{binary} %{buildroot}%{bindir}/%{pkgname}
 touch %{buildroot}/var/log/%{pkgname}.log
 
@@ -48,26 +46,26 @@ touch %{buildroot}/var/log/%{pkgname}.log
 rm -rf %{buildroot}
 
 %post
-/sbin/chkconfig --add %{pkgname} || :
+if [ $1 -eq 1 ] ; then
+  systemctl --no-reload preset %{pkgname} >/dev/null 2>&1 || :
+fi
 
-%postun
-if [ "$1" -ge 1 ]; then
-  /sbin/service %{pkgname} condrestart &>/dev/null || :
+/bin/systemctl --system daemon-reload >/dev/null 2>&1 || :
+
+if [ $1 -ge 1 ]; then
+  /bin/systemctl try-restart %{pkgname} >/dev/null 2>&1 || :;
 fi
 
 %preun
-if [ "$1" = 0 ] ; then
-  /sbin/service %{pkgname} stop > /dev/null 2>&1
-  /sbin/chkconfig --del %{pkgname} || :
+if [ $1 -eq 0 ] ; then
+  systemctl --no-reload disable --now %{pkgname} >/dev/null 2>&1 || :
 fi
 
 %files
 %attr(640, root, nobody) %config(noreplace)%{etcdir}/%{pkgname}.yaml
 %{bindir}/%{pkgname}
 /etc/logrotate.d/%{pkgname}
-%attr(755, root, root)/etc/init.d/%{pkgname}
-%attr(644, root, root) %config(noreplace)/etc/sysconfig/%{pkgname}
-%attr(755, nobody, nobody)/var/run/%{pkgname}
+/usr/lib/systemd/system/%{pkgname}.service
 %attr(640, nobody, nobody)/var/log/%{pkgname}.log
 
 %changelog
