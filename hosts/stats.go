@@ -39,7 +39,7 @@ var (
 
 	provisionedCtr = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "choria_provisioner_provisioned",
-		Help: "How many nodes were succesfully provisioned",
+		Help: "How many nodes were successfully provisioned",
 	}, []string{"site"})
 )
 

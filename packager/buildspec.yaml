@@ -34,3 +34,9 @@ foss:
       template: el/el7
       target_arch: x86_64
       binary: 64bit_linux
+
+    el8_64:
+      dist: el8
+      template: el/el8
+      target_arch: x86_64
+      binary: 64bit_linux

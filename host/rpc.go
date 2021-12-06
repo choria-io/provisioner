@@ -7,6 +7,7 @@ package host
 import (
 	"context"
 	"crypto/ed25519"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
@@ -194,7 +195,19 @@ func (h *Host) fetchEd25519PubKey(ctx context.Context) error {
 				return
 			}
 
-			if !ed25519.Verify([]byte(r.PublicKey()), []byte(h.nonce), []byte(r.Signature())) {
+			pk, err := hex.DecodeString(r.PublicKey())
+			if err != nil {
+				err = fmt.Errorf("invalid public key received: %s", err)
+				return
+			}
+
+			sig, err := hex.DecodeString(r.Signature())
+			if err != nil {
+				err = fmt.Errorf("invalid signature")
+				return
+			}
+
+			if !ed25519.Verify(pk, []byte(h.nonce), sig) {
 				err = fmt.Errorf("invalid nonce signature")
 				return
 			}
@@ -203,11 +216,16 @@ func (h *Host) fetchEd25519PubKey(ctx context.Context) error {
 			err = r.ParseGen25519Output(h.ED25519PubKey)
 			if err != nil {
 				err = fmt.Errorf("could not parse gen25519 reply: %s", err)
+				return
 			}
 
 			h.edPubK = r.PublicKey()
 			h.sslDir = r.Directory()
 		})
+
+		if err != nil {
+			h.log.Errorf("Could not fetch ed25519 public key: %s", err)
+		}
 
 		return err
 	})

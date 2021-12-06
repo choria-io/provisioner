@@ -3,6 +3,7 @@ required_properties:
  - bindir
  - etcdir
  - release
+ - manage_conf
  - dist
 
 artifacts:

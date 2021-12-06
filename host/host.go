@@ -129,7 +129,7 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	h.actionPolicies = make(map[string]interface{})
 	h.opaPolicies = make(map[string]interface{})
 
-	if config.ServerClaims != nil {
+	if h.cfg.Features.ED25519 {
 		err = h.generateServerJWT(config)
 		if err != nil {
 			return err
@@ -199,8 +199,12 @@ func (h *Host) generateServerJWT(c *ConfigResponse) error {
 		if c.ServerClaims.OrganizationUnit != "" {
 			org = c.ServerClaims.OrganizationUnit
 		}
-		if !c.ServerClaims.ExpiresAt.IsZero() {
+		if c.ServerClaims.ExpiresAt != nil && !c.ServerClaims.ExpiresAt.IsZero() {
 			validity = time.Until(c.ServerClaims.ExpiresAt.Time)
+			if validity == 0 {
+				h.log.Warnf("Could not parse expires claim %v", c.ServerClaims.ExpiresAt)
+				validity = h.cfg.ServerJWTValidityDuration
+			}
 		}
 		if len(c.ServerClaims.Collectives) > 0 {
 			collectives = c.ServerClaims.Collectives
