@@ -195,13 +195,18 @@ func (h *Host) fetchEd25519PubKey(ctx context.Context) error {
 				return
 			}
 
-			pk, err := hex.DecodeString(r.PublicKey())
+			var (
+				pk  []byte
+				sig []byte
+			)
+
+			pk, err = hex.DecodeString(r.PublicKey())
 			if err != nil {
 				err = fmt.Errorf("invalid public key received: %s", err)
 				return
 			}
 
-			sig, err := hex.DecodeString(r.Signature())
+			sig, err = hex.DecodeString(r.Signature())
 			if err != nil {
 				err = fmt.Errorf("invalid signature")
 				return
@@ -287,7 +292,8 @@ func (h *Host) fetchInventory(ctx context.Context) (err error) {
 				return
 			}
 
-			j, err := r.JSON()
+			var j []byte
+			j, err = r.JSON()
 			if err != nil {
 				err = fmt.Errorf("could not obtain inventory JSON data: %s", err)
 				return

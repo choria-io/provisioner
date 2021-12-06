@@ -323,9 +323,7 @@ func (h *Host) validateCSR() error {
 	}
 
 	names := []string{csr.Subject.CommonName}
-	for _, name := range csr.DNSNames {
-		names = append(names, name)
-	}
+	names = append(names, csr.DNSNames...)
 
 	if csr.Subject.CommonName != h.Identity {
 		return fmt.Errorf("common name %s does not match identity %s", csr.Subject.CommonName, h.Identity)
@@ -343,8 +341,10 @@ func (h *Host) validateCSR() error {
 }
 
 func matchAnyRegex(str string, regex []string) bool {
+	m := regexp.MustCompile("^/.+/$")
+
 	for _, reg := range regex {
-		if matched, _ := regexp.MatchString("^/.+/$", reg); matched {
+		if m.MatchString(reg) {
 			reg = strings.TrimLeft(reg, "/")
 			reg = strings.TrimRight(reg, "/")
 		}
