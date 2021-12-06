@@ -4,36 +4,29 @@ on:
   schedule:
     - cron: "40 4 * * *"
 
+env:
+  build_version: nightly
+
 jobs:
   el7_64:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: src/github.com/choria-io/provisioner
-
       - name: Build
         uses: choria-io/actions/packager@main
         with:
           build_package: el7_64
           packager_tag: el7-go1.17
-          version: nightly
+          version: ${{ env.build_version }}
 
   el8_64:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: src/github.com/choria-io/provisioner
-
       - name: Build
         uses: choria-io/actions/packager@main
         with:
           build_package: el8_64
           packager_tag: el8-go1.17
-          version: nightly
+          version: ${{ env.build_version }}
 
   upload:
     needs:
@@ -56,4 +49,4 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_ACCESS_KEY }}
           SOURCE_DIR: artifacts/foss
-          DEST_DIR: nightly
+          DEST_DIR: ${{ env.build_version }}
