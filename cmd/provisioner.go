@@ -32,7 +32,6 @@ var (
 	ctx     context.Context
 	cancel  func()
 	log     *logrus.Entry
-	sha     string
 )
 
 func Run() {
@@ -63,6 +62,7 @@ func run() {
 	kingpin.FatalIfError(err, "Provisioning could not be configured: %s", err)
 
 	ccfg, err := cconf.NewConfig(ccfile)
+	kingpin.FatalIfError(err, "Could not load Choria Configuration: %s", err)
 
 	ccfg.LogLevel = cfg.Loglevel
 	ccfg.LogFile = cfg.Logfile

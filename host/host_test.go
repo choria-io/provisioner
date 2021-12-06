@@ -170,6 +170,7 @@ var _ = Describe("Host", func() {
 
 			blk, _ := pem.Decode([]byte(h.key))
 			Expect(blk).ToNot(BeNil())
+			//lint:ignore SA1019 there is no alternative
 			Expect(x509.IsEncryptedPEMBlock(blk)).To(BeTrue())
 
 			// make sure the server can decode
@@ -182,6 +183,7 @@ var _ = Describe("Host", func() {
 			shared, err := choria.ECDHSharedSecret(srvPri, provPub)
 			Expect(err).ToNot(HaveOccurred())
 
+			//lint:ignore SA1019 there is no alternative
 			clearBytes, err := x509.DecryptPEMBlock(blk, shared)
 			Expect(err).ToNot(HaveOccurred())
 

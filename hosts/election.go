@@ -24,10 +24,9 @@ func startElection(ctx context.Context, wg *sync.WaitGroup, conn inter.Connector
 	won := func() {
 		conf.Resume()
 		log.Warn("Became leader after winning election")
-		select {
-		case trigger <- struct{}{}:
-			log.Info("Triggered a discovery after becoming leader")
-		}
+
+		trigger <- struct{}{}
+		log.Info("Triggered a discovery after becoming leader")
 	}
 
 	lost := func() {

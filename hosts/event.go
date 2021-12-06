@@ -17,7 +17,7 @@ import (
 
 func connect(ctx context.Context) (inter.Connector, error) {
 	if ctx.Err() != nil {
-		return nil, fmt.Errorf("Existing on shut down")
+		return nil, fmt.Errorf("exiting on shut down")
 	}
 
 	return fw.NewConnector(ctx, fw.MiddlewareServers, fw.Certname(), log)
