@@ -295,21 +295,32 @@ A Grafana dashboard is included in `dashboard.json` that produce a set of graphs
 
 #### Packages
 
-RPMs are hosted in the Choria yum repository for el6 and 7 64bit systems, packages are called `choria-provisioner`:
+RPMs are hosted in the Choria yum repository for el7 and 8 64bit systems, packages are called `choria-provisioner`:
 
 ```ini
 [choria_release]
-name=choria_release
-baseurl=https://packagecloud.io/choria/release/el/$releasever/$basearch
-repo_gpgcheck=1
-gpgcheck=0
-enabled=1
-gpgkey=https://packagecloud.io/choria/release/gpgkey
-sslverify=1
-sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+name=Choria Orchestrator Releases
+mirrorlist=http://mirrorlists.choria.io/yum/release/el/$releasever/$basearch.txt
+enabled=True
+gpgcheck=True
+repo_gpgcheck=True
+gpgkey=https://choria.io/RELEASE-GPG-KEY
 metadata_expire=300
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+sslverify=True
 ```
 
-## Thanks
+We also publish nightly builds in the following repository:
 
-<img src="https://packagecloud.io/images/packagecloud-badge.png" width="158">
+```ini
+[choria_nightly]
+name=Choria Orchestrator Nightly
+mirrorlist=http://mirrorlists.choria.io//yum/nightly/el/$releasever/$basearch.txt
+enabled=True
+gpgcheck=True
+repo_gpgcheck=True
+gpgkey=https://choria.io/NIGHTLY-GPG-KEY
+metadata_expire=300
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+sslverify=True
+```
