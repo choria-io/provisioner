@@ -1,5 +1,10 @@
 |Date      |Issue |Description                                                                                              |
 |----------|------|---------------------------------------------------------------------------------------------------------|
+|2021/12/08|      |Release 0.13.0                                                                                           |
+|2021/11/25|152   |Support Ed25519 based provisioning flow and token signing                                                |
+|2021/11/25|152   |Use new choria `tokens` package for all JWT operations                                                   |
+|2021/11/09|148   |Migrate leader election to new KV based model                                                            |
+|2021/09/15|146   |Support placing policies on provisioner nodes                                                            |
 |2021/08/17|      |Release 0.12.0                                                                                           |
 |2021/08/17|138   |Support provisioning private keys protected by Curve 25519 ECDH key exchange                             |
 |2021/08/13|      |Release 0.11.0                                                                                           |

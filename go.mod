@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/Netflix/go-expect v0.0.0-20211003183012-e1a7c020ce25 // indirect
-	github.com/choria-io/go-choria v0.24.2-0.20211125143553-43cc9c8e45df
+	github.com/choria-io/go-choria v0.24.2-0.20211207200426-9f3b037faac8
 	github.com/ghodss/yaml v1.0.0
 	github.com/hinshun/vt10x v0.0.0-20180809195222-d55458df857c // indirect
 	github.com/onsi/ginkgo v1.16.5
