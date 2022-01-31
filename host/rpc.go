@@ -195,6 +195,15 @@ func (h *Host) fetchEd25519PubKey(ctx context.Context) error {
 				return
 			}
 
+			if len(r.PublicKey()) == 0 {
+				err = fmt.Errorf("no public key received")
+				return
+			}
+			if len(r.Signature()) == 0 {
+				err = fmt.Errorf("no signature received")
+				return
+			}
+
 			var (
 				pk  []byte
 				sig []byte
