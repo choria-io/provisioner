@@ -62,11 +62,11 @@ if [ $1 -eq 0 ] ; then
 fi
 
 %files
-%attr(640, root, nobody) %config(noreplace)%{etcdir}/%{pkgname}.yaml
+%attr(640, root, root) %config(noreplace)%{etcdir}/%{pkgname}.yaml
 %{bindir}/%{pkgname}
 /etc/logrotate.d/%{pkgname}
 /usr/lib/systemd/system/%{pkgname}.service
-%attr(640, nobody, nobody)/var/log/%{pkgname}.log
+%attr(644, root, root)/var/log/%{pkgname}.log
 
 %changelog
 * Tue Aug 07 2018 R.I.Pienaar <rip@devco.net>
