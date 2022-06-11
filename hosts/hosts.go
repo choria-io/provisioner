@@ -25,8 +25,8 @@ import (
 
 var (
 	hosts = make(map[string]*host.Host)
-	work  = make(chan *host.Host, 1000)
-	done  = make(chan *host.Host, 1000)
+	work  = make(chan *host.Host, 5000)
+	done  = make(chan *host.Host, 5000)
 	mu    = &sync.Mutex{}
 	log   *logrus.Entry
 	fw    *choria.Framework
