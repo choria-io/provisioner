@@ -12,11 +12,9 @@ import (
 
 	"github.com/choria-io/go-choria/inter"
 	"github.com/choria-io/go-choria/lifecycle"
-	addl "github.com/choria-io/go-choria/providers/agent/mcorpc/ddl/agent"
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/client/client"
-	rpc "github.com/choria-io/go-choria/providers/agent/mcorpc/client"
 	"github.com/choria-io/go-choria/providers/discovery/broadcast"
 	"github.com/choria-io/provisioner/config"
 	"github.com/choria-io/provisioner/host"
@@ -25,8 +23,8 @@ import (
 
 var (
 	hosts = make(map[string]*host.Host)
-	work  = make(chan *host.Host, 5000)
-	done  = make(chan *host.Host, 5000)
+	work  = make(chan *host.Host, 1000)
+	done  = make(chan *host.Host, 1000)
 	mu    = &sync.Mutex{}
 	log   *logrus.Entry
 	fw    *choria.Framework
@@ -41,16 +39,6 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	log = fw.Logger("hosts")
 
 	log.Infof("Choria Provisioner starting using configuration file %s. Discovery interval %s using %d workers", conf.File, conf.Interval, conf.Workers)
-
-	ddl, err := addl.CachedDDL("choria_provision")
-	if err != nil {
-		return fmt.Errorf("could not find DDL for agent choria_provision in the agent cache")
-	}
-
-	agent, err := rpc.New(fw, "choria_provision", rpc.DDL(ddl))
-	if err != nil {
-		return fmt.Errorf("could not create RPC client: %s", err)
-	}
 
 	conn, err := connect(ctx)
 	if err != nil {
@@ -87,15 +75,15 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	discoveredCtr.WithLabelValues(conf.Site).Add(0.0)
 	provisionedCtr.WithLabelValues(conf.Site).Add(0.0)
 
-	discover(ctx, agent)
+	discover(ctx)
 
 	for {
 		select {
 		case <-timer.C:
-			discover(ctx, agent)
+			discover(ctx)
 
 		case <-discoverTrigger:
-			discover(ctx, agent)
+			discover(ctx)
 
 		case <-ctx.Done():
 			log.Infof("Existing on context interrupt")
@@ -123,6 +111,8 @@ func remove(host *host.Host) {
 	defer mu.Unlock()
 
 	delete(hosts, host.Identity)
+
+	waitingGauge.WithLabelValues(conf.Site).Set(float64(len(work)))
 }
 
 func add(host *host.Host) bool {
@@ -130,9 +120,11 @@ func add(host *host.Host) bool {
 	defer mu.Unlock()
 
 	if len(work) == cap(work) {
-		log.Warnf("Work queue is full at %d entries, cannot add %s", len(work), host.Identity)
+		log.Debugf("Work queue is full at %d entries, cannot add %s", len(work), host.Identity)
 		return false
 	}
+
+	waitingGauge.WithLabelValues(conf.Site).Set(float64(len(work)))
 
 	_, known := hosts[host.Identity]
 	if known {
@@ -147,7 +139,7 @@ func add(host *host.Host) bool {
 	return true
 }
 
-func discover(ctx context.Context, agent *rpc.RPC) {
+func discover(ctx context.Context) {
 	if conf.Paused() {
 		log.Warnf("Skipping discovery while paused")
 		return
@@ -155,14 +147,14 @@ func discover(ctx context.Context, agent *rpc.RPC) {
 
 	discoverCycleCtr.WithLabelValues(conf.Site).Inc()
 
-	err := discoverProvisionableNodes(ctx, agent)
+	err := discoverProvisionableNodes(ctx)
 	if err != nil {
 		errCtr.WithLabelValues(conf.Site).Inc()
 		log.Errorf("Could not discover nodes: %s", err)
 	}
 }
 
-func discoverProvisionableNodes(ctx context.Context, agent *rpc.RPC) error {
+func discoverProvisionableNodes(ctx context.Context) error {
 	log.Infof("Looking for provisionable hosts")
 
 	f, err := client.NewFilter(client.AgentFilter("choria_provision"))
@@ -171,13 +163,16 @@ func discoverProvisionableNodes(ctx context.Context, agent *rpc.RPC) error {
 	}
 
 	bd := broadcast.New(fw)
-	nodes, err := bd.Discover(ctx, broadcast.Collective("provisioning"), broadcast.Filter(f), broadcast.Timeout(1*time.Second))
+	nodes, err := bd.Discover(ctx, broadcast.Collective("provisioning"), broadcast.Filter(f), broadcast.SlidingWindow(), broadcast.Timeout(2*time.Second))
 	if err != nil {
 		return err
 	}
 
 	for _, n := range nodes {
-		if add(host.NewHost(n, conf)) {
+		h := host.NewHost(n, conf)
+		h.Discovered = time.Now()
+
+		if add(h) {
 			log.Infof("Adding %s to the provision list after discovering it", n)
 			discoveredCtr.WithLabelValues(conf.Site).Inc()
 		}

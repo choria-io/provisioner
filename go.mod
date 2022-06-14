@@ -3,13 +3,13 @@ module github.com/choria-io/provisioner
 go 1.17
 
 require (
+	github.com/choria-io/fisk v0.1.1
 	github.com/choria-io/go-choria v0.25.2-0.20220611152103-61b1442fabea
 	github.com/ghodss/yaml v1.0.0
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
 	github.com/prometheus/client_golang v1.12.2
 	github.com/sirupsen/logrus v1.8.1
-	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
 
 require (
@@ -18,12 +18,9 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
 	github.com/agnivade/levenshtein v1.0.1 // indirect
-	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
-	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/antonmedv/expr v1.9.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/choria-io/fisk v0.1.1 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.10.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
