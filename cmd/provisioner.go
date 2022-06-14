@@ -21,7 +21,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/choria-io/fisk"
 )
 
 var (
@@ -35,7 +35,7 @@ var (
 )
 
 func Run() {
-	app := kingpin.New("choria-provisioner", "The Choria Provisioning Framework")
+	app := fisk.New("choria-provisioner", "The Choria Provisioning Framework")
 	app.Version(config.Version)
 	app.Author("R.I.Pienaar <rip@devco.net>")
 
@@ -46,7 +46,7 @@ func Run() {
 	cmd.Flag("choria-config", "Choria configuration file").Default(choria.UserConfig()).ExistingFileVar(&ccfile)
 	cmd.Flag("pid", "Write running PID to a file").StringVar(&pidFile)
 
-	command := kingpin.MustParse(app.Parse(os.Args[1:]))
+	command := fisk.MustParse(app.Parse(os.Args[1:]))
 
 	ctx, cancel = context.WithCancel(context.Background())
 	defer cancel()
@@ -59,10 +59,10 @@ func Run() {
 
 func run() {
 	cfg, err := config.Load(cfile)
-	kingpin.FatalIfError(err, "Provisioning could not be configured: %s", err)
+	fisk.FatalIfError(err, "Provisioning could not be configured: %s", err)
 
 	ccfg, err := cconf.NewConfig(ccfile)
-	kingpin.FatalIfError(err, "Could not load Choria Configuration: %s", err)
+	fisk.FatalIfError(err, "Could not load Choria Configuration: %s", err)
 
 	ccfg.LogLevel = cfg.Loglevel
 	ccfg.LogFile = cfg.Logfile
@@ -85,7 +85,7 @@ func run() {
 	}
 
 	fw, err := choria.NewWithConfig(ccfg)
-	kingpin.FatalIfError(err, "Provisioning could not configure Choria: %s", err)
+	fisk.FatalIfError(err, "Provisioning could not configure Choria: %s", err)
 
 	log = fw.Logger("provisioner")
 
@@ -101,7 +101,7 @@ func run() {
 	}
 
 	err = hosts.Process(ctx, cfg, fw)
-	kingpin.FatalIfError(err, "Provisioning could not start: %s", err)
+	fisk.FatalIfError(err, "Provisioning could not start: %s", err)
 }
 
 func writePID(pidfile string) {
@@ -110,7 +110,7 @@ func writePID(pidfile string) {
 	}
 
 	err := ioutil.WriteFile(pidfile, []byte(fmt.Sprintf("%d", os.Getpid())), 0644)
-	kingpin.FatalIfError(err, "Could not write PID: %s", err)
+	fisk.FatalIfError(err, "Could not write PID: %s", err)
 }
 
 func interruptHandler(ctx context.Context, cancel func()) {

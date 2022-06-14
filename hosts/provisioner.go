@@ -26,13 +26,11 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 			if err != nil {
 				provErrCtr.WithLabelValues(conf.Site).Inc()
 				log.Errorf("Could not provision %s: %s", host.Identity, err)
-			}
-
-			// delay removing the node to avoid a race between discovery and node restarting splay
-			go func() {
-				<-time.NewTimer(60 * time.Second).C
 				done <- host
-			}()
+			} else {
+				log.Infof("Provisioned %s", host.Identity)
+				time.AfterFunc(60*time.Second, func() { done <- host })
+			}
 
 		case <-ctx.Done():
 			log.Infof("Worker %d exiting on context", i)
