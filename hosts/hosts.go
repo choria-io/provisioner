@@ -169,10 +169,7 @@ func discoverProvisionableNodes(ctx context.Context) error {
 	}
 
 	for _, n := range nodes {
-		h := host.NewHost(n, conf)
-		h.Discovered = time.Now()
-
-		if add(h) {
+		if add(host.NewHost(n, conf)) {
 			log.Infof("Adding %s to the provision list after discovering it", n)
 			discoveredCtr.WithLabelValues(conf.Site).Inc()
 		}
