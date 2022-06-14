@@ -251,7 +251,7 @@ func (h *Host) fetchJWT(ctx context.Context) (err error) {
 		return nil
 	}
 
-	return h.provisionClient(ctx, "jwt", 5, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+	return h.provisionClient(ctx, "jwt", 3, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
 		h.log.Info("Fetching JWT")
 
 		res, err := pc.Jwt(h.token).Do(ctx)

@@ -41,6 +41,11 @@ var (
 		Name: "choria_provisioner_provisioned",
 		Help: "How many nodes were successfully provisioned",
 	}, []string{"site"})
+
+	waitingGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "choria_provisioner_work_queue_entries",
+		Help: "Number of nodes on the work queue waiting to be provisioned",
+	}, []string{"site"})
 )
 
 func init() {
@@ -51,4 +56,5 @@ func init() {
 	prometheus.MustRegister(provErrCtr)
 	prometheus.MustRegister(busyWorkerGauge)
 	prometheus.MustRegister(provisionedCtr)
+	prometheus.MustRegister(waitingGauge)
 }

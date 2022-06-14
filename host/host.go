@@ -45,12 +45,13 @@ type Host struct {
 	edPubK          string
 	signedServerJWT string
 
-	cfg       *config.Config
-	token     string
-	fw        *choria.Framework
-	log       *logrus.Entry
-	mu        *sync.Mutex
-	replylock *sync.Mutex
+	Discovered time.Time `json:"-"`
+	cfg        *config.Config
+	token      string
+	fw         *choria.Framework
+	log        *logrus.Entry
+	mu         *sync.Mutex
+	replylock  *sync.Mutex
 }
 
 func NewHost(identity string, conf *config.Config) *Host {
@@ -74,6 +75,13 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 
 	h.fw = fw
 	h.log = fw.Logger(h.Identity)
+
+	if !h.Discovered.IsZero() {
+		since := time.Since(h.Discovered)
+		if since > 2*h.cfg.IntervalDuration {
+			return fmt.Errorf("skipping node that's been waiting %v", since)
+		}
+	}
 
 	if h.cfg.Features.JWT {
 		err := h.fetchJWT(ctx)
