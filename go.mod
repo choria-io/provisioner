@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/choria-io/fisk v0.1.1
-	github.com/choria-io/go-choria v0.25.2-0.20220611152103-61b1442fabea
+	github.com/choria-io/go-choria v0.25.2-0.20220615102145-24d7039bf1fc
 	github.com/ghodss/yaml v1.0.0
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
