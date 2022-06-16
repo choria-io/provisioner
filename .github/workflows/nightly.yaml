@@ -15,7 +15,7 @@ jobs:
         uses: choria-io/actions/packager@main
         with:
           build_package: el7_64
-          packager_tag: el7-go1.17
+          packager_tag: el7-go1.18
           version: ${{ env.build_version }}
 
   el8_64:
@@ -25,7 +25,7 @@ jobs:
         uses: choria-io/actions/packager@main
         with:
           build_package: el8_64
-          packager_tag: el8-go1.17
+          packager_tag: el8-go1.18
           version: ${{ env.build_version }}
 
   upload:
