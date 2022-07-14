@@ -75,6 +75,7 @@ func Process(ctx context.Context, cfg *config.Config, cfw *choria.Framework) err
 	discoveredCtr.WithLabelValues(conf.Site).Add(0.0)
 	provisionedCtr.WithLabelValues(conf.Site).Add(0.0)
 	waitingGauge.WithLabelValues(conf.Site).Set(0.0)
+	unprovisionedGauge.WithLabelValues(conf.Site).Set(0.0)
 
 	discover(ctx)
 
@@ -112,6 +113,7 @@ func remove(host *host.Host) {
 	defer mu.Unlock()
 
 	delete(hosts, host.Identity)
+	unprovisionedGauge.WithLabelValues(conf.Site).Set(float64(len(hosts)))
 
 	waitingGauge.WithLabelValues(conf.Site).Set(float64(len(work)))
 }
@@ -127,6 +129,7 @@ func add(host *host.Host) bool {
 
 	log.Infof("Adding %s to the work queue with %d entries", host.Identity, len(hosts))
 	hosts[host.Identity] = host
+	unprovisionedGauge.WithLabelValues(conf.Site).Set(float64(len(hosts)))
 
 	select {
 	case work <- host:
