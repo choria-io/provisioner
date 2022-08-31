@@ -139,7 +139,9 @@ func (h *Host) shutdown(ctx context.Context) error {
 				return
 			}
 
-			h.log.Infof("Restart response: %s", r.Message())
+			helperShutdownCtr.WithLabelValues(h.cfg.Site).Inc()
+
+			h.log.Infof("Shutdown response: %s", r.Message())
 		})
 
 		return err
