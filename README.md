@@ -18,7 +18,7 @@ The idea is that an automated system will discover nodes in the `provisioning` s
         * For ed25519 based nodes
             * Ask the node for a public key and signed nonce
         * Construct a configuration tailored to this node, setting things like SRV domain or hard coded brokers
-        * For ed25519 based nodes   
+        * For ed25519 based nodes
             * Generate and sign a server JWT
         * Send the configuration, server JWT, certificate and CA chain to the node where it will configure itself
         * Request the node restarts itself within a provided splay time
@@ -113,7 +113,7 @@ The output from your script should be like this:
 ```json
 {
   "defer": false,
-  "msg": "Reason why the provisioning is being defered",
+  "msg": "Optional message indicating success or why things are failing",
   "certificate": "-----BEGIN CERTIFICATE-----......-----END CERTIFICATE-----",
   "ca": "-----BEGIN CERTIFICATE-----......-----END CERTIFICATE-----",
   "opa_policies": {

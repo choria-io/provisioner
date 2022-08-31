@@ -15,7 +15,7 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -40,7 +40,7 @@ var _ = Describe("Host", func() {
 
 	BeforeEach(func() {
 		log := logrus.NewEntry(logrus.New())
-		log.Logger.Out = ioutil.Discard
+		log.Logger.Out = io.Discard
 
 		h = &Host{
 			Identity: "ginkgo.example.net",

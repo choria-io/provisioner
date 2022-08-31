@@ -130,6 +130,16 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 		return fmt.Errorf("configuration defered: %s", config.Msg)
 	}
 
+	if config.Shutdown {
+		if config.Msg == "" {
+			h.log.Warnf("Shutting down host based on helper output, no reason given")
+		} else {
+			h.log.Warnf("Shutting down host based on helper output: %v", config.Msg)
+		}
+
+		return h.shutdown(ctx)
+	}
+
 	h.config = config.Configuration
 	h.ca = config.CA
 	h.cert = config.Certificate

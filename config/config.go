@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"sync"
@@ -67,7 +66,7 @@ func Load(file string) (*Config, error) {
 		return nil, fmt.Errorf("file %s not found", file)
 	}
 
-	c, err := ioutil.ReadFile(file)
+	c, err := os.ReadFile(file)
 	if err != nil {
 		return nil, fmt.Errorf("config file could not be read: %s", err)
 	}
