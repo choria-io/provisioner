@@ -7,7 +7,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/signal"
@@ -109,7 +108,7 @@ func writePID(pidfile string) {
 		return
 	}
 
-	err := ioutil.WriteFile(pidfile, []byte(fmt.Sprintf("%d", os.Getpid())), 0644)
+	err := os.WriteFile(pidfile, []byte(fmt.Sprintf("%d", os.Getpid())), 0644)
 	fisk.FatalIfError(err, "Could not write PID: %s", err)
 }
 
