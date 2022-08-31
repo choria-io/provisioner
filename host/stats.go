@@ -26,6 +26,11 @@ var (
 		Name: "choria_provisioner_helper_errors",
 		Help: "How many helper related errors were encountered",
 	}, []string{"site"})
+
+	helperShutdownCtr = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "choria_provisioner_helper_shutdown_requests",
+		Help: "Host many times the helper asked for a node to be shutdown and it succeeded",
+	}, []string{"site"})
 )
 
 func init() {
@@ -33,4 +38,5 @@ func init() {
 	prometheus.MustRegister(helperDuration)
 	prometheus.MustRegister(rpcErrCtr)
 	prometheus.MustRegister(helperErrCtr)
+	prometheus.MustRegister(helperShutdownCtr)
 }
