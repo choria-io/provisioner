@@ -21,6 +21,7 @@ import (
 
 type ConfigResponse struct {
 	Defer          bool                 `json:"defer"`
+	Shutdown       bool                 `json:"shutdown"`
 	Msg            string               `json:"msg"`
 	Key            string               `json:"key"`
 	Certificate    string               `json:"certificate"`
