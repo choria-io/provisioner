@@ -22,14 +22,18 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 		case host := <-work:
 			log.Infof("Provisioning %s", host.Identity)
 
-			err := provisionTarget(ctx, host)
+			delay, err := provisionTarget(ctx, host)
 			if err != nil {
 				provErrCtr.WithLabelValues(conf.Site).Inc()
 				log.Errorf("Could not provision %s: %s", host.Identity, err)
 				done <- host
 			} else {
 				log.Infof("Provisioned %s", host.Identity)
-				time.AfterFunc(60*time.Second, func() { done <- host })
+				if delay {
+					time.AfterFunc(60*time.Second, func() { done <- host })
+				} else {
+					done <- host
+				}
 			}
 
 		case <-ctx.Done():
@@ -39,18 +43,18 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 	}
 }
 
-func provisionTarget(ctx context.Context, target *host.Host) error {
+func provisionTarget(ctx context.Context, target *host.Host) (bool, error) {
 	busyWorkerGauge.WithLabelValues(conf.Site).Inc()
 	defer busyWorkerGauge.WithLabelValues(conf.Site).Dec()
 
-	err := target.Provision(ctx, fw)
+	delay, err := target.Provision(ctx, fw)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	provisionedCtr.WithLabelValues(conf.Site).Inc()
 
-	return nil
+	return delay, nil
 }
 
 func finisher(ctx context.Context, wg *sync.WaitGroup) {

@@ -94,6 +94,33 @@ func (h *Host) rpcWrapper(ctx context.Context, action string, tries int, cb func
 	return err
 }
 
+func (h *Host) upgrade(ctx context.Context) error {
+	return h.provisionClient(ctx, "release_update", 3, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
+		h.log.Infof("Upgrading node to %s", h.upgradeTargetVersion)
+
+		res, err := pc.ReleaseUpdate(h.cfg.UpgradesRepo, h.token, h.upgradeTargetVersion).Do(ctx)
+		if err != nil {
+			return err
+		}
+
+		if res.Stats().ResponsesCount() != 1 {
+			return fmt.Errorf("could not perform upgrade: received %d responses while expecting a response from %s", res.Stats().ResponsesCount(), h.Identity)
+		}
+
+		res.EachOutput(func(r *provclient.ReleaseUpdateOutput) {
+			if !r.ResultDetails().OK() {
+				err = fmt.Errorf("invalid response from %s: %s (%d)", r.ResultDetails().Sender(), r.ResultDetails().StatusMessage(), r.ResultDetails().StatusCode())
+				return
+			}
+
+			h.log.Infof("Restart response: %s", r.Message())
+		})
+
+		return err
+	})
+
+}
+
 func (h *Host) restart(ctx context.Context) error {
 	return h.provisionClient(ctx, "restart", 3, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
 		h.log.Info("Restarting node")
@@ -337,6 +364,8 @@ func (h *Host) fetchInventory(ctx context.Context) (err error) {
 			}
 
 			h.Metadata = string(j)
+			h.version = r.Version()
+			h.upgradable = r.Upgradable()
 		})
 
 		return err
