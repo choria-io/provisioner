@@ -37,26 +37,23 @@ func Run() {
 	app := fisk.New("choria-provisioner", "The Choria Provisioning Framework")
 	app.Version(config.Version)
 	app.Author("R.I.Pienaar <rip@devco.net>")
+	app.UsageTemplate(fisk.CompactMainUsageTemplate)
+	app.ErrorUsageTemplate(fisk.CompactUsageTemplate)
 
 	app.Flag("debug", "Enables debug logging").BoolVar(&debug)
 
-	cmd := app.Command("run", "Runs the provisioner").Default()
+	cmd := app.Command("run", "Runs the provisioner").Default().Action(run)
 	cmd.Flag("config", "Configuration file").Required().ExistingFileVar(&cfile)
 	cmd.Flag("choria-config", "Choria configuration file").Default(choria.UserConfig()).ExistingFileVar(&ccfile)
 	cmd.Flag("pid", "Write running PID to a file").StringVar(&pidFile)
 
-	command := fisk.MustParse(app.Parse(os.Args[1:]))
-
 	ctx, cancel = context.WithCancel(context.Background())
 	defer cancel()
 
-	switch command {
-	case cmd.FullCommand():
-		run()
-	}
+	app.MustParseWithUsage(os.Args[1:])
 }
 
-func run() {
+func run(_ *fisk.ParseContext) error {
 	cfg, err := config.Load(cfile)
 	fisk.FatalIfError(err, "Provisioning could not be configured: %s", err)
 
@@ -101,6 +98,8 @@ func run() {
 
 	err = hosts.Process(ctx, cfg, fw)
 	fisk.FatalIfError(err, "Provisioning could not start: %s", err)
+
+	return nil
 }
 
 func writePID(pidfile string) {

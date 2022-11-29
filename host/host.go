@@ -7,11 +7,13 @@ package host
 import (
 	"bytes"
 	"context"
+	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"sync"
@@ -210,6 +212,11 @@ func (h *Host) generateServerJWT(c *ConfigResponse) error {
 		permissions *tokens.ServerPermissions
 	)
 
+	// choria switches to a different default when v2 protocol and security is in use
+	if prov, ok := c.Configuration["plugin.security.provider"]; ok && prov == "choria" {
+		collectives = []string{"choria"}
+	}
+
 	if cc, ok := c.Configuration["collectives"]; ok {
 		collectives = strings.Split(cc, ",")
 	}
@@ -244,6 +251,34 @@ func (h *Host) generateServerJWT(c *ConfigResponse) error {
 	claims, err := tokens.NewServerClaims(h.Identity, collectives, org, permissions, pubSubs, pk, "Choria Provisioner", validity)
 	if err != nil {
 		return err
+	}
+
+	if h.cfg.JWTSigningToken != "" {
+		// a bunch of redundant repeated reading happens here of the same files but I prefer
+		// to do that so just updating the secrets will update the running instance
+		t, err := os.ReadFile(h.cfg.JWTSigningToken)
+		if err != nil {
+			return err
+		}
+
+		_, prik, err := choria.Ed25519KeyPairFromSeedFile(h.cfg.JWTSigningKey)
+		if err != nil {
+			return err
+		}
+
+		token, err := tokens.ParseClientIDTokenUnverified(string(t))
+		if err != nil {
+			return err
+		}
+
+		if token.TrustChainSignature == "" {
+			return fmt.Errorf("no Trust Chain Signature claim in JWT Signing Token")
+		}
+
+		err = claims.AddChainIssuerData(token, prik)
+		if err != nil {
+			return err
+		}
 	}
 
 	signed, err := tokens.SignTokenWithKeyFile(claims, h.cfg.JWTSigningKey)
@@ -316,7 +351,18 @@ func (h *Host) validateJWT() error {
 		return fmt.Errorf("no JWT verification certificate configured, cannot validate JWT")
 	}
 
-	claims, err := tokens.ParseProvisioningTokenWithKeyfile(h.rawJWT, h.cfg.JWTVerifyCert)
+	var claims *tokens.ProvisioningClaims
+	var err error
+	if _, err = os.Stat(h.cfg.JWTVerifyCert); os.IsNotExist(err) {
+		var pk []byte
+		pk, err = hex.DecodeString(h.cfg.JWTVerifyCert)
+		if err != nil {
+			return err
+		}
+		claims, err = tokens.ParseProvisioningToken(h.rawJWT, ed25519.PublicKey(pk))
+	} else {
+		claims, err = tokens.ParseProvisioningTokenWithKeyfile(h.rawJWT, h.cfg.JWTVerifyCert)
+	}
 	if err != nil {
 		return err
 	}
