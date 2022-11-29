@@ -27,27 +27,30 @@ import (
 )
 
 type Host struct {
-	Identity        string                     `json:"identity"`
-	CSR             *provision.CSRReply        `json:"csr"`
-	ED25519PubKey   *provision.ED25519Reply    `json:"ed25519_pubkey"`
-	Metadata        string                     `json:"inventory"`
-	JWT             *tokens.ProvisioningClaims `json:"jwt"`
-	rawJWT          string
-	config          map[string]string
-	provisioned     bool
-	ca              string
-	cert            string
-	key             string
-	sslDir          string
-	serverPubKey    string
-	provisionPubKey string
-	actionPolicies  map[string]interface{}
-	opaPolicies     map[string]interface{}
-	nonce           string
-	edPubK          string
-	signedServerJWT string
+	Identity             string                     `json:"identity"`
+	CSR                  *provision.CSRReply        `json:"csr"`
+	ED25519PubKey        *provision.ED25519Reply    `json:"ed25519_pubkey"`
+	Metadata             string                     `json:"inventory"`
+	JWT                  *tokens.ProvisioningClaims `json:"jwt"`
+	rawJWT               string
+	config               map[string]string
+	provisioned          bool
+	ca                   string
+	cert                 string
+	key                  string
+	sslDir               string
+	serverPubKey         string
+	provisionPubKey      string
+	actionPolicies       map[string]interface{}
+	opaPolicies          map[string]interface{}
+	nonce                string
+	edPubK               string
+	signedServerJWT      string
+	version              string
+	upgradable           bool
+	upgradeTargetVersion string
 
-	discovered time.Time `json:"-"`
+	discovered time.Time
 	cfg        *config.Config
 	token      string
 	fw         *choria.Framework
@@ -68,12 +71,12 @@ func NewHost(identity string, conf *config.Config) *Host {
 	}
 }
 
-func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
+func (h *Host) Provision(ctx context.Context, fw *choria.Framework) (bool, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	if h.provisioned {
-		return nil
+		return true, nil
 	}
 
 	h.fw = fw
@@ -82,54 +85,54 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	if !h.discovered.IsZero() {
 		since := time.Since(h.discovered)
 		if since > 2*h.cfg.IntervalDuration {
-			return fmt.Errorf("skipping node that's been waiting %v", since)
+			return false, fmt.Errorf("skipping node that's been waiting %v", since)
 		}
 	}
 
 	if h.cfg.Features.JWT {
 		err := h.fetchJWT(ctx)
 		if err != nil {
-			return fmt.Errorf("could not fetch and validate JWT: %s: %s", h.Identity, err)
+			return false, fmt.Errorf("could not fetch and validate JWT: %s: %s", h.Identity, err)
 		}
 
 		err = h.validateJWT()
 		if err != nil {
-			return fmt.Errorf("could not validate JWT: %s: %s", h.Identity, err)
+			return false, fmt.Errorf("could not validate JWT: %s: %s", h.Identity, err)
 		}
 	}
 
 	if h.cfg.Features.ED25519 {
 		err := h.fetchEd25519PubKey(ctx)
 		if err != nil {
-			return fmt.Errorf("could not fetch ed25519 public key: %s", err)
+			return false, fmt.Errorf("could not fetch ed25519 public key: %s", err)
 		}
 	}
 
 	err := h.fetchInventory(ctx)
 	if err != nil {
-		return fmt.Errorf("could not provision %s: %s", h.Identity, err)
+		return false, fmt.Errorf("could not provision %s: %s", h.Identity, err)
 	}
 
 	if h.cfg.Features.PKI {
 		err = h.fetchCSR(ctx)
 		if err != nil {
-			return fmt.Errorf("could not provision %s: %s", h.Identity, err)
+			return false, fmt.Errorf("could not provision %s: %s", h.Identity, err)
 		}
 
 		err = h.validateCSR()
 		if err != nil {
-			return fmt.Errorf("could not provision %s: %s", h.Identity, err)
+			return false, fmt.Errorf("could not provision %s: %s", h.Identity, err)
 		}
 	}
 
 	config, err := h.getConfig(ctx)
 	if err != nil {
 		helperErrCtr.WithLabelValues(h.cfg.Site).Inc()
-		return err
+		return false, err
 	}
 
 	if config.Defer {
-		return fmt.Errorf("configuration defered: %s", config.Msg)
+		return false, fmt.Errorf("configuration defered: %s", config.Msg)
 	}
 
 	if config.Shutdown {
@@ -139,7 +142,7 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 			h.log.Warnf("Shutting down host based on helper output: %v", config.Msg)
 		}
 
-		return h.shutdown(ctx)
+		return true, h.shutdown(ctx)
 	}
 
 	h.config = config.Configuration
@@ -149,11 +152,12 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	h.sslDir = config.SSLDir
 	h.actionPolicies = make(map[string]interface{})
 	h.opaPolicies = make(map[string]interface{})
+	h.upgradeTargetVersion = config.UpgradeVersion
 
 	if h.cfg.Features.ED25519 {
 		err = h.generateServerJWT(config)
 		if err != nil {
-			return err
+			return false, err
 		}
 	}
 
@@ -172,21 +176,64 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) error {
 	if h.key != "" {
 		err = h.encryptPrivateKey()
 		if err != nil {
-			return err
+			return false, err
+		}
+	}
+
+	if h.cfg.Features.VersionUpgrades && h.upgradeTargetVersion != "" {
+		err := h.handleHostUpgrade(ctx)
+		switch {
+		case err == nil:
+			// no delay so we reprov asap
+			return false, nil
+		case h.cfg.UpgradesOptional:
+			h.log.Warnf("Could not upgrade to %v, continuing: %v", h.upgradeTargetVersion, err)
+		default:
+			return true, err
 		}
 	}
 
 	err = h.configure(ctx)
 	if err != nil {
-		return fmt.Errorf("configuration failed: %s", err)
+		return false, fmt.Errorf("configuration failed: %s", err)
 	}
 
 	err = h.restart(ctx)
 	if err != nil {
-		return fmt.Errorf("restart failed: %s", err)
+		return false, fmt.Errorf("restart failed: %s", err)
 	}
 
 	h.provisioned = true
+
+	return true, nil
+}
+
+func (h *Host) handleHostUpgrade(ctx context.Context) error {
+	if h.cfg.Features.VersionUpgrades {
+		if h.cfg.UpgradesRepo == "" && !h.cfg.UpgradesOptional {
+			return fmt.Errorf("updates_repository not configured for upgrades feature")
+		}
+	}
+
+	if h.version == "" {
+		return fmt.Errorf("did not receive a version in inventory")
+	}
+
+	if !h.upgradable {
+		return fmt.Errorf("does not support upgrades")
+	}
+
+	cv := NewVersion(h.version)
+	tv := NewVersion(h.upgradeTargetVersion)
+
+	if cv.LessThan(tv) {
+		h.log.Warnf("Will attempt version upgrade from %s to %s", h.version, h.upgradeTargetVersion)
+
+		err := h.upgrade(ctx)
+		if err != nil {
+			return fmt.Errorf("upgrading to %v failed: %v", h.upgradeTargetVersion, err)
+		}
+	}
 
 	return nil
 }

@@ -31,6 +31,7 @@ type ConfigResponse struct {
 	Configuration  map[string]string    `json:"configuration"`
 	ActionPolicies map[string]string    `json:"action_policies"`
 	OPAPolicies    map[string]string    `json:"opa_policies"`
+	UpgradeVersion string               `json:"upgrade"`
 }
 
 func (h *Host) getConfig(ctx context.Context) (*ConfigResponse, error) {

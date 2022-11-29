@@ -42,11 +42,14 @@ type Config struct {
 	ServerJWTValidity       string   `json:"server_jwt_validity"`
 	RegoPolicy              string   `json:"rego_policy"`
 	LeaderElection          bool     `json:"leader_election"`
+	UpgradesRepo            string   `json:"upgrades_repository"`
+	UpgradesOptional        bool     `json:"upgrades_optional"`
 
 	Features struct {
-		PKI     bool `json:"pki"`
-		JWT     bool `json:"jwt"`
-		ED25519 bool `json:"ed25519"`
+		PKI             bool `json:"pki"`
+		JWT             bool `json:"jwt"`
+		ED25519         bool `json:"ed25519"`
+		VersionUpgrades bool `json:"upgrades"`
 	} `json:"features"`
 
 	ServerJWTValidityDuration time.Duration `json:"-"`
