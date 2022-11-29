@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -37,6 +38,7 @@ type Config struct {
 	CertDenyList            []string `json:"cert_deny_list"`
 	JWTVerifyCert           string   `json:"jwt_verify_cert"`
 	JWTSigningKey           string   `json:"jwt_signing_key"`
+	JWTSigningToken         string   `json:"jwt_signing_token"`
 	ServerJWTValidity       string   `json:"server_jwt_validity"`
 	RegoPolicy              string   `json:"rego_policy"`
 	LeaderElection          bool     `json:"leader_election"`
@@ -83,6 +85,10 @@ func Load(file string) (*Config, error) {
 
 	if config.LifecycleComponent == "" {
 		config.LifecycleComponent = "provision_mode_server"
+	}
+
+	if config.Workers == 0 {
+		config.Workers = runtime.NumCPU()
 	}
 
 	if strings.Contains(config.LifecycleComponent, ".") || strings.Contains(config.LifecycleComponent, ">") || strings.Contains(config.LifecycleComponent, "*") {
