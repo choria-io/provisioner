@@ -276,7 +276,6 @@ func (h *Host) generateServerJWT(c *ConfigResponse) error {
 			validity = time.Until(c.ServerClaims.ExpiresAt.Time)
 			if validity == 0 {
 				h.log.Warnf("Could not parse expires claim %v", c.ServerClaims.ExpiresAt)
-				validity = h.cfg.ServerJWTValidityDuration
 			}
 		}
 		if len(c.ServerClaims.Collectives) > 0 {
@@ -288,6 +287,10 @@ func (h *Host) generateServerJWT(c *ConfigResponse) error {
 		if c.ServerClaims.Permissions != nil {
 			permissions = c.ServerClaims.Permissions
 		}
+	}
+	if validity <= time.Hour {
+		h.log.Warnf("Server validity %v is too short, setting to default %s", validity, h.cfg.ServerJWTValidityDuration)
+		validity = h.cfg.ServerJWTValidityDuration
 	}
 
 	pk, err := hex.DecodeString(h.edPubK)
