@@ -64,6 +64,8 @@ type Config struct {
 func Load(file string) (*Config, error) {
 	config := &Config{
 		LifecycleComponent: "provision_mode_server",
+		Interval:           "1m",
+		Logfile:            "info",
 		File:               file,
 	}
 
