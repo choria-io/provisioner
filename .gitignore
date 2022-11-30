@@ -2,6 +2,6 @@ vendor
 .hugo_build.lock
 choria-provisioner-*-*-*
 provisioning-agent
-provisioner
 *.rpm
+/provisioner
 .idea
