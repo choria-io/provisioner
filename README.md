@@ -13,8 +13,10 @@ Features:
  * Enrollment into a Choria Organization Issuer based network (requires future Choria release)
  * Enroll 1000+ servers per minute in a highly available cluster of servers
 
-* [Documentation](https://choria-io.github.io/provisioner/)
-* [Community](https://github.com/choria-io/general/discussions)
+## Links
+
+ * [Documentation](https://choria-io.github.io/provisioner/)
+ * [Community](https://github.com/choria-io/general/discussions)
 
 ## Status
 
