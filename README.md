@@ -23,3 +23,7 @@ Features:
 This project and the Choria authentication landscape in general, is in a period of flux as we move to support a fully Certificate Authority free deployment strategy.
 
 This project can be used today, even by users deploying with Puppet and has proven to be stable and scalable. In a future deployment scenario it will be central to the scalable operation of Choria.
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/choria-io/provisioner)](https://goreportcard.com/report/github.com/choria-io/provisioner)
+[![CodeQL](https://github.com/choria-io/provisioner/workflows/CodeQL/badge.svg)](https://github.com/choria-io/provisioner/actions/workflows/codeql.yaml)
+[![Unit Tests](https://github.com/choria-io/provisioner/actions/workflows/test.yaml/badge.svg)](https://github.com/choria-io/provisioner/actions/workflows/test.yaml)
