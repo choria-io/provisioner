@@ -1,8 +1,8 @@
 +++
 title = "Monitoring"
 toc = true
-weight = 30
-pre = "<b>3. </b>"
+weight = 40
+pre = "<b>4. </b>"
 +++
 
 ## Watching the Provisioning Process
