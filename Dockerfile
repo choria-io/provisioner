@@ -6,6 +6,7 @@ WORKDIR /etc/choria-provisioner/
 
 RUN curl -s "${REPO}" > /etc/yum.repos.d/choria.repo && \
     yum -y install choria-provisioner ruby nc procps-ng openssl && \
+    yum -y update && \
     yum -y clean all
 
 RUN groupadd --gid 2048 choria && \
@@ -13,7 +14,8 @@ RUN groupadd --gid 2048 choria && \
     chown -R choria:choria /etc/choria-provisioner
 
 USER choria
+ENV USER=choria
 
 ENTRYPOINT ["/usr/sbin/choria-provisioner"]
 
-CMD ["--config choria-provisioner.yaml", "--choria-config client.cfg"]
+CMD ["run", "--config=/etc/choria-provisioner/choria-provisioner.yaml", "--choria-config=/etc/choria-provisioner/client.cfg"]
