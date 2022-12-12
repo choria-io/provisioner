@@ -10,11 +10,13 @@ home = [ "HTML", "RSS", "JSON"]
 
 [params]
 author = "Choria Project"
-showVisitedLinks = false
 disableLanguageSwitchingButton = true
-themeVariant = "my-custom-variant"
+themeVariant = "choria-relearn"
 disableInlineCopyToClipBoard = true
-alwaysopen = true
+alwaysopen = false
+showVisitedLinks = false
+disableLandingPageButton = true
+
 
 [[menu.shortcuts]]
 name = "<i class='fab fa-fw fa-github'></i> GitHub"
