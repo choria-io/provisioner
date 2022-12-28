@@ -37,8 +37,6 @@ func Run() {
 	app := fisk.New("choria-provisioner", "The Choria Provisioning Framework")
 	app.Version(config.Version)
 	app.Author("R.I.Pienaar <rip@devco.net>")
-	app.UsageTemplate(fisk.CompactMainUsageTemplate)
-	app.ErrorUsageTemplate(fisk.CompactUsageTemplate)
 
 	app.Flag("debug", "Enables debug logging").BoolVar(&debug)
 
