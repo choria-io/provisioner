@@ -22,8 +22,8 @@ import (
 
 	"github.com/choria-io/go-choria/choria"
 	"github.com/choria-io/go-choria/providers/agent/mcorpc/golang/provision"
-	"github.com/choria-io/go-choria/tokens"
 	"github.com/choria-io/provisioner/config"
+	"github.com/choria-io/tokens"
 	"github.com/sirupsen/logrus"
 
 	. "github.com/onsi/ginkgo/v2"
