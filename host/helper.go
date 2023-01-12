@@ -13,8 +13,8 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/choria-io/go-choria/tokens"
 	"github.com/choria-io/provisioner/config"
+	"github.com/choria-io/tokens"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
