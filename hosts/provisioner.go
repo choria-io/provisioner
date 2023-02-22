@@ -27,13 +27,14 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 				provErrCtr.WithLabelValues(conf.Site).Inc()
 				log.Errorf("Could not provision %s: %s", host.Identity, err)
 				done <- host
+				continue
+			}
+
+			log.Infof("Provisioned %s", host.Identity)
+			if delay {
+				time.AfterFunc(60*time.Second, func() { done <- host })
 			} else {
-				log.Infof("Provisioned %s", host.Identity)
-				if delay {
-					time.AfterFunc(60*time.Second, func() { done <- host })
-				} else {
-					done <- host
-				}
+				done <- host
 			}
 
 		case <-ctx.Done():
