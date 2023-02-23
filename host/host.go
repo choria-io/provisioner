@@ -181,9 +181,13 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) (bool, error
 	}
 
 	if h.cfg.Features.VersionUpgrades && h.upgradeTargetVersion != "" {
-		err := h.handleHostUpgrade(ctx)
+		skipped, err := h.handleHostUpgrade(ctx)
 		switch {
 		case err == nil:
+			if skipped {
+				break
+			}
+
 			// no delay so we reprov asap
 			return false, nil
 		case h.cfg.UpgradesOptional:
@@ -208,19 +212,19 @@ func (h *Host) Provision(ctx context.Context, fw *choria.Framework) (bool, error
 	return true, nil
 }
 
-func (h *Host) handleHostUpgrade(ctx context.Context) error {
+func (h *Host) handleHostUpgrade(ctx context.Context) (bool, error) {
 	if h.cfg.Features.VersionUpgrades {
 		if h.cfg.UpgradesRepo == "" && !h.cfg.UpgradesOptional {
-			return fmt.Errorf("updates_repository not configured for upgrades feature")
+			return false, fmt.Errorf("updates_repository not configured for upgrades feature")
 		}
 	}
 
 	if h.version == "" {
-		return fmt.Errorf("did not receive a version in inventory")
+		return false, fmt.Errorf("did not receive a version in inventory")
 	}
 
 	if !h.upgradable {
-		return fmt.Errorf("does not support upgrades")
+		return false, fmt.Errorf("does not support upgrades")
 	}
 
 	cv := NewVersion(h.version)
@@ -231,11 +235,13 @@ func (h *Host) handleHostUpgrade(ctx context.Context) error {
 
 		err := h.upgrade(ctx)
 		if err != nil {
-			return fmt.Errorf("upgrading to %v failed: %v", h.upgradeTargetVersion, err)
+			return false, fmt.Errorf("upgrading to %v failed: %v", h.upgradeTargetVersion, err)
 		}
+
+		return false, nil
 	}
 
-	return nil
+	return true, nil
 }
 
 func (h *Host) generateServerJWT(c *ConfigResponse) error {
