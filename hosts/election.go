@@ -32,6 +32,7 @@ func startElection(ctx context.Context, wg *sync.WaitGroup, conn inter.Connector
 	lost := func() {
 		conf.Pause()
 		log.Warn("Lost leadership")
+		removeAllHosts()
 	}
 
 	elect, err := fw.NewElection(ctx, conn, "provisioner", true, election.OnWon(won), election.OnLost(lost), election.WithBackoff(backoff.TwentySec), election.WithDebug(log.Debugf))

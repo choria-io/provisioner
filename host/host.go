@@ -71,6 +71,10 @@ func NewHost(identity string, conf *config.Config) *Host {
 	}
 }
 
+func (h *Host) DiscoveredTime() time.Time {
+	return h.discovered
+}
+
 func (h *Host) Provision(ctx context.Context, fw *choria.Framework) (bool, error) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
