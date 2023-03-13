@@ -22,6 +22,16 @@ func provisioner(ctx context.Context, wg *sync.WaitGroup, i int) {
 		case host := <-work:
 			log.Infof("Provisioning %s", host.Identity)
 
+			// the work queue might have an old entry that is not in the host lists anymore
+			// so we short circuit here to avoid provisioning machines that might be stale.
+			//
+			// hosts are removed when elections pause processing etc
+			//
+			// we dont pass to done, its already not on the hosts list.
+			if !isCurrent(host) {
+				continue
+			}
+
 			delay, err := provisionTarget(ctx, host)
 			if err != nil {
 				provErrCtr.WithLabelValues(conf.Site).Inc()

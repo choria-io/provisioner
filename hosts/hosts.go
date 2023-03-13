@@ -23,8 +23,8 @@ import (
 
 var (
 	hosts = make(map[string]*host.Host)
-	work  = make(chan *host.Host, 5000)
-	done  = make(chan *host.Host, 5000)
+	work  = make(chan *host.Host, 50000)
+	done  = make(chan *host.Host, 50000)
 	mu    = &sync.Mutex{}
 	log   *logrus.Entry
 	fw    *choria.Framework
@@ -112,10 +112,42 @@ func remove(host *host.Host) {
 	mu.Lock()
 	defer mu.Unlock()
 
+	removeUnlocked(host)
+}
+
+func removeUnlocked(host *host.Host) {
 	delete(hosts, host.Identity)
 	unprovisionedGauge.WithLabelValues(conf.Site).Set(float64(len(hosts)))
 
 	waitingGauge.WithLabelValues(conf.Site).Set(float64(len(work)))
+}
+
+func removeAllHosts() {
+	mu.Lock()
+	defer mu.Unlock()
+
+	for _, h := range hosts {
+		delete(hosts, h.Identity)
+	}
+
+	for {
+		select {
+		case <-work:
+		default:
+			unprovisionedGauge.WithLabelValues(conf.Site).Set(float64(len(hosts)))
+			waitingGauge.WithLabelValues(conf.Site).Set(float64(len(work)))
+
+			return
+		}
+	}
+}
+
+func isCurrent(h *host.Host) bool {
+	mu.Lock()
+	defer mu.Unlock()
+
+	_, ok := hosts[h.Identity]
+	return ok
 }
 
 func add(host *host.Host) bool {
@@ -124,19 +156,28 @@ func add(host *host.Host) bool {
 
 	_, known := hosts[host.Identity]
 	if known {
-		return false
+		// if it was recently added don't add it again else we remove it
+		// and add it again, might cause a dupe provision but better than
+		// nodes dying on us, a dupe provision will time out on first rpc
+		// failure and provision will also not provision nodes added too
+		// long ago
+		if time.Since(host.DiscoveredTime()) < conf.IntervalDuration {
+			return false
+		}
+		removeUnlocked(host)
 	}
 
 	log.Infof("Adding %s to the work queue with %d entries", host.Identity, len(hosts))
 	hosts[host.Identity] = host
-	unprovisionedGauge.WithLabelValues(conf.Site).Set(float64(len(hosts)))
 
 	select {
 	case work <- host:
 	default:
 		log.Warnf("Adding host to work queue failed with %d / %d entries", len(work), cap(work))
+		removeUnlocked(host)
 	}
 
+	unprovisionedGauge.WithLabelValues(conf.Site).Set(float64(len(hosts)))
 	waitingGauge.WithLabelValues(conf.Site).Set(float64(len(work)))
 
 	return true
