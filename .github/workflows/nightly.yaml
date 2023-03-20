@@ -28,6 +28,21 @@ jobs:
           packager_tag: el8-go1.19
           version: ${{ env.build_version }}
 
+  docker:
+    needs:
+      - upload
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and Publish Docker Container
+        uses: choria-io/actions/nightly@main
+        with:
+          package: choria-provisioner
+          repo: choria-provisioner
+          dockerfile: Dockerfile-nightly
+          registry_username: "${{ secrets.REGISTRY_USERNAME }}"
+          registry_password: "${{ secrets.REGISTRY_PASSWORD }}"
+
   upload:
     needs:
       - el7_64
