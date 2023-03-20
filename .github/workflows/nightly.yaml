@@ -38,7 +38,7 @@ jobs:
         uses: choria-io/actions/nightly@main
         with:
           package: choria-provisioner
-          repo: choria-provisioner
+          repo: provisioner
           dockerfile: Dockerfile-nightly
           registry_username: "${{ secrets.REGISTRY_USERNAME }}"
           registry_password: "${{ secrets.REGISTRY_PASSWORD }}"
