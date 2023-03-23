@@ -1,5 +1,11 @@
 | Date       | Issue | Description                                                                                           |
 |------------|-------|-------------------------------------------------------------------------------------------------------|
+| 2023/03/23 |       | Release 0.15.0                                                                                        |
+| 2023/03/13 | 190   | Improve handling very large waiting node counts                                                       |
+| 2022/11/29 | 52    | Support upgrading nodes over the air using `go-updater`                                               |
+| 2022/11/29 | 177   | Support provisioning Protocol v2 nodes via Organization Issuers                                       |
+| 2022/08/31 | 174   | Support shutting down servers as well as defer provisioning                                           |
+| 2022/07/14 | 172   | Report on the number of waiting nodes                                                                 |
 | 2022/06/16 |       | Release 0.14.0                                                                                        |
 | 2022/06/14 | 167   | Improve hosts list handling in the face of 100s of nodes that live for seconds                        |
 | 2022/04/07 | 164   | Create configuration files and log files as root                                                      |       
