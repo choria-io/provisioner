@@ -80,6 +80,7 @@ features:
 | `helper`                       | Path to the helper script                                                                  |                 |
 | `token`                        | The value of the token set using `--token` in the `provisioning.jwt`                       |                 |
 | `site`                         | A unique name for this installation, surfaced in monitoring data                           |                 |
+| `monitor_port`                 | The post to listen on for monitoring requests                                              |                 |
 | `broker_provisioning_password` | The password configured in the broker `plugin.choria.network.provisioning.client_password` |                 |
 | `features.jwt`                 | Enables fetching and validating `provisioning.jwt`, should almost always be `true`         | `false`         |
 | `features.ed25519`             | Enables JWT processing for Organization Issuer based networks                              | `false`         |
