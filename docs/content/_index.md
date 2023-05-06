@@ -26,7 +26,7 @@ Choria supports a provisioning mode where the process of enrolling a node can be
 
 In essence this can replace the role of traditional Configuration Management with a more dynamic process for the purpose of configuring Choria Server. This is equivalent to an IoT device and it's management.
 
-Choria Provisioner is a very high performance system capable of provisioning 1,000 servers per minute assuming corporate x509 infrastructure is performance enough. It can be deployed in an active-standby cluster mode for high availability.
+Choria Provisioner is a very high performance system capable of provisioning 1,000 servers per minute assuming corporate x509 infrastructure is performant enough. It can be deployed in an active-standby cluster mode for high availability.
 
 ## Status
 
