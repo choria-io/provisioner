@@ -28,6 +28,16 @@ jobs:
           packager_tag: el8-go1.19
           version: ${{ env.build_version }}
 
+  el9_64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: choria-io/actions/packager@main
+        with:
+          build_package: el9_64
+          packager_tag: el9-go1.19
+          version: ${{ env.build_version }}
+
   docker:
     needs:
       - upload
@@ -47,6 +57,7 @@ jobs:
     needs:
       - el7_64
       - el8_64
+      - el9_64
 
     runs-on: ubuntu-latest
     steps:
