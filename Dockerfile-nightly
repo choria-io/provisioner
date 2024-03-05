@@ -1,14 +1,14 @@
-FROM almalinux:8
+FROM almalinux:9
 
 ARG DATE="unknown"
 
 WORKDIR /etc/choria-provisioner/
 
-COPY choria-provisioner-0.99.0.${DATE}-1.el8.x86_64.rpm /tmp
+COPY choria-provisioner-0.99.0.${DATE}-1.el9.x86_64.rpm /tmp
 
 
 RUN yum -y install ruby nc procps-ng openssl && \
-    yum -y localinstall /tmp/choria-provisioner-0.99.0.${DATE}-1.el8.x86_64.rpm && \
+    yum -y localinstall /tmp/choria-provisioner-0.99.0.${DATE}-1.el9.x86_64.rpm && \
     yum -y clean all
 
 RUN groupadd --gid 2048 choria && \
