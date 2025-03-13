@@ -15,7 +15,7 @@ jobs:
         uses: choria-io/actions/packager@main
         with:
           build_package: el8_64
-          packager_tag: el8-go1.22
+          packager_tag: el8-go1.23
           version: ${{ env.build_version }}
 
   el9_64:
@@ -25,7 +25,7 @@ jobs:
         uses: choria-io/actions/packager@main
         with:
           build_package: el9_64
-          packager_tag: el9-go1.22
+          packager_tag: el9-go1.23
           version: ${{ env.build_version }}
 
   docker:
