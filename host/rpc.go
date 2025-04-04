@@ -96,7 +96,7 @@ func (h *Host) rpcWrapper(ctx context.Context, action string, tries int, cb func
 
 func (h *Host) upgrade(ctx context.Context) error {
 	return h.provisionClient(ctx, "release_update", 3, func(ctx context.Context, pc *provclient.ChoriaProvisionClient) error {
-		h.log.Infof("Upgrading node to %s", h.upgradeTargetVersion)
+		h.log.Infof("Updating node to %s", h.upgradeTargetVersion)
 
 		res, err := pc.ReleaseUpdate(h.cfg.UpgradesRepo, h.token, h.upgradeTargetVersion).Do(ctx)
 		if err != nil {
