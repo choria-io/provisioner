@@ -5,16 +5,6 @@ on:
       - '*'
 
 jobs:
-  el7_64:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build
-        uses: choria-io/actions/packager@main
-        with:
-          build_package: el7_64
-          packager_tag: el7-go1.21
-          version: tag
-
   el8_64:
     runs-on: ubuntu-latest
     steps:
@@ -22,20 +12,39 @@ jobs:
         uses: choria-io/actions/packager@main
         with:
           build_package: el8_64
-          packager_tag: el8-go1.21
+          packager_tag: el8-go.1.23
+          version: tag
+
+  el9_64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: choria-io/actions/packager@main
+        with:
+          build_package: el9_64
+          packager_tag: el9-go.1.23
           version: tag
 
   upload:
     needs:
-      - el7_64
       - el8_64
+      - el9_64
 
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: Artifacts normalization
+        shell: bash
+        run: |
+          cd artifacts
+          for i in foss*
+          do
+            mv -v $i $(echo $i|cut -d_ -f2-)
+          done
 
       - name: Upload artifacts to Spaces
         uses: jakejarvis/s3-sync-action@master
@@ -45,5 +54,5 @@ jobs:
           AWS_S3_BUCKET: choria-packages-ams
           AWS_ACCESS_KEY_ID: ${{ secrets.SPACES_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SPACES_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: artifacts/foss
+          SOURCE_DIR: artifacts
           DEST_DIR: release
