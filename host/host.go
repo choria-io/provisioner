@@ -234,12 +234,12 @@ func (h *Host) handleHostUpgrade(ctx context.Context) (bool, error) {
 	cv := NewVersion(h.version)
 	tv := NewVersion(h.upgradeTargetVersion)
 
-	if cv.LessThan(tv) {
-		h.log.Warnf("Will attempt version upgrade from %s to %s", h.version, h.upgradeTargetVersion)
+	if !cv.Equal(tv) {
+		h.log.Warnf("Will attempt version update from %s to %s", h.version, h.upgradeTargetVersion)
 
 		err := h.upgrade(ctx)
 		if err != nil {
-			return false, fmt.Errorf("upgrading to %v failed: %v", h.upgradeTargetVersion, err)
+			return false, fmt.Errorf("update to %v failed: %v", h.upgradeTargetVersion, err)
 		}
 
 		return false, nil
