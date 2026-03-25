@@ -8,16 +8,6 @@ env:
   build_version: nightly
 
 jobs:
-  el8_64:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build
-        uses: choria-io/actions/packager@main
-        with:
-          build_package: el8_64
-          packager_tag: el8-go1.23
-          version: ${{ env.build_version }}
-
   el9_64:
     runs-on: ubuntu-latest
     steps:
@@ -25,7 +15,17 @@ jobs:
         uses: choria-io/actions/packager@main
         with:
           build_package: el9_64
-          packager_tag: el9-go1.23
+          packager_tag: el9-go1.25
+          version: ${{ env.build_version }}
+
+  el10_64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: choria-io/actions/packager@main
+        with:
+          build_package: el10_64
+          packager_tag: el10-go1.25
           version: ${{ env.build_version }}
 
   docker:
@@ -45,8 +45,8 @@ jobs:
 
   upload:
     needs:
-      - el8_64
       - el9_64
+      - el10_64
 
     runs-on: ubuntu-latest
     steps:

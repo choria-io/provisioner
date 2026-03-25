@@ -29,12 +29,6 @@ foss:
       release: 1
       manage_conf: 1
 
-    el7_64:
-      dist: el7
-      template: el/el7
-      target_arch: x86_64
-      binary: 64bit_linux
-
     el8_64:
       dist: el8
       template: el/el8
@@ -44,5 +38,11 @@ foss:
     el9_64:
       dist: el9
       template: el/el9
+      target_arch: x86_64
+      binary: 64bit_linux
+
+    el10_64:
+      dist: el10
+      template: el/el10
       target_arch: x86_64
       binary: 64bit_linux
