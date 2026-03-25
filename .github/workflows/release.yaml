@@ -12,7 +12,7 @@ jobs:
         uses: choria-io/actions/packager@main
         with:
           build_package: el8_64
-          packager_tag: el8-go.1.23
+          packager_tag: el8-go.1.25
           version: tag
 
   el9_64:
@@ -22,13 +22,24 @@ jobs:
         uses: choria-io/actions/packager@main
         with:
           build_package: el9_64
-          packager_tag: el9-go.1.23
+          packager_tag: el9-go.1.25
+          version: tag
+
+  el10_64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        uses: choria-io/actions/packager@main
+        with:
+          build_package: el10_64
+          packager_tag: el10-go.1.25
           version: tag
 
   upload:
     needs:
       - el8_64
       - el9_64
+      - el10_64
 
     runs-on: ubuntu-latest
     steps:
