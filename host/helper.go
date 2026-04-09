@@ -15,6 +15,7 @@ import (
 
 	"github.com/choria-io/provisioner/config"
 	"github.com/choria-io/tokens"
+	"github.com/kballard/go-shellquote"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
@@ -42,7 +43,7 @@ func (h *Host) getConfig(ctx context.Context) (*ConfigResponse, error) {
 		return nil, fmt.Errorf("could not JSON encode host: %s", err)
 	}
 
-	err = runDecodedHelper(ctx, []string{}, string(input), r, h.cfg, h.log)
+	err = runDecodedHelper(ctx, string(input), r, h.cfg, h.log)
 	if err != nil {
 		return nil, fmt.Errorf("could not invoke configure helper: %s", err)
 	}
@@ -50,8 +51,8 @@ func (h *Host) getConfig(ctx context.Context) (*ConfigResponse, error) {
 	return r, nil
 }
 
-func runDecodedHelper(ctx context.Context, args []string, input string, output interface{}, cfg *config.Config, log *logrus.Entry) error {
-	o, err := runHelper(ctx, args, input, cfg)
+func runDecodedHelper(ctx context.Context, input string, output interface{}, cfg *config.Config, log *logrus.Entry) error {
+	o, err := runHelper(ctx, input, cfg)
 	if err != nil {
 		return err
 	}
@@ -64,7 +65,7 @@ func runDecodedHelper(ctx context.Context, args []string, input string, output i
 	return nil
 }
 
-func runHelper(ctx context.Context, args []string, input string, cfg *config.Config) ([]byte, error) {
+func runHelper(ctx context.Context, input string, cfg *config.Config) ([]byte, error) {
 	obs := prometheus.NewTimer(helperDuration.WithLabelValues(cfg.Site))
 	defer obs.ObserveDuration()
 
@@ -72,10 +73,19 @@ func runHelper(ctx context.Context, args []string, input string, cfg *config.Con
 		return nil, fmt.Errorf("provisioning is paused, cannot perform %s", cfg.Helper)
 	}
 
-	tctx, cancel := context.WithTimeout(ctx, time.Duration(10*time.Second))
+	tctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	execution := exec.CommandContext(tctx, cfg.Helper, args...)
+	parts, err := shellquote.Split(cfg.Helper)
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse helper command: %s", err)
+	}
+
+	if len(parts) == 0 {
+		return nil, fmt.Errorf("cannot parse helper command: empty")
+	}
+
+	execution := exec.CommandContext(tctx, parts[0], parts[1:]...)
 
 	stdin, err := execution.StdinPipe()
 	if err != nil {
