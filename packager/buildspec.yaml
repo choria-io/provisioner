@@ -6,20 +6,18 @@ foss:
   compile_targets:
     defaults:
       output: choria-provisioner-{{version}}-{{os}}-{{arch}}
-      environment:
-        CGO_ENABLED: "0"
 
     64bit_linux:
       os: linux
       arch: amd64
 
-    32bit_linux:
+    aarch64_linux:
       os: linux
-      arch: 386
+      arch: arm64
 
-    darwin:
-      os: darwin
-      arch: amd64
+    ppc64le_linux:
+      os: linux
+      arch: ppc64le
 
   packages:
     defaults:
@@ -29,20 +27,20 @@ foss:
       release: 1
       manage_conf: 1
 
-    el8_64:
-      dist: el8
-      template: el/el8
+    el_64:
+      dist: el
+      template: el/generic
       target_arch: x86_64
       binary: 64bit_linux
 
-    el9_64:
-      dist: el9
-      template: el/el9
-      target_arch: x86_64
-      binary: 64bit_linux
+    el_ppc64le:
+      template: el/generic
+      dist: el
+      target_arch: ppc64le
+      binary: ppc64le_linux
 
-    el10_64:
-      dist: el10
-      template: el/el10
-      target_arch: x86_64
-      binary: 64bit_linux
+    el_aarch64:
+      template: el/generic
+      dist: el
+      target_arch: aarch64
+      binary: aarch64_linux
