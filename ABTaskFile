@@ -19,11 +19,17 @@ commands:
               description: Enable using go proxy
               bool: true
               default: "true"
+            - name: actions
+              bool: true
+              default: "true"
+              description: Run actions update using pinact
           banner: |
               >>>
               >>> Updating all dependencies
               >>>
           script: |
+            . "{{ BashHelperPath }}"
+            
             {{ if eq .Flags.proxy false }}
             export GOPROXY=direct
             echo ">>>"
@@ -36,6 +42,16 @@ commands:
 
             echo ">>> Running go mod tidy"
             go mod tidy
+
+            {{ if .Flags.actions }}
+            ab_say Updating actions
+            pinact run \
+              --update \
+              --exclude choria-io/actions/packager \
+              --exclude choria-io/actions/lint_and_test/go \
+              --exclude choria-io/actions/nightly \
+              --exclude  jakejarvis/s3-sync-action
+            {{ end }}
 
     - name: test
       type: parent
