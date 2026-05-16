@@ -3,9 +3,9 @@ module github.com/choria-io/provisioner
 go 1.25.0
 
 require (
-	github.com/choria-io/fisk v0.8.1
-	github.com/choria-io/go-choria v0.30.0-rc.1
-	github.com/choria-io/tokens v0.0.4-0.20260330095821-b91f2ad57ea0
+	github.com/choria-io/fisk v0.8.3
+	github.com/choria-io/go-choria v0.30.0
+	github.com/choria-io/tokens v0.0.4
 	github.com/ghodss/yaml v1.0.0
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/onsi/ginkgo/v2 v2.28.3
@@ -69,7 +69,7 @@ require (
 	github.com/nats-io/nats.go v1.52.0 // indirect
 	github.com/nats-io/nkeys v0.4.15 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/open-policy-agent/opa v1.16.1 // indirect
+	github.com/open-policy-agent/opa v1.16.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
