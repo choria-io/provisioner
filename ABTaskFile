@@ -82,16 +82,18 @@ commands:
 
     - name: docs
       type: parent
+      aliases: [doc]
       description: Documentation related commands
       commands:
         - name: serve
           description: Serves documentation locally
           type: exec
+          dir: "{{ AppDir }}/docs"
           flags:
             - name: port
               description: The port to listen on
               default: "8081"
-          command: hugo serve -p {{ .Flags.port }} -s docs
+          command: hugo serve -p {{ .Flags.port }} -s .
 
     - name: build
       type: parent

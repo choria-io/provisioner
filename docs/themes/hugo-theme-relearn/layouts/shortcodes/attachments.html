@@ -1,7 +1,8 @@
 {{- $_hugo_config := `{ "version": 1 }` }}
+{{- $unused := .Inner }}
 {{- partial "shortcodes/attachments.html" (dict
-  "context" .
-  "content" .Inner
+  "page"    .Page
+  "color"   (.Get "color")
   "icon"    (.Get "icon")
   "pattern" (.Get "pattern")
   "style"   (.Get "style")

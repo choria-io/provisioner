@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Server Setup :: Choria Provisioner</title>
+    <link>https://choria-io.github.io/provisioner/configuration/server/</link>
+    <description>The Choria Server has the required RPC Agent embedded and is ready to be used in a Provisioner managed network but it is disabled by default. Custom binaries can enable provisioning at compile time for an always-on experience.&#xA;Provisioning is enabled in the Open Source server by means of a JWT token that you create and place on the server. The JWT token holds all of the information the server needs to find it’s provisioning server and will present that token also to the provisioning server for authentication.</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <atom:link href="https://choria-io.github.io/provisioner/configuration/server/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

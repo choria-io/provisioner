@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html id="R-html" lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="print">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.154.5">
+    <meta name="generator" content="Relearn 9.0.3">
+    <meta name="description" content="Choria Broker supports a concept called an Account or Organization, these are like a VLAN on your network switches.
+Nodes partitioned into one Organization cannot communicate with nodes in any other Organizations unless special arrangements are made to facilitate that.
+We use this feature to create an isolated network where unprovisioned servers wait for provisioning. When Choria Provisioner connects using fully verified credentials it gains access to these isolated Servers and can provision them.">
+    <meta name="author" content="">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Broker Setup :: Choria Provisioner">
+    <meta name="twitter:description" content="Choria Broker supports a concept called an Account or Organization, these are like a VLAN on your network switches.
+Nodes partitioned into one Organization cannot communicate with nodes in any other Organizations unless special arrangements are made to facilitate that.
+We use this feature to create an isolated network where unprovisioned servers wait for provisioning. When Choria Provisioner connects using fully verified credentials it gains access to these isolated Servers and can provision them.">
+    <meta property="og:url" content="https://choria-io.github.io/provisioner/configuration/broker/">
+    <meta property="og:site_name" content="Choria Provisioner">
+    <meta property="og:title" content="Broker Setup :: Choria Provisioner">
+    <meta property="og:description" content="Choria Broker supports a concept called an Account or Organization, these are like a VLAN on your network switches.
+Nodes partitioned into one Organization cannot communicate with nodes in any other Organizations unless special arrangements are made to facilitate that.
+We use this feature to create an isolated network where unprovisioned servers wait for provisioning. When Choria Provisioner connects using fully verified credentials it gains access to these isolated Servers and can provision them.">
+    <meta property="og:locale" content="en_us">
+    <meta property="og:type" content="website">
+    <meta itemprop="name" content="Broker Setup :: Choria Provisioner">
+    <meta itemprop="description" content="Choria Broker supports a concept called an Account or Organization, these are like a VLAN on your network switches.
+Nodes partitioned into one Organization cannot communicate with nodes in any other Organizations unless special arrangements are made to facilitate that.
+We use this feature to create an isolated network where unprovisioned servers wait for provisioning. When Choria Provisioner connects using fully verified credentials it gains access to these isolated Servers and can provision them.">
+    <meta itemprop="wordCount" content="358">
+    <title>Broker Setup :: Choria Provisioner</title>
+    <link href="https://choria-io.github.io/provisioner/configuration/broker/" rel="canonical" type="text/html" title="Broker Setup :: Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/configuration/broker/index.xml" rel="alternate" type="application/rss+xml" title="Broker Setup :: Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/configuration/broker/index.md" rel="alternate" type="text/markdown" title="Broker Setup :: Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/css/auto-complete/auto-complete.min.css?1787141446" rel="stylesheet">
+    <script src="https://choria-io.github.io/provisioner/js/auto-complete/auto-complete.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/search-lunr.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/search.min.js?1787141446" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      window.relearn.index_js_url="https://choria-io.github.io/provisioner/searchindex.en.js?1787141446";
+    </script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.stemmer.support.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.multi.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.en.min.js?1787141446" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      window.relearn.contentLangs=['en'];
+    </script>
+    <link href="https://choria-io.github.io/provisioner/fonts/fontawesome/css/all.min.css?1787141446" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="https://choria-io.github.io/provisioner/fonts/fontawesome/css/all.min.css?1787141446" rel="stylesheet"></noscript>
+    <link href="https://choria-io.github.io/provisioner/css/perfect-scrollbar/perfect-scrollbar.min.css?1787141446" rel="stylesheet">
+    <link href="https://choria-io.github.io/provisioner/css/theme.min.css?1787141446" rel="stylesheet">
+    <link href="https://choria-io.github.io/provisioner/css/format-print.min.css?1787141446" rel="stylesheet" id="R-format-style">
+    <script>
+      window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/configuration\/broker\/';
+      window.relearn.relBasePath='..\/..';
+      window.relearn.relBaseUri='..\/..';
+      window.relearn.absBaseUri='https:\/\/choria-io.github.io\/provisioner';
+      window.relearn.disableInlineCopyToClipboard=true;
+      window.relearn.enableBlockCodeWrap=true;
+      // translations
+      window.T_Copy_to_clipboard = `Copy text to clipboard`;
+      window.T_Copied_to_clipboard = `Text copied to clipboard!`;
+      window.T_Link_copied_to_clipboard = `Link copied to clipboard!`;
+      window.T_Reset_view = `Reset view`;
+      window.T_View_reset = `View reset!`;
+      window.T_No_results_found = `No results found for "{0}"`;
+      window.T_N_results_found = `{1} results found for "{0}"`;
+      window.T_Browser_unsupported_feature = `This browser doesn't support this feature`;
+      // variant stuff
+      window.relearn.themevariants = [ 'zen-auto', 'zen-light', 'ccm' ];
+      window.relearn.customvariantprefix = "my-custom-";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.localStorage.setItem(window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.localStorage.getItem(window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.localStorage.getItem(window.relearn.absBaseUri + "/variant") ?? "";
+        if( !variant ||
+            (!variant.startsWith(window.relearn.customvariantprefix) && !window.relearn.themevariants.includes(variant)) ||
+            (variant.startsWith(window.relearn.customvariantprefix) && !window.localStorage.getItem(window.relearn.absBaseUri + "/variantstylesheet-" + variant)) ){
+          variant = window.relearn.themevariants[0];
+          window.localStorage.setItem(window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
+    </script><link rel="stylesheet" href="https://choria-io.github.io/provisioner/css/codemap.css">
+
+  </head>
+  <body class="mobile-support print" data-origin="/configuration/broker/">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar" class="default-animation">
+        <div class="topbar-wrapper default-animation">
+          <div class="topbar-sidebar-divider default-animation"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar default-animation" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)"><i class="fa-fw fas fa-bars"></i></button></span>
+            </div>
+            <div class="topbar-button topbar-button-toc default-animation" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)"><i class="fa-fw fas fa-table-list"></i></button></span>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+<nav class="TableOfContents">
+  <ul>
+    <li><a href="#enabling-the-system-account">Enabling the System Account</a></li>
+    <li><a href="#enabling-the-provisioning-account">Enabling the Provisioning Account</a>
+      <ul>
+        <li><a href="#x509-based-choria">x509 Based Choria</a></li>
+        <li><a href="#organization-based-choria">Organization Based Choria</a></li>
+      </ul>
+    </li>
+    <li><a href="#confirming">Confirming</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="https://choria-io.github.io/provisioner/"><span itemprop="name">Choria Provisioner</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="https://choria-io.github.io/provisioner/configuration/"><span itemprop="name">Configuration</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Broker Setup</span><meta itemprop="position" content="3"></li>
+          </ol>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-markdown default-animation" data-content-empty="disable" data-width-s="area-more" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/configuration/broker/index.md" title="Show Markdown"><i class="fa-fw fab fa-markdown"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-print default-animation" data-content-empty="disable" data-width-s="area-more" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/configuration/broker/index.print.html" title="Print whole chapter (CTRL+ALT+p)"><i class="fa-fw fas fa-print"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-prev default-animation" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/configuration/server/" title="Server Setup (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-next default-animation" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/configuration/helper/" title="Writing a Helper (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-more default-animation" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button></span>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable configuration" tabindex="-1">
+        <div class="flex-block-wrapper">
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="broker-setup">Broker Setup</h1>
+
+<p>Choria Broker supports a concept called an Account or Organization, these are like a VLAN on your network switches.</p>
+<p>Nodes partitioned into one Organization cannot communicate with nodes in any other Organizations unless special arrangements are made to facilitate that.</p>
+<p>We use this feature to create an isolated network where unprovisioned servers wait for provisioning.  When Choria Provisioner connects using fully verified credentials it gains access to these isolated Servers and can provision them.</p>
+<p><a href="#R-image-5a135826e0ec931a1cef653dd9870b9e" class="lightbox-link"><img alt="TLS Based Provisioning" class="lazy lightbox figure-image" loading="lazy" src="../../unverified-tls-provisioning.png" style="height: auto;width: auto;"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-5a135826e0ec931a1cef653dd9870b9e"><img alt="TLS Based Provisioning" class="lazy lightbox lightbox-image" loading="lazy" src="../../unverified-tls-provisioning.png"></a></p>
+<p>Here we show one Choria Broker Cluster with a Choria Account and a Provisioning Account active. Unverified connections enter the Provisioning Account automatically. The Provisioner connects with its fully verified credentials that identify it as a Provisioner and gains access to the unprovisioned servers.</p>
+<p>Restrictions in the Choria Broker authentication layer ensures this separation is not optional and enforce control over what software gains access to the unprovisioned fleet.</p>
+<h2 id="enabling-the-system-account">Enabling the System Account<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>We suggest enabling the Choria Broker system account to allow introspection of nodes waiting to be provisioned and more.</p>
+<p>Configure this in both your Broker and Client configurations.</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.choria.network.system.user</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">system</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">plugin.choria.network.system.password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">system</span></span></span></code></pre></div>
+<h2 id="enabling-the-provisioning-account">Enabling the Provisioning Account<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>The Choria Provisioner will connect using its normal Certificate or JWT token which means it will appear just like any other client.  To differentiate it we force it to connect to a specific user and password.</p>
+<p>The password is unique per environment and should be configured in the broker:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.choria.network.provisioning.client_password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">provSecret</span></span></span></code></pre></div>
+<h3 id="x509-based-choria">x509 Based Choria<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<p>If you are using an x509 based network you have to set the Public certificate that was used to <a href="https://choria-io.github.io/provisioner/configuration/server/">configure servers</a>.</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.choria.network.provisioning.signer_cert</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/etc/choria/provisioning-jwt-signer.pem</span></span></span></code></pre></div>
+<h3 id="organization-based-choria">Organization Based Choria<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+
+<details open class="box cstyle notices secondary">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-code-branch"></i> 
+    Version Hint
+  </summary>
+  <div class="box-content">
+<p>This applies only to Choria 0.27.0 and newer which is due to ship early 2023</p>
+  </div>
+</details>
+<p>If you are using an Organization Issuer you should already have the issuer configured and have used that issuer to sign the <code>provisioning.jwt</code></p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.security.issuer.names</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">choria</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">plugin.security.issuer.choria.public</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">4ada2...cea4</span></span></span></code></pre></div>
+<h2 id="confirming">Confirming<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Once configured you can run the command <code>choria broker server report conns --account provisioning</code> to both confirm the account is active and it will show any connections made to this account.  The Choria Provisioner will appear there as well as any machines being provisioned.</p>
+<p><a href="#R-image-f7f70a7dc7d0883c943b20e68a63e4d1" class="lightbox-link"><img alt="Provisioning account connections" class="lazy lightbox figure-image" loading="lazy" src="../../prov-account-conns.png" style="height: auto;width: auto;"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-f7f70a7dc7d0883c943b20e68a63e4d1"><img alt="Provisioning account connections" class="lazy lightbox lightbox-image" loading="lazy" src="../../prov-account-conns.png"></a></p>
+
+  <footer class="footline">
+  </footer>
+</article>
+        </div>
+      </main>
+    </div>
+    <script src="https://choria-io.github.io/provisioner/js/perfect-scrollbar/perfect-scrollbar.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/theme.min.js?1787141446" defer></script>
+    <div id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
+  </body>
+</html>
