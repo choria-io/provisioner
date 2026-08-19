@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Configuration File :: Choria Provisioner</title>
+    <link>https://choria-io.github.io/provisioner/configuration/provisioner/</link>
+    <description>Provisioner is configured using /etc/choria-provisioner/choria-provisioner.yaml typically. It’s a YAML format file with a few required settings and a number of optional ones. Changes to the file requires the process to be restarted.&#xA;Choria Client Configuration As the Provisioner connects to the Choria Broker as a client it needs a configuration that allows it access. Create /etc/choria-provisioner/choria.cfg with the following based on needs. These settings will augment those in /etc/choria/client.cfg.</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <atom:link href="https://choria-io.github.io/provisioner/configuration/provisioner/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html id="R-html" lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="html">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.154.5">
+    <meta name="generator" content="Relearn 9.0.3">
+    <meta name="description" content="Overview In a typical Choria environment Puppet is used to provision a uniform Choria infrastructure integrated into the Puppet CA. This does not really work in large enterprises or dynamic environments..
+Choria supports a provisioning mode where the process of enrolling a node can be managed on a per-environment basis, this is where we manage the vast differences in environments, platforms, etc. Once Choria is installed we have a unified overlay interface:">
+    <meta name="author" content="">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Choria Provisioner">
+    <meta name="twitter:description" content="Overview In a typical Choria environment Puppet is used to provision a uniform Choria infrastructure integrated into the Puppet CA. This does not really work in large enterprises or dynamic environments..
+Choria supports a provisioning mode where the process of enrolling a node can be managed on a per-environment basis, this is where we manage the vast differences in environments, platforms, etc. Once Choria is installed we have a unified overlay interface:">
+    <meta property="og:url" content="https://choria-io.github.io/provisioner/">
+    <meta property="og:site_name" content="Choria Provisioner">
+    <meta property="og:title" content="Choria Provisioner">
+    <meta property="og:description" content="Overview In a typical Choria environment Puppet is used to provision a uniform Choria infrastructure integrated into the Puppet CA. This does not really work in large enterprises or dynamic environments..
+Choria supports a provisioning mode where the process of enrolling a node can be managed on a per-environment basis, this is where we manage the vast differences in environments, platforms, etc. Once Choria is installed we have a unified overlay interface:">
+    <meta property="og:locale" content="en_us">
+    <meta property="og:type" content="website">
+    <meta itemprop="name" content="Choria Provisioner">
+    <meta itemprop="description" content="Overview In a typical Choria environment Puppet is used to provision a uniform Choria infrastructure integrated into the Puppet CA. This does not really work in large enterprises or dynamic environments..
+Choria supports a provisioning mode where the process of enrolling a node can be managed on a per-environment basis, this is where we manage the vast differences in environments, platforms, etc. Once Choria is installed we have a unified overlay interface:">
+    <meta itemprop="wordCount" content="314">
+    <title>Choria Provisioner</title>
+    <link href="https://choria-io.github.io/provisioner/index.xml" rel="alternate" type="application/rss+xml" title="Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/index.print.html" rel="alternate" type="text/html" title="Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/index.md" rel="alternate" type="text/markdown" title="Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/llms.txt" rel="alternate" type="text/plain" title="Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/css/auto-complete/auto-complete.min.css?1787141446" rel="stylesheet">
+    <script src="https://choria-io.github.io/provisioner/js/auto-complete/auto-complete.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/search-lunr.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/search.min.js?1787141446" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      window.relearn.index_js_url="https://choria-io.github.io/provisioner/searchindex.en.js?1787141446";
+    </script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.stemmer.support.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.multi.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.en.min.js?1787141446" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      window.relearn.contentLangs=['en'];
+    </script>
+    <link href="https://choria-io.github.io/provisioner/fonts/fontawesome/css/all.min.css?1787141446" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="https://choria-io.github.io/provisioner/fonts/fontawesome/css/all.min.css?1787141446" rel="stylesheet"></noscript>
+    <link href="https://choria-io.github.io/provisioner/css/perfect-scrollbar/perfect-scrollbar.min.css?1787141446" rel="stylesheet">
+    <link href="https://choria-io.github.io/provisioner/css/theme.min.css?1787141446" rel="stylesheet">
+    <link href="https://choria-io.github.io/provisioner/css/format-html.min.css?1787141446" rel="stylesheet" id="R-format-style">
+    <script>
+      window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/';
+      window.relearn.relBasePath='.';
+      window.relearn.relBaseUri='.';
+      window.relearn.absBaseUri='https:\/\/choria-io.github.io\/provisioner';
+      window.relearn.disableInlineCopyToClipboard=true;
+      window.relearn.enableBlockCodeWrap=true;
+      // translations
+      window.T_Copy_to_clipboard = `Copy text to clipboard`;
+      window.T_Copied_to_clipboard = `Text copied to clipboard!`;
+      window.T_Link_copied_to_clipboard = `Link copied to clipboard!`;
+      window.T_Reset_view = `Reset view`;
+      window.T_View_reset = `View reset!`;
+      window.T_No_results_found = `No results found for "{0}"`;
+      window.T_N_results_found = `{1} results found for "{0}"`;
+      window.T_Browser_unsupported_feature = `This browser doesn't support this feature`;
+      // variant stuff
+      window.relearn.themevariants = [ 'zen-auto', 'zen-light', 'ccm' ];
+      window.relearn.customvariantprefix = "my-custom-";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.localStorage.setItem(window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.localStorage.getItem(window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.localStorage.getItem(window.relearn.absBaseUri + "/variant") ?? "";
+        if( !variant ||
+            (!variant.startsWith(window.relearn.customvariantprefix) && !window.relearn.themevariants.includes(variant)) ||
+            (variant.startsWith(window.relearn.customvariantprefix) && !window.localStorage.getItem(window.relearn.absBaseUri + "/variantstylesheet-" + variant)) ){
+          variant = window.relearn.themevariants[0];
+          window.localStorage.setItem(window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
+    </script><link rel="stylesheet" href="https://choria-io.github.io/provisioner/css/codemap.css">
+
+  </head>
+  <body class="mobile-support html" data-origin="/">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar" class="default-animation">
+        <div class="topbar-wrapper default-animation">
+          <div class="topbar-sidebar-divider default-animation"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar default-animation" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)"><i class="fa-fw fas fa-bars"></i></button></span>
+            </div>
+            <div class="topbar-button topbar-button-toc default-animation" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)"><i class="fa-fw fas fa-table-list"></i></button></span>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+<nav class="TableOfContents">
+  <ul>
+    <li><a href="#status">Status</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Choria Provisioner</span><meta itemprop="position" content="1"></li>
+          </ol>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-markdown default-animation" data-content-empty="disable" data-width-s="area-more" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/index.md" title="Show Markdown"><i class="fa-fw fab fa-markdown"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-print default-animation" data-content-empty="disable" data-width-s="area-more" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/index.print.html" title="Print whole chapter (CTRL+ALT+p)"><i class="fa-fw fas fa-print"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-prev default-animation" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle"><span><i class="fa-fw fas fa-chevron-left"></i></span></span>
+            </div>
+            <div class="topbar-button topbar-button-next default-animation" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/installtion/" title="Installation (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-more default-animation" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button></span>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable page" tabindex="-1">
+        <div class="flex-block-wrapper">
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="choria-provisioner">Choria Provisioner</h1>
+
+<h1 id="overview">Overview<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h1>
+<p>In a typical Choria environment Puppet is used to provision a uniform Choria infrastructure integrated into the Puppet CA. This does not really work in large enterprises or dynamic environments..</p>
+<p>Choria supports a provisioning mode where the process of enrolling a node can be managed on a per-environment basis, this is where we manage the vast differences in environments, platforms, etc. Once Choria is installed we have a unified overlay interface:</p>
+<ul>
+<li>Custom endpoints for provisioning where needed. Optionally programmatically determined via plugins that can be compiled into Choria</li>
+<li>Fully dynamic generation of configuration based on node metadata and fleet environment</li>
+<li>Self-healing via cycling back into provisioning on critical error</li>
+<li>On-boarding of machines at a rate of thousands a minute</li>
+</ul>
+<p><strong>Choria Provisioner</strong> owns the early lifecycle of Choria Servers:</p>
+<ul>
+<li>Discovers unprovisioned Servers</li>
+<li>Discovers their capabilities</li>
+<li>Optionally upgrade their versions to the latest version</li>
+<li>Enroll the Server with the Choria security system with integrations for x509 and ed25519 Choria Organization based networks</li>
+<li>Create, using user supplied logic, a per-node configuration</li>
+<li>Configures the Server</li>
+<li>Deploys Open Policy Agent policies</li>
+<li>CLI Integrations to re-provision machines on demand.</li>
+</ul>
+<p>In essence this can replace the role of traditional Configuration Management with a more dynamic process for the purpose of configuring Choria Server. This is equivalent to an IoT device and it&rsquo;s management.</p>
+<p>Choria Provisioner is a very high performance system capable of provisioning 1,000 servers per minute assuming corporate x509 infrastructure is performant enough. It can be deployed in an active-standby cluster mode for high availability.</p>
+<h2 id="status">Status<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>This project and the Choria authentication landscape in general, is in a period of flux as we move to support a fully Certificate Authority free deployment strategy.</p>
+<p>This project can be used today, even by users deploying with Puppet and has proven to be stable and scalable. In a future deployment scenario it will be central to the scalable operation of Choria.</p>
+
+  <footer class="footline">
+  </footer>
+</article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation"><img src="https://choria-io.github.io/provisioner/logo.png" />
+
+
+        <search><form action="https://choria-io.github.io/provisioner/search/" method="get">
+          <div class="searchbox default-animation">
+            <button class="search-detail" type="submit" title="Search (CTRL+ALT+f)"><i class="fas fa-fw fa-search"></i></button>
+            <label class="a11y-only" for="R-search-by">Search</label>
+            <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+            <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-fw fa-times" title="Clear search"></i></button>
+          </div>
+        </form></search>
+      </div>
+      <div id="R-homelinks" class="default-animation homelinks">
+        <div class="R-menu-divider default-animation">
+          <hr class="padding default-animation">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-homelinks default-animation">
+          <ul class="space collapsible-menu">
+            <li class="active " data-nav-id="/"><a class="padding" href="https://choria-io.github.io/provisioner/"><i class="fa-fw fas fa-home"></i> Home</a></li>
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding default-animation">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-headercontrols default-animation">
+          <ul class="">
+          </ul>
+        </div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding default-animation">
+        </div>
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div class="R-sidebarmenu R-shortcutmenu-main default-animation">
+          <ul class="enlarge morespace collapsible-menu">
+            <li class="" data-nav-id="/installtion/"><a class="padding" href="https://choria-io.github.io/provisioner/installtion/"><b>1. </b>Installation</a></li>
+            <li class="" data-nav-id="/configuration/"><input type="checkbox" id="R-section-6f6dce359ca8d596b5b1de1969a0aca2" aria-controls="R-subsections-6f6dce359ca8d596b5b1de1969a0aca2"><label for="R-section-6f6dce359ca8d596b5b1de1969a0aca2"><i class="fa-fw fas fa-chevron-right"></i><span class="a11y-only">Submenu Configuration</span></label><a class="padding default-animation" href="https://choria-io.github.io/provisioner/configuration/"><b>2. </b>Configuration</a><ul id="R-subsections-6f6dce359ca8d596b5b1de1969a0aca2" class="collapsible-menu">
+            <li class="" data-nav-id="/configuration/server/"><a class="padding" href="https://choria-io.github.io/provisioner/configuration/server/"><b>1.1. </b>Server Setup</a></li>
+            <li class="" data-nav-id="/configuration/broker/"><a class="padding" href="https://choria-io.github.io/provisioner/configuration/broker/"><b>1.2. </b>Broker Setup</a></li>
+            <li class="" data-nav-id="/configuration/helper/"><a class="padding" href="https://choria-io.github.io/provisioner/configuration/helper/"><b>1.3. </b>Writing a Helper</a></li>
+            <li class="" data-nav-id="/configuration/provisioner/"><a class="padding" href="https://choria-io.github.io/provisioner/configuration/provisioner/"><b>1.4. </b>Configuration File</a></li></ul></li>
+            <li class="" data-nav-id="/managing/"><a class="padding" href="https://choria-io.github.io/provisioner/managing/"><b>3. </b>Fleet Management</a></li>
+            <li class="" data-nav-id="/monitoring/"><a class="padding" href="https://choria-io.github.io/provisioner/monitoring/"><b>4. </b>Monitoring</a></li>
+            <li class="" data-nav-id="/design/"><input type="checkbox" id="R-section-584881683b3574eff66f4a8e3d60d561" aria-controls="R-subsections-584881683b3574eff66f4a8e3d60d561"><label for="R-section-584881683b3574eff66f4a8e3d60d561"><i class="fa-fw fas fa-chevron-right"></i><span class="a11y-only">Submenu Design</span></label><a class="padding default-animation" href="https://choria-io.github.io/provisioner/design/"><b>5. </b>Design</a><ul id="R-subsections-584881683b3574eff66f4a8e3d60d561" class="collapsible-menu">
+            <li class="" data-nav-id="/design/codemap/"><input type="checkbox" id="R-section-7834c5c3bd4578cefd1d8cf2d5cf7e08" aria-controls="R-subsections-7834c5c3bd4578cefd1d8cf2d5cf7e08"><label for="R-section-7834c5c3bd4578cefd1d8cf2d5cf7e08"><i class="fa-fw fas fa-chevron-right"></i><span class="a11y-only">Submenu Code Map</span></label><a class="padding default-animation" href="https://choria-io.github.io/provisioner/design/codemap/"><b>5.1. </b>Code Map</a><ul id="R-subsections-7834c5c3bd4578cefd1d8cf2d5cf7e08" class="collapsible-menu">
+            <li class="" data-nav-id="/design/codemap/architecture/"><a class="padding" href="https://choria-io.github.io/provisioner/design/codemap/architecture/">Architecture</a></li>
+            <li class="" data-nav-id="/design/codemap/discovery/"><a class="padding" href="https://choria-io.github.io/provisioner/design/codemap/discovery/">Discovery and the work queue</a></li>
+            <li class="" data-nav-id="/design/codemap/provisioning-cycle/"><a class="padding" href="https://choria-io.github.io/provisioner/design/codemap/provisioning-cycle/">The provisioning cycle</a></li>
+            <li class="" data-nav-id="/design/codemap/helper/"><a class="padding" href="https://choria-io.github.io/provisioner/design/codemap/helper/">The helper contract</a></li>
+            <li class="" data-nav-id="/design/codemap/security/"><a class="padding" href="https://choria-io.github.io/provisioner/design/codemap/security/">Security and enrollment</a></li>
+            <li class="" data-nav-id="/design/codemap/rpc-and-upgrades/"><a class="padding" href="https://choria-io.github.io/provisioner/design/codemap/rpc-and-upgrades/">RPC, retries, and upgrades</a></li>
+            <li class="" data-nav-id="/design/codemap/clustering/"><a class="padding" href="https://choria-io.github.io/provisioner/design/codemap/clustering/">Pausing and leader election</a></li>
+            <li class="" data-nav-id="/design/codemap/reference/"><a class="padding" href="https://choria-io.github.io/provisioner/design/codemap/reference/">Reference and map</a></li></ul></li></ul></li>
+          </ul>
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-shortcuts default-animation">
+          <div class="nav-title padding">More</div>
+          <ul class="space collapsible-menu">
+            <li class="" data-nav-id="https://github.com/choria-io/provisioner"><a class="padding" href="https://github.com/choria-io/provisioner" rel="external"><i class='fab fa-fw fa-github'></i> GitHub</a></li>
+            <li class="" data-nav-id="https://github.com/choria-io/provisioner/releases"><a class="padding" href="https://github.com/choria-io/provisioner/releases" rel="external"><i class='far fa-save'></i> Download</a></li>
+            <li class="" data-nav-id="https://github.com/choria-io/general/discussions"><a class="padding" href="https://github.com/choria-io/general/discussions" rel="external"><i class='far fa-comments'></i> Discussions</a></li>
+            <li class="" data-nav-id="https://github.com/choria-io/provisioner/issues"><a class="padding" href="https://github.com/choria-io/provisioner/issues" rel="external"><i class='far fa-life-ring'></i> Issues</a></li>
+            <li class="" data-nav-id="https://slack.puppet.com/"><a class="padding" href="https://slack.puppet.com/" rel="external"><i class='fab fa-slack'></i> #choria</a></li>
+          </ul>
+        </div>
+        <div id="R-footer-margin" class="default-animation"></div>
+        <div class="R-menu-divider default-animation">
+          <hr class="padding default-animation">
+        </div>
+        <div class="R-sidebarmenu R-shortcutmenu-footercontrols default-animation">
+          <ul class="">
+            <li class="R-variantswitcher">
+              <div class="padding menu-control">
+                <i class="fa-fw fas fa-paint-brush"></i>
+                <span>&nbsp;</span>
+                <div class="control-style">
+                  <label class="a11y-only" for="R-select-variant">Theme</label>
+                  <select id="R-select-variant">
+                    <option id="R-select-variant-zen-auto" value="zen-auto" selected>Auto Theme</option>
+                    <option id="R-select-variant-zen-light" value="zen-light">Light</option>
+                    <option id="R-select-variant-ccm" value="ccm">Dark</option>
+                  </select>
+                </div>
+                <div class="clear"></div>
+              </div>
+              <script>window.relearn.markVariant();</script>
+            </li>
+          </ul>
+        </div>
+<div id="R-footer" class="default-animation">
+<style>
+    #footer {
+        font-size: 13px;
+        height: 100px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 2rem 1rem;
+        text-align: center;
+        min-width: 230px;
+        max-width: 300px;
+    }
+    #footer p {
+        margin: 0;
+    }
+</style>
+<p>Hosted at <a href="https://github.com/choria-io">GitHub</a> by <a href="https://www.devco.net/">R.I. Pienaar</a></p>
+</div>
+      </div>
+    </aside>
+    <script src="https://choria-io.github.io/provisioner/js/perfect-scrollbar/perfect-scrollbar.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/theme.min.js?1787141446" defer></script>
+    <div id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
+  </body>
+</html>

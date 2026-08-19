@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html id="R-html" lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="print">
+  <head><script src="/provisioner/livereload.js?mindelay=10&amp;v=2&amp;port=8081&amp;path=provisioner/livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.154.5">
+    <meta name="generator" content="Relearn 9.0.3">
+    <meta name="description" content="The wrapper every Choria call runs through, the per-action retry limits, and how an in-place version upgrade is decided.">
+    <meta name="author" content="">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="RPC, retries, and upgrades :: Choria Provisioner">
+    <meta name="twitter:description" content="The wrapper every Choria call runs through, the per-action retry limits, and how an in-place version upgrade is decided.">
+    <meta property="og:url" content="http://localhost:8081/provisioner/design/codemap/rpc-and-upgrades/">
+    <meta property="og:site_name" content="Choria Provisioner">
+    <meta property="og:title" content="RPC, retries, and upgrades :: Choria Provisioner">
+    <meta property="og:description" content="The wrapper every Choria call runs through, the per-action retry limits, and how an in-place version upgrade is decided.">
+    <meta property="og:locale" content="en_us">
+    <meta property="og:type" content="article">
+    <meta property="article:section" content="Design">
+    <meta itemprop="name" content="RPC, retries, and upgrades :: Choria Provisioner">
+    <meta itemprop="description" content="The wrapper every Choria call runs through, the per-action retry limits, and how an in-place version upgrade is decided.">
+    <meta itemprop="wordCount" content="787">
+    <title>RPC, retries, and upgrades :: Choria Provisioner</title>
+    <link href="http://localhost:8081/provisioner/design/codemap/rpc-and-upgrades/" rel="canonical" type="text/html" title="RPC, retries, and upgrades :: Choria Provisioner">
+    <link href="http://localhost:8081/provisioner/design/codemap/rpc-and-upgrades/index.md" rel="alternate" type="text/markdown" title="RPC, retries, and upgrades :: Choria Provisioner">
+    <link href="http://localhost:8081/provisioner/css/auto-complete/auto-complete.min.css?1787141498" rel="stylesheet">
+    <script src="http://localhost:8081/provisioner/js/auto-complete/auto-complete.min.js?1787141498" defer></script>
+    <script src="http://localhost:8081/provisioner/js/search-lunr.js?1787141498" defer></script>
+    <script src="http://localhost:8081/provisioner/js/search.js?1787141498" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      window.relearn.index_js_url="http://localhost:8081/provisioner/searchindex.en.js?1787141498";
+    </script>
+    <script src="http://localhost:8081/provisioner/js/lunr/lunr.min.js?1787141498" defer></script>
+    <script src="http://localhost:8081/provisioner/js/lunr/lunr.stemmer.support.min.js?1787141498" defer></script>
+    <script src="http://localhost:8081/provisioner/js/lunr/lunr.multi.min.js?1787141498" defer></script>
+    <script src="http://localhost:8081/provisioner/js/lunr/lunr.en.min.js?1787141498" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      window.relearn.contentLangs=['en'];
+    </script>
+    <link href="http://localhost:8081/provisioner/fonts/fontawesome/css/all.min.css?1787141498" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="http://localhost:8081/provisioner/fonts/fontawesome/css/all.min.css?1787141498" rel="stylesheet"></noscript>
+    <link href="http://localhost:8081/provisioner/css/perfect-scrollbar/perfect-scrollbar.min.css?1787141498" rel="stylesheet">
+    <link href="http://localhost:8081/provisioner/css/theme.css?1787141498" rel="stylesheet">
+    <link href="http://localhost:8081/provisioner/css/format-print.css?1787141498" rel="stylesheet" id="R-format-style">
+    <script>
+      window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = ``;
+      window.relearn.path='\/design\/codemap\/rpc-and-upgrades\/';
+      window.relearn.relBasePath='..\/..\/..';
+      window.relearn.relBaseUri='..\/..\/..';
+      window.relearn.absBaseUri='http:\/\/localhost:8081\/provisioner';
+      window.relearn.disableInlineCopyToClipboard=true;
+      window.relearn.enableBlockCodeWrap=true;
+      // translations
+      window.T_Copy_to_clipboard = `Copy text to clipboard`;
+      window.T_Copied_to_clipboard = `Text copied to clipboard!`;
+      window.T_Link_copied_to_clipboard = `Link copied to clipboard!`;
+      window.T_Reset_view = `Reset view`;
+      window.T_View_reset = `View reset!`;
+      window.T_No_results_found = `No results found for "{0}"`;
+      window.T_N_results_found = `{1} results found for "{0}"`;
+      window.T_Browser_unsupported_feature = `This browser doesn't support this feature`;
+      // variant stuff
+      window.relearn.themevariants = [ 'zen-auto', 'zen-light', 'ccm' ];
+      window.relearn.customvariantprefix = "my-custom-";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.localStorage.setItem(window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.localStorage.getItem(window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.localStorage.getItem(window.relearn.absBaseUri + "/variant") ?? "";
+        if( !variant ||
+            (!variant.startsWith(window.relearn.customvariantprefix) && !window.relearn.themevariants.includes(variant)) ||
+            (variant.startsWith(window.relearn.customvariantprefix) && !window.localStorage.getItem(window.relearn.absBaseUri + "/variantstylesheet-" + variant)) ){
+          variant = window.relearn.themevariants[0];
+          window.localStorage.setItem(window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
+    </script><link rel="stylesheet" href="http://localhost:8081/provisioner/css/codemap.css">
+
+  </head>
+  <body class="mobile-support print" data-origin="/design/codemap/rpc-and-upgrades/">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar" class="default-animation">
+        <div class="topbar-wrapper default-animation">
+          <div class="topbar-sidebar-divider default-animation"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar default-animation" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)"><i class="fa-fw fas fa-bars"></i></button></span>
+            </div>
+            <div class="topbar-button topbar-button-toc default-animation" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)"><i class="fa-fw fas fa-table-list"></i></button></span>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+<nav class="TableOfContents">
+  <ul>
+    <li><a href="#the-shared-client-setup">The shared client setup</a></li>
+    <li><a href="#the-retry-loop">The retry loop</a></li>
+    <li><a href="#retry-limits-per-action">Retry limits per action</a></li>
+    <li><a href="#reply-validation">Reply validation</a></li>
+    <li><a href="#the-upgrade-decision">The upgrade decision</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="http://localhost:8081/provisioner/"><span itemprop="name">Choria Provisioner</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="http://localhost:8081/provisioner/design/"><span itemprop="name">Design</span></a><meta itemprop="position" content="2">&nbsp;>&nbsp;</li><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="http://localhost:8081/provisioner/design/codemap/"><span itemprop="name">Code Map</span></a><meta itemprop="position" content="3">&nbsp;>&nbsp;</li><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">RPC, retries, and upgrades</span><meta itemprop="position" content="4"></li>
+          </ol>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-markdown default-animation" data-content-empty="disable" data-width-s="area-more" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="http://localhost:8081/provisioner/design/codemap/rpc-and-upgrades/index.md" title="Show Markdown"><i class="fa-fw fab fa-markdown"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-print default-animation" data-content-empty="disable" data-width-s="area-more" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="http://localhost:8081/provisioner/design/codemap/rpc-and-upgrades/index.print.html" title="Print whole chapter (CTRL+ALT+p)"><i class="fa-fw fas fa-print"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-prev default-animation" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="http://localhost:8081/provisioner/design/codemap/security/" title="Security and enrollment (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-next default-animation" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="http://localhost:8081/provisioner/design/codemap/clustering/" title="Pausing and leader election (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-more default-animation" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button></span>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable design" tabindex="-1">
+        <div class="flex-block-wrapper">
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="rpc-retries-and-upgrades">RPC, retries, and upgrades</h1>
+
+<p>Every call Provisioner makes to a server goes through one wrapper, so <code>rpcWrapper</code> holds the retries,
+timing, error counting, and pause check for every call.</p>
+
+<details open class="box cstyle notices note">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-exclamation-circle"></i> 
+    Where it lives
+  </summary>
+  <div class="box-content">
+<p><code>host/rpc.go</code>, 404 lines. Every action calls <code>rpcWrapper</code> at <code>host/rpc.go:58</code>.
+<code>host/version.go</code> holds the RPM version comparison that the upgrade decision uses.</p>
+  </div>
+</details>
+<h2 id="the-shared-client-setup">The shared client setup<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p><code>rpcUtilClient</code> and <code>provisionClient</code> (<code>host/rpc.go:22</code> and <code>host/rpc.go:40</code>) build the generated
+go-choria clients for the <code>rpcutil</code> and <code>choria_provision</code> agents. Both narrow the client the same way
+before calling <code>rpcWrapper</code>:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">client</span>.<span style="color:#a6e22e">OptionWorkers</span>(<span style="color:#ae81ff">1</span>).<span style="color:#a6e22e">OptionTargets</span>([]<span style="color:#66d9ef">string</span>{<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">Identity</span>})</span></span></code></pre></div>
+<p>The client uses one worker and one target because a <code>Host</code> is one machine. The action name passed to
+<code>rpcWrapper</code> is formatted as <code>agent#action</code>, and that string becomes the <code>rpc</code> label on both
+<code>choria_provisioner_rpc_time</code> and <code>choria_provisioner_rpc_errors</code>, so a dashboard can show which call
+is slow or failing.</p>
+<h2 id="the-retry-loop">The retry loop<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<figure class="cm-diagram">
+  <svg viewBox="0 0 760 270" role="img" aria-label="The retry loop. A pause check runs before the loop, then backoff.For drives attempts. Each attempt starts a timer and runs the call. A failed attempt logs the error, waits for the backoff interval, and starts the next attempt; exceeding the try limit cancels the context and increments the error counter; a successful attempt returns nil.">
+    <defs>
+      <marker id="rlah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--cm-accent)"/></marker>
+      <marker id="rlah3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--cm-accent3)"/></marker>
+      <marker id="rlah2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--cm-accent2)"/></marker>
+    </defs>
+    <!-- main line -->
+    <rect x="20" y="40" width="160" height="56" rx="8" fill="color-mix(in srgb, var(--cm-accent2) 14%, transparent)" stroke="var(--cm-accent2)"/>
+    <text class="cm-svg-label" x="100" y="64" text-anchor="middle" style="fill:var(--cm-accent2)">Pause check</text>
+    <text class="cm-svg-sub" x="100" y="82" text-anchor="middle">before the loop</text>
+    <rect class="cm-svg-box" x="205" y="40" width="160" height="56" rx="8"/>
+    <text class="cm-svg-label" x="285" y="64" text-anchor="middle">backoff.For</text>
+    <text class="cm-svg-sub" x="285" y="82" text-anchor="middle">retry driver</text>
+    <rect x="390" y="40" width="160" height="56" rx="8" fill="color-mix(in srgb, var(--cm-accent) 18%, transparent)" stroke="var(--cm-accent)" stroke-width="2"/>
+    <text class="cm-svg-label" x="470" y="64" text-anchor="middle" style="fill:var(--cm-accent)">Attempt N</text>
+    <text class="cm-svg-sub" x="470" y="82" text-anchor="middle">pause, timer, call</text>
+    <rect x="575" y="40" width="160" height="56" rx="8" fill="color-mix(in srgb, var(--cm-accent) 12%, transparent)" stroke="var(--cm-accent)"/>
+    <text class="cm-svg-label" x="655" y="64" text-anchor="middle" style="fill:var(--cm-accent)">Success</text>
+    <text class="cm-svg-sub" x="655" y="82" text-anchor="middle">returns nil</text>
+    <line x1="180" y1="68" x2="201" y2="68" stroke="var(--cm-accent)" stroke-width="2" marker-end="url(#rlah)"/>
+    <line x1="365" y1="68" x2="386" y2="68" stroke="var(--cm-accent)" stroke-width="2" marker-end="url(#rlah)"/>
+    <line x1="550" y1="68" x2="571" y2="68" stroke="var(--cm-accent)" stroke-width="2" marker-end="url(#rlah)"/>
+    <!-- failure branches -->
+    <rect x="305" y="170" width="160" height="56" rx="8" fill="color-mix(in srgb, var(--cm-accent2) 14%, transparent)" stroke="var(--cm-accent2)"/>
+    <text class="cm-svg-label" x="385" y="194" text-anchor="middle" style="fill:var(--cm-accent2)">Retry</text>
+    <text class="cm-svg-sub" x="385" y="212" text-anchor="middle">log, then back off</text>
+    <rect x="530" y="170" width="160" height="56" rx="8" fill="color-mix(in srgb, var(--cm-accent3) 14%, transparent)" stroke="var(--cm-accent3)"/>
+    <text class="cm-svg-label" x="610" y="194" text-anchor="middle" style="fill:var(--cm-accent3)">Give up</text>
+    <text class="cm-svg-sub" x="610" y="212" text-anchor="middle">cancel, rpc_errors + 1</text>
+    <line x1="440" y1="96" x2="398" y2="166" stroke="var(--cm-accent2)" stroke-width="2" marker-end="url(#rlah2)"/>
+    <line x1="505" y1="96" x2="580" y2="166" stroke="var(--cm-accent3)" stroke-width="2" marker-end="url(#rlah3)"/>
+    <text class="cm-svg-sub" x="640" y="130" text-anchor="middle">try &gt; tries</text>
+    <!-- loop back -->
+    <path d="M305,198 L275,198 L275,100" fill="none" stroke="var(--cm-accent2)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#rlah2)"/>
+    <text class="cm-svg-sub" x="380" y="252" text-anchor="middle">A pause taking effect mid-loop ends the call on the next attempt</text>
+  </svg>
+  <figcaption>The callback enforces the retry limit by canceling the context that runs the loop.</figcaption>
+</figure>
+<p><code>backoff.Default.For</code> retries until the callback returns nil or the context ends, so the try limit is
+enforced from inside:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">backoff</span>.<span style="color:#a6e22e">Default</span>.<span style="color:#a6e22e">For</span>(<span style="color:#a6e22e">tctx</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">try</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">error</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">try</span> &gt; <span style="color:#a6e22e">tries</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">cancel</span>()
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;maximum tries reached&#34;</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">cfg</span>.<span style="color:#a6e22e">Paused</span>() {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">cancel</span>()
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;provisioning is paused, cannot perform %s&#34;</span>, <span style="color:#a6e22e">action</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">obs</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">prometheus</span>.<span style="color:#a6e22e">NewTimer</span>(<span style="color:#a6e22e">rpcDuration</span>.<span style="color:#a6e22e">WithLabelValues</span>(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">cfg</span>.<span style="color:#a6e22e">Site</span>, <span style="color:#a6e22e">action</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">defer</span> <span style="color:#a6e22e">obs</span>.<span style="color:#a6e22e">ObserveDuration</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">cb</span>(<span style="color:#a6e22e">tctx</span>)
+</span></span><span style="display:flex;"><span>})</span></span></code></pre></div>
+<p>The pause flag is read twice: once before the loop and once on every attempt. A provisioner that loses
+an election mid-provision stops at the next attempt boundary rather than finishing the sequence
+against a node that another instance is now provisioning.</p>
+<p>The timer is deferred inside the callback, so <code>choria_provisioner_rpc_time</code> records each attempt
+separately rather than the total across retries. <code>choria_provisioner_rpc_errors</code> increments once per
+wrapper call, after the loop gives up.</p>
+<h2 id="retry-limits-per-action">Retry limits per action<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Each caller picks its own limit, and the values reflect how expensive a repeat is.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Call</th>
+          <th>Tries</th>
+          <th>Reasoning</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>rpcutil#inventory</code></td>
+          <td>5</td>
+          <td>Read-only and cheap to repeat.</td>
+      </tr>
+      <tr>
+          <td><code>choria_provision#gen25519</code></td>
+          <td>5</td>
+          <td>Read-only. A repeat generates a fresh nonce.</td>
+      </tr>
+      <tr>
+          <td><code>choria_provision#configure</code></td>
+          <td>5</td>
+          <td>The call that writes the configuration. Repeats are idempotent on the node.</td>
+      </tr>
+      <tr>
+          <td><code>choria_provision#jwt</code></td>
+          <td>3</td>
+          <td>Read-only.</td>
+      </tr>
+      <tr>
+          <td><code>choria_provision#restart</code></td>
+          <td>3</td>
+          <td>A repeat restarts a node that may already be restarting.</td>
+      </tr>
+      <tr>
+          <td><code>choria_provision#shutdown</code></td>
+          <td>3</td>
+          <td>A repeat targets a node that may already be shutting down.</td>
+      </tr>
+      <tr>
+          <td><code>choria_provision#release_update</code></td>
+          <td>3</td>
+          <td>A repeat downloads and rewrites the binary again.</td>
+      </tr>
+      <tr>
+          <td><code>choria_provision#gencsr</code></td>
+          <td>1</td>
+          <td>Each call makes the node generate a new private key.</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="reply-validation">Reply validation<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Every action checks the response count first. It must be exactly one:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">Stats</span>().<span style="color:#a6e22e">ResponsesCount</span>() <span style="color:#f92672">!=</span> <span style="color:#ae81ff">1</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;... received %d responses while expecting a response from %s&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">Stats</span>().<span style="color:#a6e22e">ResponsesCount</span>(), <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">Identity</span>)
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<p>Zero means the node did not answer within the client timeout. More than one means two machines answer
+to the same identity, and the wrapper cannot tell which machine the configuration would reach, so it
+fails the call. <code>EachOutput</code> then checks <code>ResultDetails().OK()</code> and assigns to a captured <code>err</code> that
+the enclosing closure returns.</p>
+<p><code>shutdown</code> is the exception. It logs a non-OK result as a warning without setting <code>err</code>, and
+increments <code>choria_provisioner_helper_shutdown_requests</code> only on the OK path. The helper already
+rejected the node, so a failed shutdown confirmation does not fail the cycle.</p>
+<h2 id="the-upgrade-decision">The upgrade decision<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p><code>handleHostUpgrade</code> (<code>host/host.go:219</code>) runs before configuration and refuses the node when
+<code>upgrades_repository</code> is unset and <code>upgrades_optional</code> is off, when the inventory carried no version,
+or when the node did not report <code>upgradable</code>.</p>
+<p>The comparison itself uses <code>host/version.go</code>, a vendored copy of
+<a href="https://github.com/knqyf263/go-rpm-version" rel="external">go-rpm-version</a>, MIT licensed, vendored because the
+upstream project is unmaintained. It implements RPM&rsquo;s <code>epoch:version-release</code> parsing and the
+<code>rpmvercmp</code> segment comparison, including tilde handling and the rule that numeric segments sort
+higher than alphabetic ones.</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">cv</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewVersion</span>(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">version</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">tv</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">NewVersion</span>(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">upgradeTargetVersion</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">cv</span>.<span style="color:#a6e22e">Equal</span>(<span style="color:#a6e22e">tv</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">upgrade</span>(<span style="color:#a6e22e">ctx</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+
+<details open class="box cstyle notices warning">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-exclamation-triangle"></i> 
+    Version comparison is an equality test
+  </summary>
+  <div class="box-content">
+<p><code>handleHostUpgrade</code> compares the two versions with <code>Equal</code> and acts on any difference. <code>Version</code>
+exposes <code>GreaterThan</code> and <code>LessThan</code>, and neither is called anywhere in the codebase. A helper that
+returns an <code>upgrade</code> value older than the node&rsquo;s current version triggers a release update that moves
+the node backwards. Whether a version change is an upgrade or a rollback is therefore the helper&rsquo;s
+decision. A helper that must prevent rollbacks compares the versions itself before setting the field.</p>
+  </div>
+</details>
+<p><code>NewVersion</code> never returns an error. An epoch that does not parse as an integer silently becomes 0,
+which follows the upstream behavior.</p>
+<p>When the versions differ, <code>upgrade</code> sends <code>release_update</code> with the configured repository, the token,
+and the target version, and <code>Provision</code> returns with no delay so the node is re-provisioned on the
+next cycle.</p>
+
+<details open class="box cstyle notices tip">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-lightbulb"></i> 
+    Next
+  </summary>
+  <div class="box-content">
+<p><a href="http://localhost:8081/provisioner/design/codemap/clustering/">Pausing and leader election</a> covers the pause flag that gates every
+call on this page.</p>
+  </div>
+</details>
+
+  <footer class="footline">
+  </footer>
+</article>
+        </div>
+      </main>
+    </div>
+    <script src="http://localhost:8081/provisioner/js/perfect-scrollbar/perfect-scrollbar.min.js?1787141498" defer></script>
+    <script src="http://localhost:8081/provisioner/js/theme.js?1787141498" defer></script>
+    <div id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Writing a Helper :: Choria Provisioner</title>
+    <link>https://choria-io.github.io/provisioner/configuration/helper/</link>
+    <description>The Helper is a script or program written in any language that is in charge of handling the steps that are unique to your environment.&#xA;Essentially it receives Server Metadata on its STDIN and writes a response to STDOUT that is used to configure the server.&#xA;See the sections below for sample Helper scripts.&#xA;Input Let’s look at what you might receive as input on STDIN. The specifics will vary a bit between scenarios which we will call out in specific sections. The data you will get will all already have been validated. For example the JWT would have been parsed already and known to be valid.</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <atom:link href="https://choria-io.github.io/provisioner/configuration/helper/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

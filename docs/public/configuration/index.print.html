@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html id="R-html" lang="en-us" dir="ltr" itemscope itemtype="http://schema.org/Article" data-r-output-format="print">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.154.5">
+    <meta name="generator" content="Relearn 9.0.3">
+    <meta name="description" content="Configuring the Provisioner requires exact knowledge of your deployment needs, we suggest you start with first configuring servers by hand while exploring your needs, once the specific configuration file contents and security needs are defined those can be configured into the Provisioner system.
+Deploying a Provisioner should not be the first thing you do.
+General Requirements Choria Broker You must be running the Choria Broker and it will need a few extra configuration items.">
+    <meta name="author" content="">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Configuration :: Choria Provisioner">
+    <meta name="twitter:description" content="Configuring the Provisioner requires exact knowledge of your deployment needs, we suggest you start with first configuring servers by hand while exploring your needs, once the specific configuration file contents and security needs are defined those can be configured into the Provisioner system.
+Deploying a Provisioner should not be the first thing you do.
+General Requirements Choria Broker You must be running the Choria Broker and it will need a few extra configuration items.">
+    <meta property="og:url" content="https://choria-io.github.io/provisioner/configuration/">
+    <meta property="og:site_name" content="Choria Provisioner">
+    <meta property="og:title" content="Configuration :: Choria Provisioner">
+    <meta property="og:description" content="Configuring the Provisioner requires exact knowledge of your deployment needs, we suggest you start with first configuring servers by hand while exploring your needs, once the specific configuration file contents and security needs are defined those can be configured into the Provisioner system.
+Deploying a Provisioner should not be the first thing you do.
+General Requirements Choria Broker You must be running the Choria Broker and it will need a few extra configuration items.">
+    <meta property="og:locale" content="en_us">
+    <meta property="og:type" content="website">
+    <meta itemprop="name" content="Configuration :: Choria Provisioner">
+    <meta itemprop="description" content="Configuring the Provisioner requires exact knowledge of your deployment needs, we suggest you start with first configuring servers by hand while exploring your needs, once the specific configuration file contents and security needs are defined those can be configured into the Provisioner system.
+Deploying a Provisioner should not be the first thing you do.
+General Requirements Choria Broker You must be running the Choria Broker and it will need a few extra configuration items.">
+    <meta itemprop="wordCount" content="250">
+    <title>Configuration :: Choria Provisioner</title>
+    <link href="https://choria-io.github.io/provisioner/configuration/" rel="canonical" type="text/html" title="Configuration :: Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/configuration/index.xml" rel="alternate" type="application/rss+xml" title="Configuration :: Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/configuration/index.md" rel="alternate" type="text/markdown" title="Configuration :: Choria Provisioner">
+    <link href="https://choria-io.github.io/provisioner/css/auto-complete/auto-complete.min.css?1787141446" rel="stylesheet">
+    <script src="https://choria-io.github.io/provisioner/js/auto-complete/auto-complete.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/search-lunr.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/search.min.js?1787141446" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      window.relearn.index_js_url="https://choria-io.github.io/provisioner/searchindex.en.js?1787141446";
+    </script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.stemmer.support.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.multi.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/lunr/lunr.en.min.js?1787141446" defer></script>
+    <script>
+      window.relearn = window.relearn || {};
+      window.relearn.contentLangs=['en'];
+    </script>
+    <link href="https://choria-io.github.io/provisioner/fonts/fontawesome/css/all.min.css?1787141446" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="https://choria-io.github.io/provisioner/fonts/fontawesome/css/all.min.css?1787141446" rel="stylesheet"></noscript>
+    <link href="https://choria-io.github.io/provisioner/css/perfect-scrollbar/perfect-scrollbar.min.css?1787141446" rel="stylesheet">
+    <link href="https://choria-io.github.io/provisioner/css/theme.min.css?1787141446" rel="stylesheet">
+    <link href="https://choria-io.github.io/provisioner/css/format-print.min.css?1787141446" rel="stylesheet" id="R-format-style">
+    <script>
+      window.relearn = window.relearn || {};
+      // configuration
+      window.relearn.min = `.min`;
+      window.relearn.path='\/configuration\/';
+      window.relearn.relBasePath='..';
+      window.relearn.relBaseUri='..';
+      window.relearn.absBaseUri='https:\/\/choria-io.github.io\/provisioner';
+      window.relearn.disableInlineCopyToClipboard=true;
+      window.relearn.enableBlockCodeWrap=true;
+      // translations
+      window.T_Copy_to_clipboard = `Copy text to clipboard`;
+      window.T_Copied_to_clipboard = `Text copied to clipboard!`;
+      window.T_Link_copied_to_clipboard = `Link copied to clipboard!`;
+      window.T_Reset_view = `Reset view`;
+      window.T_View_reset = `View reset!`;
+      window.T_No_results_found = `No results found for "{0}"`;
+      window.T_N_results_found = `{1} results found for "{0}"`;
+      window.T_Browser_unsupported_feature = `This browser doesn't support this feature`;
+      // variant stuff
+      window.relearn.themevariants = [ 'zen-auto', 'zen-light', 'ccm' ];
+      window.relearn.customvariantprefix = "my-custom-";
+      window.relearn.changeVariant = function(variant) {
+        var oldVariant = document.documentElement.dataset.rThemeVariant;
+        window.localStorage.setItem(window.relearn.absBaseUri + "/variant", variant);
+        document.documentElement.dataset.rThemeVariant = variant;
+        if (oldVariant != variant) {
+          document.dispatchEvent( new CustomEvent('themeVariantLoaded', { detail: { variant, oldVariant } }) );
+          window.relearn.markVariant();
+        }
+      }
+      window.relearn.markVariant = function() {
+        var variant = window.localStorage.getItem(window.relearn.absBaseUri + "/variant");
+        document.querySelectorAll(".R-variantswitcher select").forEach((select) => {select.value = variant;});
+      }
+      window.relearn.initVariant = function() {
+        var variant = window.localStorage.getItem(window.relearn.absBaseUri + "/variant") ?? "";
+        if( !variant ||
+            (!variant.startsWith(window.relearn.customvariantprefix) && !window.relearn.themevariants.includes(variant)) ||
+            (variant.startsWith(window.relearn.customvariantprefix) && !window.localStorage.getItem(window.relearn.absBaseUri + "/variantstylesheet-" + variant)) ){
+          variant = window.relearn.themevariants[0];
+          window.localStorage.setItem(window.relearn.absBaseUri + "/variant", variant);
+        }
+        document.documentElement.dataset.rThemeVariant = variant;
+      }
+      window.relearn.initVariant();
+      window.relearn.markVariant();
+    </script><link rel="stylesheet" href="https://choria-io.github.io/provisioner/css/codemap.css">
+
+  </head>
+  <body class="mobile-support print" data-origin="/configuration/">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar" class="default-animation">
+        <div class="topbar-wrapper default-animation">
+          <div class="topbar-sidebar-divider default-animation"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar default-animation" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)"><i class="fa-fw fas fa-bars"></i></button></span>
+            </div>
+            <div class="topbar-button topbar-button-toc default-animation" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)"><i class="fa-fw fas fa-table-list"></i></button></span>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+<nav class="TableOfContents">
+  <ul>
+    <li><a href="#general-requirements">General Requirements</a>
+      <ul>
+        <li><a href="#choria-broker">Choria Broker</a></li>
+        <li><a href="#jwt-files-or-custom-binaries">JWT files or custom binaries</a></li>
+        <li><a href="#helper-script">Helper Script</a></li>
+        <li><a href="#certificate-authorities">Certificate Authorities</a></li>
+        <li><a href="#authorization-policies">Authorization Policies</a></li>
+        <li><a href="#monitoring">Monitoring</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ol class="topbar-breadcrumbs breadcrumbs highlightable" itemscope itemtype="http://schema.org/BreadcrumbList"><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><a itemprop="item" href="https://choria-io.github.io/provisioner/"><span itemprop="name">Choria Provisioner</span></a><meta itemprop="position" content="1">&nbsp;>&nbsp;</li><li itemscope itemtype="https://schema.org/ListItem" itemprop="itemListElement" class=""><span itemprop="name">Configuration</span><meta itemprop="position" content="2"></li>
+          </ol>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-markdown default-animation" data-content-empty="disable" data-width-s="area-more" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/configuration/index.md" title="Show Markdown"><i class="fa-fw fab fa-markdown"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-print default-animation" data-content-empty="disable" data-width-s="area-more" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/configuration/index.print.html" title="Print whole chapter (CTRL+ALT+p)"><i class="fa-fw fas fa-print"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-prev default-animation" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/installtion/" title="Installation (🡐)"><i class="fa-fw fas fa-chevron-left"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-next default-animation" data-content-empty="disable" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><a href="https://choria-io.github.io/provisioner/configuration/server/" title="Server Setup (🡒)"><i class="fa-fw fas fa-chevron-right"></i></a></span>
+            </div>
+            <div class="topbar-button topbar-button-more default-animation" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+<span class="btn cstyle button link noborder notitle interactive"><button onclick="toggleTopbarFlyout(this)" type="button" title="More"><i class="fa-fw fas fa-ellipsis-v"></i></button></span>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable configuration" tabindex="-1">
+        <div class="flex-block-wrapper">
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="configuration">Configuration</h1>
+
+<p>Configuring the Provisioner requires exact knowledge of your deployment needs, we suggest you start with first configuring servers by hand while exploring your needs, once the specific configuration file contents and security needs are defined those can be configured into the Provisioner system.</p>
+<p>Deploying a Provisioner should not be the first thing you do.</p>
+<h2 id="general-requirements">General Requirements<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<h3 id="choria-broker">Choria Broker<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<p>You must be running the Choria Broker and it will need a few extra configuration items.</p>
+<h3 id="jwt-files-or-custom-binaries">JWT files or custom binaries<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<p>You can enable Provisioning mode in the standard Open Source Choria Server by placing a <code>provisining.jwt</code> in the right place.  Those doing custom builds can also apply build-time defaults that has no external dependencies.</p>
+<h3 id="helper-script">Helper Script<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<p>Provisioner calls into a user-supplier helper, written in a language like Ruby but any language can be used, to generate the per-node configuration properties.</p>
+<h3 id="certificate-authorities">Certificate Authorities<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<p>If you have a x509 based Choria deployment (the default) you will need to be able to generate or sign certificates for your nodes. To do this your CA needs to have a API that you can call to issue certificates.</p>
+<p>There are other options requiring JWT files to be signed also if that is not possible.</p>
+<h3 id="authorization-policies">Authorization Policies<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<p>In this mode typically nodes do not have any Policies controlling who can invoke Agents and Actions.  You will probably want to write a <a href="https://www.openpolicyagent.org/" rel="external">Open Policy Agent</a> policy that the Provisioner will deploy</p>
+<h3 id="monitoring">Monitoring<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<p>We expose metrics to Prometheus, for in-depth monitoring you will need Prometheus or a compatible system.</p>
+
+  <footer class="footline">
+  </footer>
+</article>
+          <section>
+            <h1 class="a11y-only">Subsections of Configuration</h1>
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="server-setup">Server Setup</h1>
+
+<p>The Choria Server has the required RPC Agent embedded and is ready to be used in a Provisioner managed network but it is disabled by default.  Custom binaries can enable provisioning at compile time for an always-on experience.</p>
+<p>Provisioning is enabled in the Open Source server by means of a JWT token that you create and place on the server. The JWT token holds all of the information the server needs to find it&rsquo;s provisioning server and will present that token also to the provisioning server for authentication.</p>
+<p>The token is signed using a trusted private key, the provisioner will only provision nodes presenting a trusted key.</p>
+<h2 id="credentials">Credentials<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>If you are using a x509 based setup you really just need any RSA Key pair to sign the JWT with:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0"><code class="language-nohighlight" data-lang="nohighlight">$ openssl genrsa -out provisioning-jwt-signer-key.pem 2048
+$ openssl rsa -in provisioning-jwt-signer-key.pem -outform PEM -pubout -out provisioning-jwt-signer.pem</code></pre></div>
+<p>The public file will be placed on all your brokers to <a href="https://choria-io.github.io/provisioner/configuration/broker/">enable provisioning</a>.</p>
+<p>For the Organization Issuer based deploys you would sign it using your Issuer.</p>
+<h2 id="creating-the-jwt">Creating the JWT<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Choria JWTs are creating using the <code>choria jwt</code> command, for provisioning specifically <code>choria jwt provisioning</code>.</p>
+<p>Creating the JWT:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0"><code class="language-nohighlight" data-lang="nohighlight">$ choria jwt provisioning.jwt provisioning-jwt-signer-key.pem --srv choria.example.net --token toomanysecrets
+Saved token to provisioning.jwt, use &#39;choria jwt view provisioning.jwt&#39; to view it
+
+$ choria jwt provisioning.jwt
+Unvalidated Provisioning Token x.jwt
+
+                         Token: *****
+                        Secure: true
+                    SRV Domain: choria.example.net
+       Provisioning by default: false
+               Standard Claims: {
+                                  &#34;purpose&#34;: &#34;choria_provisioning&#34;,
+                                  &#34;iss&#34;: &#34;Choria Tokens Package v0.26.2&#34;,
+                                  &#34;sub&#34;: &#34;choria_provisioning&#34;,
+                                  &#34;nbf&#34;: 1669805752,
+                                  &#34;iat&#34;: 1669805752,
+                                  &#34;jti&#34;: &#34;2c99227346f641bbba34faf0a6991d05&#34;
+                                }</code></pre></div>
+<p>Here we create a provisioning.jwt that will instruct Choria to look for <code>_choria-provisioner._tcp.choria.example.net</code> SRV records to find the server to connect to.</p>
+<p>Other options can be set for example to hard code provisioning URLs, username and passwords and more.</p>
+
+<details open class="box cstyle notices secondary">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-code-branch"></i> 
+    Version Hint
+  </summary>
+  <div class="box-content">
+<p>This table is correct for Choria 0.27.0 and newer which is due to ship early 2023. Review <code>--help</code> for your version.</p>
+  </div>
+</details>
+<table>
+  <thead>
+      <tr>
+          <th>Option</th>
+          <th>Description</th>
+          <th>Default</th>
+          <th>Required</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>signing-key</code></td>
+          <td>The token must be signed using a private key, this can be a file with either RSA or ed25519 private key.</td>
+          <td></td>
+          <td>yes</td>
+      </tr>
+      <tr>
+          <td><code>--[no]-insecure</code></td>
+          <td>During provisioning the protocol security system cannot be active as no private credentials exist, this disables that</td>
+          <td>since 0.27.0</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--token</code></td>
+          <td>A basic shared secret that the provisioner must present to perform certain actions</td>
+          <td></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--urls</code></td>
+          <td>A static, comma seperated, list of servers to connect to for provisioning</td>
+          <td></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--srv</code></td>
+          <td>A domain name to query for SRV records</td>
+          <td></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--default</code></td>
+          <td>Enables provisioning by default.  Else requires <code>plugin.choria.server.provision</code> to be set</td>
+          <td>false</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--registration</code></td>
+          <td>Path to a file to publish as registration data while in provisioning mode</td>
+          <td></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--facts</code></td>
+          <td>Path to a file to use as fact source data while in provisioning mode</td>
+          <td></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--username</code></td>
+          <td>A NATS user to use when connecting to the broker</td>
+          <td></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--password</code></td>
+          <td>Password to use when connecting to the broker</td>
+          <td></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--extensions</code></td>
+          <td>Additional free-form data to embed in the JWT as JSON text</td>
+          <td></td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--org</code></td>
+          <td>The Organization this server belongs to</td>
+          <td><code>choria</code></td>
+          <td>yes</td>
+      </tr>
+      <tr>
+          <td><code>--vault</code></td>
+          <td>Use Hashicorp Vault for signing the token, the <code>signing-key</code> is then the name of the vault key</td>
+          <td>false</td>
+          <td>no</td>
+      </tr>
+      <tr>
+          <td><code>--protocol-v2</code></td>
+          <td>Enables the <code>choria</code> security system and version 2 protocol. Set for Org Issuer based networks</td>
+          <td>false</td>
+          <td>no</td>
+      </tr>
+  </tbody>
+</table>
+<p>When this file is placed in <code>/etc/choria/provisioning.jwt</code> and Choria starts without a configuration it will provision via these settings.</p>
+<p>Choria also support provisioning plugins to resolve this information dynamically but this requires custom binaries and should in general be avoided.</p>
+<h2 id="confirming">Confirming<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Without the JWT in place Provisioning is not enabled:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0"><code class="language-nohighlight" data-lang="nohighlight">$ choria buildinfo
+...
+Server Settings:
+
+    Provisioning Target Resolver: Choria JWT Resolver
+           Supports Provisioning: false
+           Provisioning JWT file: /etc/choria/provisioning.jwt
+...</code></pre></div>
+<p>We can see it will look for the <code>/etc/choria/provisioning.jwt</code> file, lets move our newly created file there and try again:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0"><code class="language-nohighlight" data-lang="nohighlight">$ sudo msg provisioning.jwt /etc/choria/provisioning.jwt
+$ choria buildinfo
+...
+Server Settings:
+
+    Provisioning Target Resolver: Choria JWT Resolver
+           Supports Provisioning: true
+           Provisioning JWT file: /etc/choria/provisioning.jwt
+              Provisioning Token: *****
+            Provisioning Default: false
+                Provisioning TLS: true
+      Default Provisioning Agent: true
+         Provisioning SRV Domain: choria.example.net
+...</code></pre></div>
+<p>Now provisioning is on with the settings we provided in the token.</p>
+
+  <footer class="footline">
+  </footer>
+</article>
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="broker-setup">Broker Setup</h1>
+
+<p>Choria Broker supports a concept called an Account or Organization, these are like a VLAN on your network switches.</p>
+<p>Nodes partitioned into one Organization cannot communicate with nodes in any other Organizations unless special arrangements are made to facilitate that.</p>
+<p>We use this feature to create an isolated network where unprovisioned servers wait for provisioning.  When Choria Provisioner connects using fully verified credentials it gains access to these isolated Servers and can provision them.</p>
+<p><a href="#R-image-5a135826e0ec931a1cef653dd9870b9e" class="lightbox-link"><img alt="TLS Based Provisioning" class="lazy lightbox figure-image" loading="lazy" src="../../unverified-tls-provisioning.png" style="height: auto;width: auto;"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-5a135826e0ec931a1cef653dd9870b9e"><img alt="TLS Based Provisioning" class="lazy lightbox lightbox-image" loading="lazy" src="../../unverified-tls-provisioning.png"></a></p>
+<p>Here we show one Choria Broker Cluster with a Choria Account and a Provisioning Account active. Unverified connections enter the Provisioning Account automatically. The Provisioner connects with its fully verified credentials that identify it as a Provisioner and gains access to the unprovisioned servers.</p>
+<p>Restrictions in the Choria Broker authentication layer ensures this separation is not optional and enforce control over what software gains access to the unprovisioned fleet.</p>
+<h2 id="enabling-the-system-account">Enabling the System Account<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>We suggest enabling the Choria Broker system account to allow introspection of nodes waiting to be provisioned and more.</p>
+<p>Configure this in both your Broker and Client configurations.</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.choria.network.system.user</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">system</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">plugin.choria.network.system.password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">system</span></span></span></code></pre></div>
+<h2 id="enabling-the-provisioning-account">Enabling the Provisioning Account<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>The Choria Provisioner will connect using its normal Certificate or JWT token which means it will appear just like any other client.  To differentiate it we force it to connect to a specific user and password.</p>
+<p>The password is unique per environment and should be configured in the broker:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.choria.network.provisioning.client_password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">provSecret</span></span></span></code></pre></div>
+<h3 id="x509-based-choria">x509 Based Choria<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<p>If you are using an x509 based network you have to set the Public certificate that was used to <a href="https://choria-io.github.io/provisioner/configuration/server/">configure servers</a>.</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.choria.network.provisioning.signer_cert</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/etc/choria/provisioning-jwt-signer.pem</span></span></span></code></pre></div>
+<h3 id="organization-based-choria">Organization Based Choria<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+
+<details open class="box cstyle notices secondary">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-code-branch"></i> 
+    Version Hint
+  </summary>
+  <div class="box-content">
+<p>This applies only to Choria 0.27.0 and newer which is due to ship early 2023</p>
+  </div>
+</details>
+<p>If you are using an Organization Issuer you should already have the issuer configured and have used that issuer to sign the <code>provisioning.jwt</code></p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.security.issuer.names</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">choria</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">plugin.security.issuer.choria.public</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">4ada2...cea4</span></span></span></code></pre></div>
+<h2 id="confirming">Confirming<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Once configured you can run the command <code>choria broker server report conns --account provisioning</code> to both confirm the account is active and it will show any connections made to this account.  The Choria Provisioner will appear there as well as any machines being provisioned.</p>
+<p><a href="#R-image-f7f70a7dc7d0883c943b20e68a63e4d1" class="lightbox-link"><img alt="Provisioning account connections" class="lazy lightbox figure-image" loading="lazy" src="../../prov-account-conns.png" style="height: auto;width: auto;"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-f7f70a7dc7d0883c943b20e68a63e4d1"><img alt="Provisioning account connections" class="lazy lightbox lightbox-image" loading="lazy" src="../../prov-account-conns.png"></a></p>
+
+  <footer class="footline">
+  </footer>
+</article>
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="writing-a-helper">Writing a Helper</h1>
+
+<p>The Helper is a script or program written in any language that is in charge of handling the steps that are unique to your environment.</p>
+<p>Essentially it receives Server Metadata on its STDIN and writes a response to STDOUT that is used to configure the server.</p>
+<p>See the sections below for sample Helper scripts.</p>
+<h2 id="input">Input<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Let&rsquo;s look at what you might receive as input on STDIN. The specifics will vary a bit between scenarios which we will call out in specific sections. The data you will get will all already have been validated. For example the JWT would have been parsed already and known to be valid.</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;identity&#34;</span>: <span style="color:#e6db74">&#34;24bd22cdb279.choria.local&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;csr&#34;</span>: <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;ed25519_pubkey&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;public_key&#34;</span>: <span style="color:#e6db74">&#34;2ddc906446a935aefde69ceee2beb3b1d85f264153720d9a752aa88771c0594c&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;directory&#34;</span>: <span style="color:#e6db74">&#34;/etc/choria&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;signature&#34;</span>: <span style="color:#e6db74">&#34;34c5c4d0564747b1d0577ddc9c4084de547235d56e2803a754c76ba4eabbf17e31453ebd9ca4b4a7dd5e25ccf57afd4138519de4666c81d3ee3cd5381cc15a0a&#34;</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;inventory&#34;</span>: <span style="color:#e6db74">&#34;{\&#34;agents\&#34;:[\&#34;choria_provision\&#34;,\&#34;choria_util\&#34;,\&#34;discovery\&#34;,\&#34;rpcutil\&#34;],\&#34;classes\&#34;:[],\&#34;collectives\&#34;:[\&#34;provisioning\&#34;],\&#34;data_plugins\&#34;:[],\&#34;facts\&#34;:{},\&#34;machines\&#34;:[],\&#34;main_collective\&#34;:\&#34;provisioning\&#34;,\&#34;version\&#34;:\&#34;0.99.0.20221129\&#34;,\&#34;upgradable\&#34;:true}&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;jwt&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;cht&#34;</span>: <span style="color:#e6db74">&#34;s3cret&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;chs&#34;</span>: <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;chu&#34;</span>: <span style="color:#e6db74">&#34;nats://broker.choria.local:4222&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;chpd&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;extensions&#34;</span>: <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;ou&#34;</span>: <span style="color:#e6db74">&#34;choria&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;v2&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;purpose&#34;</span>: <span style="color:#e6db74">&#34;choria_provisioning&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;iss&#34;</span>: <span style="color:#e6db74">&#34;Choria Tokens Package v0.26.2&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;sub&#34;</span>: <span style="color:#e6db74">&#34;choria_provisioning&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;nbf&#34;</span>: <span style="color:#ae81ff">1669809657</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;iat&#34;</span>: <span style="color:#ae81ff">1669809657</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;jti&#34;</span>: <span style="color:#e6db74">&#34;3a4f9896e013498daeedbcb9a82fcd3c&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+<table>
+  <thead>
+      <tr>
+          <th>Key</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>identity</code></td>
+          <td>The Choria Server identity being provisioned - typically FQDN</td>
+      </tr>
+      <tr>
+          <td><code>csr</code></td>
+          <td>Would be non nil when the <code>pki</code> feature is enabled for obtaining x509 certificates</td>
+      </tr>
+      <tr>
+          <td><code>ed25519_pubkey</code></td>
+          <td>Would be non nil when the <code>ed25519</code> feature is enabled</td>
+      </tr>
+      <tr>
+          <td><code>inventory</code></td>
+          <td>Is the JSON result of <code>choria req rpcutil inventory</code> this lets you find facts, version information and more about the server.</td>
+      </tr>
+      <tr>
+          <td><code>jwt</code></td>
+          <td>Is the verified contents of the <code>provisioning.jwt</code> on the server when the <code>jwt</code> feature is enabled</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="output">Output<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>The response your helper should write to STDOUT is also in JSON format.</p>
+<p>Here is an example that configures Choria Server and uses the <code>jwt</code> feature to enroll a node into an Organization Issuer based network.</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;defer&#34;</span>: <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;msg&#34;</span>: <span style="color:#e6db74">&#34;Done&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;certificate&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;ca&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;configuration&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;identity&#34;</span>: <span style="color:#e6db74">&#34;eb873ce040d7.choria.local&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;loglevel&#34;</span>: <span style="color:#e6db74">&#34;info&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.choria.server.provision&#34;</span>: <span style="color:#e6db74">&#34;false&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.choria.middleware_hosts&#34;</span>: <span style="color:#e6db74">&#34;nats://broker.choria.local:4222&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;rpcauthorization&#34;</span>: <span style="color:#e6db74">&#34;0&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.choria.status_file_path&#34;</span>: <span style="color:#e6db74">&#34;/var/log/choria-status.json&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.choria.submission.spool&#34;</span>: <span style="color:#e6db74">&#34;/var/lib/choria/submission&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.security.issuer.names&#34;</span>: <span style="color:#e6db74">&#34;choria&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.security.issuer.choria.public&#34;</span>: <span style="color:#e6db74">&#34;e72cba5268b34627b75c5ceae9449ad16d62f15f862c30d4e0e7d2588e2e6259&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.security.provider&#34;</span>: <span style="color:#e6db74">&#34;choria&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.security.choria.token_file&#34;</span>: <span style="color:#e6db74">&#34;/etc/choria/server.jwt&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.security.choria.seed_file&#34;</span>: <span style="color:#e6db74">&#34;/etc/choria/server.seed&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;plugin.choria.machine.store&#34;</span>: <span style="color:#e6db74">&#34;/etc/choria/machine&#34;</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;server_claims&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;exp&#34;</span>: <span style="color:#ae81ff">157680000</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;permissions&#34;</span>: {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;streams&#34;</span>: <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;submission&#34;</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div>
+
+<details open class="box cstyle notices warning">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-exclamation-triangle"></i> 
+    Warning
+  </summary>
+  <div class="box-content">
+<p>The configuration must set <code>plugin.choria.server.provision</code> to disable provisioning, else the node will keep being reprovisioned forever.</p>
+  </div>
+</details>
+<p>Response keys used by scenarios:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Key</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>defer</code></td>
+          <td>Defers the provisioning, this is a soft state meaning the server will come back and be retried later</td>
+      </tr>
+      <tr>
+          <td><code>shutdown</code></td>
+          <td>Issues a shutdown on the server with exit code 0, systemd will not restart it.</td>
+      </tr>
+      <tr>
+          <td><code>msg</code></td>
+          <td>A message to log on the Server to explain why it is being deferred or shut down</td>
+      </tr>
+      <tr>
+          <td><code>configuration</code></td>
+          <td>A JSON Object of configuration items in key-value pairs, will be written to the server config</td>
+      </tr>
+      <tr>
+          <td><code>action_policies</code></td>
+          <td>A JSON Object of Action Policy policies in key-value pairs, where the key is an agent name</td>
+      </tr>
+      <tr>
+          <td><code>opa_policies</code></td>
+          <td>A JSON Object of Open Policy Agent policies in key-value pairs, where the key is an agent name or <code>default</code></td>
+      </tr>
+  </tbody>
+</table>
+<p>When using the <code>pki</code> feature used to enroll with a Certificate Authority:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Key</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>key</code></td>
+          <td>An optional x509 private key that the server should use, will be encrypted using a unique one-time password in transit</td>
+      </tr>
+      <tr>
+          <td><code>certificate</code></td>
+          <td>The signed certificate in PEM format</td>
+      </tr>
+      <tr>
+          <td><code>ca</code></td>
+          <td>The Certificate Authority public key in PEM format</td>
+      </tr>
+      <tr>
+          <td><code>ssldir</code></td>
+          <td>What directory to store the key, certificate and ca in on the server</td>
+      </tr>
+  </tbody>
+</table>
+<p>When using the <code>jwt</code> feature to create server JWT tokens for Organization Issuer based networks:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Key</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>server_claims</code></td>
+          <td>The Choria Server token claims to base the server JWT on</td>
+      </tr>
+  </tbody>
+</table>
+<p>When using the <code>upgrades</code> feature to in-place upgrade servers:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Key</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>upgrade</code></td>
+          <td>The version to upgrade the server to before provisioning</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="enrolling-nodes-with-a-certificate-authority">Enrolling nodes with a Certificate Authority<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Most typically you have a Enterprise Certificate Authority or you made your own using something like <a href="https://cfssl.org/" rel="external">cfssl</a>.</p>
+<p>In this mode Choria Server will generate a private key on its disk, create a CSR and your helper will receive the CSR in PEM format.  In your helper you then simply interact with your CA to sign the CSR and respond with the signed Certificate and CA public key.  This way once provisioned your server will be fully enrolled for mTLS.</p>
+<p>To enable the Provisioner to request the CSR the <code>pki</code> feature needs to be enabled in the Provisioner Configuration.</p>
+<p>The <code>csr</code> input field will then be a JSON Object with:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Key</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>csr</code></td>
+          <td>The PEM encoded CSR the node is sending</td>
+      </tr>
+      <tr>
+          <td><code>public_key</code></td>
+          <td>The public part of the key the server created</td>
+      </tr>
+      <tr>
+          <td><code>ssldir</code></td>
+          <td>The directory the server created the private key in so it can be used in the generated configuration</td>
+      </tr>
+  </tbody>
+</table>
+<p>Once you have this data you can use your CA API to enroll the node and get a signed certificate back. Simply put the resulting PEM data in the <code>certificate</code>and <code>ca</code> keys in the reply.  You can set a SSL directory but typically just set <code>ssldir</code> to what was received in the input.</p>
+
+<details open class="box cstyle notices info">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-info-circle"></i> 
+    Info
+  </summary>
+  <div class="box-content">
+<p>A basic sample helper that enrolls in a <code>cfssl</code> based CA can be seen in <a href="../../cfssl-helper.rb">cfssl-helper.rb</a></p>
+  </div>
+</details>
+<p>In general the Private key stays on the node and you do not need it. Some Certificate Authorities require the private key to be accessible when signing a request. Provisioner support that, if you generate a key in the provisioner and add it to the reply in the <code>key</code> JSON field a single use Shared Secret negotiated using Diffie-Hellman will be used to encrypt the key in transit.</p>
+<p>I would not suggest ever to use a CA that requires you to transmit the Private Key during enrollment, it&rsquo;s best to assume your CA is unusable at that point and consider a Organization Issuer based deployment.</p>
+<h2 id="enrolling-nodes-with-an-organization-issuer">Enrolling nodes with an Organization Issuer<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>In cases where a Certificate Authority is not available or it is operated in a way that makes it unsuitable for mTLS use you might opt to deploy Choria in an Organization Issuer based setup.  The basic setup of that mode is out of scope for this document.</p>
+
+<details open class="box cstyle notices secondary">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-code-branch"></i> 
+    Version Hint
+  </summary>
+  <div class="box-content">
+<p>This applies only to Choria 0.27.0 and newer which is due to ship early 2023</p>
+  </div>
+</details>
+<p>To enrol nodes in an Organization Issuer based network you need to enable the <code>ed25519</code> feature in the Provisioner Configuration.</p>
+<p>Once enabled the <code>ed25519_pubkey</code> field will hold a JSON Object with these values:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Key</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>public_key</code></td>
+          <td>The <code>ed25519</code> public key unique to the server</td>
+      </tr>
+      <tr>
+          <td><code>directory</code></td>
+          <td>The directory that will hold <code>server.seed</code> and where <code>server.jwt</code> will be saved to later</td>
+      </tr>
+      <tr>
+          <td><code>signature</code></td>
+          <td>A signature of the request made using the private key matching the <code>public_key</code>, this can be ignored as it would already be validated</td>
+      </tr>
+  </tbody>
+</table>
+<p>Once you received these you can include a <code>server_claims</code> in your reply to give the server access to specific features in its JWT claims. The list here is correct for <code>0.27.0</code>. For an up-to-date list see the <a href="https://pkg.go.dev/github.com/choria-io/go-choria@v0.26.2/tokens#ServerClaims" rel="external">Go Documentation for your version of Choria</a>.</p>
+<p>The claims can include <code>permissions</code> that have these properties.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Permission</th>
+          <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>submission</code></td>
+          <td>Allows the server to use <a href="https://choria.io/docs/streams/submission/" rel="external">Choria Submission</a></td>
+      </tr>
+      <tr>
+          <td><code>streams</code></td>
+          <td>Allows the server to access <a href="https://choria.io/docs/streams/" rel="external">Choria Streams</a> for example to read KV buckets from autonomous agents</td>
+      </tr>
+      <tr>
+          <td><code>governor</code></td>
+          <td>Allows the server to access <a href="https://choria.io/docs/streams/governor/" rel="external">Choria Governor</a> from autonomous agents</td>
+      </tr>
+      <tr>
+          <td><code>service_host</code></td>
+          <td>Allows the server to host Services</td>
+      </tr>
+  </tbody>
+</table>
+<p>You can also use them to restrict it to a specific sub collective and more. Most values will default to sane defaults when not given.</p>
+<h2 id="upgrading-servers">Upgrading Servers<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Choria Server can be upgraded in-place to a new version. This is done by overwriting the binary at run-time with one downloaded from a specifically prepared repository.</p>
+<p>This can only be done during Provisioning and requires the <code>upgrades</code> feature to be enabled.</p>
+
+<details open class="box cstyle notices secondary">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-code-branch"></i> 
+    Version Hint
+  </summary>
+  <div class="box-content">
+<p>This applies only to Choria 0.27.0 and newer which is due to ship early 2023</p>
+  </div>
+</details>
+<p>Compatible nodes will have the <code>upgradable</code> key in the inventory received and will be set to <code>true</code> when upgrades are enabled. If you only want to support the latest nodes you can use this to determine if a upgrade is needed along with the <code>version</code> key in the inventory. On nodes that are too old set <code>shutdown</code> or <code>defer</code>.</p>
+<p>You would have to configure the Provisioner with a repository location and set up a repository on a HTTP server as per the guidelines from <a href="https://github.com/choria-io/go-updater" rel="external">go-updater</a>.</p>
+<p>With all of this in place you can add the <code>upgrade</code> key to the helper response that should just be a desired version like <code>0.28.0</code>. Provisioner will then attempt to upgrade the node.</p>
+
+  <footer class="footline">
+  </footer>
+</article>
+<article class="default">
+  <header class="headline">
+  </header>
+
+<h1 id="configuration-file">Configuration File</h1>
+
+<p>Provisioner is configured using <code>/etc/choria-provisioner/choria-provisioner.yaml</code> typically.  It&rsquo;s a YAML format file with a few required settings and a number of optional ones.  Changes to the file requires the process to be restarted.</p>
+<h2 id="choria-client-configuration">Choria Client Configuration<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>As the Provisioner connects to the Choria Broker as a client it needs a configuration that allows it access. Create <code>/etc/choria-provisioner/choria.cfg</code> with the following based on needs.  These settings will augment those in <code>/etc/choria/client.cfg</code>.</p>
+<h3 id="x509-based-networks">x509 based Networks<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#ae81ff">plugin.security.provider = file</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">plugin.security.file.certificate = /etc/choria-provisioner/ssl/cert.pem</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">plugin.security.file.key = /etc/choria-provisioner/ssl/key.pem</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">plugin.security.file.ca = /etc/choria-provisioner/ssl/ca.pem</span></span></span></code></pre></div>
+<p>Obtain these certificates the same way you would obtain any other certificate, perhaps using <code>choria enroll --certname provisioner.mcollective</code>.</p>
+<h3 id="organization-issuer-based-networks">Organization Issuer Based Networks<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h3>
+
+<details open class="box cstyle notices secondary">
+  <summary class="box-label" tabindex="-1">
+    <i class="fa-fw fas fa-code-branch"></i> 
+    Version Hint
+  </summary>
+  <div class="box-content">
+<p>This applies only to Choria 0.27.0 and Provisioner 0.15.0 and newer which is due to ship early 2023</p>
+  </div>
+</details>
+<p>In these setups you need a client JWT with <code>--server-provisioner</code> and <code>--issuer</code> set while creating the client JWT:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0"><code class="language-nohighlight" data-lang="nohighlight">$ choria jwt keys /etc/choria-provisioner/signer.seed /etc/choria-provisioner/signer.public
+$ choria jwt client /etc/choria-provisioner/signer.jwt provisioner_signer issuer \
+     --public-key $(cat /etc/choria-provisioner/signer.public) \ 
+     --server-provisioner \
+     --validity 365d \
+     --vault \
+     --issuer</code></pre></div>
+<p>The <code>/etc/choria-provisioner/choria.cfg</code> would then have:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#a6e22e">plugin.security.provider</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">choria</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">plugin.security.choria.token_file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/etc/choria-provisioner/credentials/signer.jwt</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">plugin.security.choria.seed_file</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/etc/choria-provisioner/credentials/signer.seed</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">identity</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">provisioner_signer</span></span></span></code></pre></div>
+<h2 id="common-settings">Common Settings<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>These settings are required for all scenarios, below an example configuration followed by explanation:</p>
+<div class="highlight actionbar-wrapper wrap-code" dir="auto"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">workers</span>: <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">interval</span>: <span style="color:#ae81ff">1m</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">logfile</span>: <span style="color:#ae81ff">/dev/stdout</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">loglevel</span>: <span style="color:#ae81ff">warn</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">helper</span>: <span style="color:#ae81ff">/etc/choria-provisioner/provisioner/helper.rb</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">token</span>: <span style="color:#ae81ff">s3cret</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">site</span>: <span style="color:#ae81ff">testing</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">broker_provisioning_password</span>: <span style="color:#ae81ff">s3cret</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">jwt_verify_cert</span>: <span style="color:#ae81ff">e72cba5268b34627b75c5ceae9449ad16d62f15f862c30d4e0e7d2588e2e6259</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">jwt_signing_key</span>: <span style="color:#ae81ff">/etc/choria-provisioner/credentials/signer.seed</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">jwt_signing_token</span>: <span style="color:#ae81ff">/etc/choria-provisioner/credentials/signer.jwt</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">features</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">jwt</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ed25519</span>: <span style="color:#66d9ef">true</span></span></span></code></pre></div>
+<table>
+  <thead>
+      <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th>Default</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>workers</code></td>
+          <td>How many concurrent helpers to call while provisioning</td>
+          <td>number of cores</td>
+      </tr>
+      <tr>
+          <td><code>interval</code></td>
+          <td>How often to perform a discovery against the network for new machines</td>
+          <td><code>1m</code></td>
+      </tr>
+      <tr>
+          <td><code>logfile</code></td>
+          <td>Where to write the log</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>loglevel</code></td>
+          <td>The level to log at, <code>debug</code>, <code>info</code>, <code>warn</code> or <code>error</code></td>
+          <td><code>info</code></td>
+      </tr>
+      <tr>
+          <td><code>helper</code></td>
+          <td>Path to the helper script</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>token</code></td>
+          <td>The value of the token set using <code>--token</code> in the <code>provisioning.jwt</code></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>site</code></td>
+          <td>A unique name for this installation, surfaced in monitoring data</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>monitor_port</code></td>
+          <td>The post to listen on for monitoring requests</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>broker_provisioning_password</code></td>
+          <td>The password configured in the broker <code>plugin.choria.network.provisioning.client_password</code></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>features.jwt</code></td>
+          <td>Enables fetching and validating <code>provisioning.jwt</code>, should almost always be <code>true</code></td>
+          <td><code>false</code></td>
+      </tr>
+      <tr>
+          <td><code>features.ed25519</code></td>
+          <td>Enables JWT processing for Organization Issuer based networks</td>
+          <td><code>false</code></td>
+      </tr>
+      <tr>
+          <td><code>features.pki</code></td>
+          <td>Enables x509 enrollment</td>
+          <td><code>false</code></td>
+      </tr>
+      <tr>
+          <td><code>features.upgrades</code></td>
+          <td>Enables server version upgrades</td>
+          <td><code>false</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="pki--x509-enrollment">PKI / x509 Enrollment<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>When enabled the Provisioner will fetch a CSR from the node and ask the node to create a private key that stays on the node. The helper can then get the certificate signed and the signed certificate will be sent to the node.</p>
+<p>To enable set <code>features.pki</code> to <code>true</code>.</p>
+<p>Here we reference our x509 key and certificate</p>
+<table>
+  <thead>
+      <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th>Default</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>jwt_verify_cert</code></td>
+          <td>Full path to the public certificate used to sign <code>provisioning.jwt</code></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>jwt_signing_key</code></td>
+          <td>Full path to our private key, also used in <code>choria.conf</code></td>
+          <td></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="organization-issuer-based-enrollment">Organization Issuer based Enrollment<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>When enabled the Provisioner will sign and issue server JWTs with custom claims and signatures. No x509 steps will be done.</p>
+<p>To enable set <code>features.ed25519</code> to <code>true</code>.</p>
+<p>Here we reference our JWT that gives us the right to provision and issue new JWTs</p>
+<table>
+  <thead>
+      <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th>Default</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>jwt_verify_cert</code></td>
+          <td>The hex encoded public key of your Organization Issuer</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>jwt_signing_key</code></td>
+          <td>The private ed25519 key, also used in <code>choria.conf</code></td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>jwt_signing_token</code></td>
+          <td>The JWT token, also used in <code>choria.conf</code></td>
+          <td></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="choria-server-upgrades">Choria Server Upgrades<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>Choria Provisioner can upgrade Choria Servers using a <a href="https://github.com/choria-io/go-updater" rel="external">go-updated</a> repository.</p>
+<p>To enable set <code>features.upgrades</code> to <code>true</code>.</p>
+<p>Here we configure the updates repository and say how failures are handled</p>
+<table>
+  <thead>
+      <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th>Default</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>upgrades_repository</code></td>
+          <td>URL to your updates repository</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td><code>upgrades_optional</code></td>
+          <td>Continue provisioning even if upgrading fails</td>
+          <td><code>false</code></td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="clustered-deployments">Clustered Deployments<span class="btn cstyle anchor copyanchor scrollanchor link noborder notitle interactive"><button type="button" title="Copy link to clipboard"><i class="fa-fw fas fa-link fa-lg"></i></button></span></h2>
+<p>The Provisioner is generally fast enough to not need a cluster of active-active servers, so we support deploying multiple instances of Provisioner and using <a href="https://choria.io/docs/streams/elections/" rel="external">Leader Elections</a> to elect one in the cluster as a leader that will be actively provisioning nodes.</p>
+<p>To enable this the client needs access to Streams and Leader Elections so need <code>--stream-user</code> and <code>--elections-user</code> passed when creating its JWT.</p>
+<p>Campaigning will be on a backoff schedule up to 20 second between campaigns, this means there can be up to a minute of downtime during a failover scenario, generally that&rsquo;s fine for the Provisioner.</p>
+<p>If a Provisioner was on standby and becomes leader it will immediately perform a discovery to pick up any nodes ready for provisioning.</p>
+<p>Your broker must therefor have <a href="https://choria.io/docs/streams/" rel="external">Choria Streams</a> enabled.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Item</th>
+          <th>Description</th>
+          <th>Default</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>leader_election</code></td>
+          <td>Enables active-standby clusters</td>
+          <td><code>false</code></td>
+      </tr>
+  </tbody>
+</table>
+
+  <footer class="footline">
+  </footer>
+</article>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script src="https://choria-io.github.io/provisioner/js/perfect-scrollbar/perfect-scrollbar.min.js?1787141446" defer></script>
+    <script src="https://choria-io.github.io/provisioner/js/theme.min.js?1787141446" defer></script>
+    <div id="toast-container" role="status" aria-live="polite" aria-atomic="false"></div>
+  </body>
+</html>
